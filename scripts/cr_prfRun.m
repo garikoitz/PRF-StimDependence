@@ -1,0 +1,156 @@
+function cr_prfRun(cr, opt, varargin)
+% Run PRF models
+% This was a script from Rosemary. I am going to create a function out of it. 
+% It shuold be very similar to the pmVistasoft.m script. We will test both later
+% on. 
+% 
+% 
+% Rosemary's notes
+% assumes that the datatypes with the averaged tseries are already created
+% and xformed
+%
+% rl  08/2014
+% glu 08/2019
+
+
+% clear all; close all; clc; 
+% bookKeeping; 
+
+%% Read parameters (this is usually the modify section of RL's scripts)
+
+
+% Make varargin lower case, remove white spaces...
+varargin = mrvParamFormat(varargin);
+% Parse
+p = inputParser;
+p.addRequired('cr'  , @isstruct);
+p.addRequired('opt' , @isstruct);
+
+% Parse. Assign result inside each case
+p.parse(cr, opt, varargin{:});
+% Read here only the generic ones
+% opt = p.Results.opt;
+
+% The following parameters have been set in bk = bookKeeping():
+% session list. see bookKeeping
+opt.list_path            = cr.bk.list_sessionRet; 
+% list of checker scan number, corresponding to session list
+opt.list_numCheckers     = cr.bk.list_scanNum_Checkers_sessionRet; 
+% list of knk scan number, corresponding to session list
+opt.list_numKnk          = cr.bk.list_scanNum_Knk_sessionRet;  
+
+
+%% 
+    
+    % directory with ret vista session. move here
+    dirVista = opt.list_path{opt.list_subInds};
+    chdir(dirVista);
+    
+    % open the session
+    vw = initHiddenGray;
+
+    % need some global variables later
+    load mrSESSION; 
+
+    % main anatomy path
+    dirAnatomy = cr.bk.list_anatomy{opt.list_subInds};
+    
+    % ret parameters based on the subject
+    % scan number with checkers and knk, for clip frame information
+    opt.p.scanNum_Knk                  = opt.list_numKnk(opt.list_subInds);
+    opt.p.scanNum_Checkers             = opt.list_numCheckers(opt.list_subInds);
+    
+    %% loop over the datatypes
+    for kk = 1:length(opt.list_rmName)
+
+        % set current dataTYPE 
+        rmName = opt.list_rmName{kk};
+        vw = viewSet(vw, 'curdt', rmName); 
+
+        % get the dataType struct
+        dtstruct = viewGet(vw, 'dtstruct'); 
+
+        % get the data type number for later
+        dataNum = viewGet(vw, 'curdt'); 
+
+        % some variables depend on whether checkers or knk was run  
+        if length(rmName) > 7 && strcmp(rmName(1:8), 'Checkers')
+            opt.params.paramsFile   = opt.p.paramsFile_Checkers; 
+            opt.params.imFile       = opt.p.imFile_Checkers; 
+            opt.p.scanNum           = opt.p.scanNum_Checkers; 
+        else
+            opt.params.paramsFile   = opt.p.paramsFile_Knk; 
+            opt.params.imFile       = opt.p.imFile_Knk; 
+            opt.p.scanNum           = opt.p.scanNum_Knk; 
+        end
+
+
+        %% getting parameter values for prf model fit ----------------------
+        opt.params.nFrames          = viewGet(vw, 'nFrames');       
+        opt.params.framePeriod      = viewGet(vw, 'framePeriod');   
+        tem.totalFrames             = mrSESSION.functionals(opt.p.scanNum).totalFrames;  
+        opt.params.prescanDuration  = (tem.totalFrames - opt.params.nFrames)*opt.params.framePeriod; 
+
+        % store it
+        dataTYPES(dataNum).retinotopyModelParams = opt.params;
+
+        % save it
+        saveSession; 
+
+        %% Put the rm params into the view structure
+
+        vw = rmLoadParameters(vw);  
+        % the function rmLoadParameters used to call both rmDefineParameters
+        % and rmMakeStimulus. If we do it here so that we can give it arguments
+        % outside of the default (eg previously, sigma major and minor would be 
+        % identical despite having prfModel = {'one oval gaussian'} when
+        % specifying it as an argument in vw = rmMain(vw, ...)
+
+%         scan/stim and analysis parameters
+%         params = rmDefineParameters(vw, varargin)
+%         params = rmDefineParameters(vw, 'model', prfModel);
+% 
+%         make stimulus and add it to the parameters
+%          params = rmMakeStimulus(params, keepAllPoints)
+%         params = rmMakeStimulus(params);
+
+        % store params in view struct
+        vw  = viewSet(vw,'rmParams',opt.params);
+
+        % check it 
+        % rmStimulusMatrix(viewGet(vw, 'rmparams'), [],[],2,false);
+        
+        %% RUN THE PRF!
+        %% If we've defined a list of rois to run over, do that loop here
+        if ~isempty(opt.list_rois)
+            
+            for jj = 1:length(opt.list_rois)
+                
+                % load the current roi
+                roiName = opt.list_rois{jj};
+                roiPath = fullfile(dirAnatomy, 'ROIs', roiName);
+                vw = loadROI(vw, roiPath, [], [], 1, 0);
+                
+                % name the ret model
+                outFileName = ['retModel-' rmName '-' opt.prfModel{1} '-' roiName];
+                
+                % run the model!
+                vw = rmMain(vw, [], opt.wSearch, 'model', opt.prfModel, 'matFileName', outFileName);
+                
+            end
+            
+        else
+            
+            % name the ret model - whole brain
+            outFileName = ['retModel-' rmName '-' opt.prfModel{1}];
+            
+            % no need to load rois, just run it!
+            vw = rmMain(vw, [], wSearch, 'model', opt.prfModel, 'matFileName', outFileName);
+
+        end
+           
+    end
+
+
+
+end
