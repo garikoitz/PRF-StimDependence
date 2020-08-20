@@ -1,4 +1,4 @@
-function cr_prfRun(cr, opt, varargin)
+function cr = cr_prfRun(cr, subind, varargin)
 % Run PRF models
 % This was a script from Rosemary. I am going to create a function out of it. 
 % It shuold be very similar to the pmVistasoft.m script. We will test both later
@@ -23,13 +23,20 @@ function cr_prfRun(cr, opt, varargin)
 varargin = mrvParamFormat(varargin);
 % Parse
 p = inputParser;
-p.addRequired('cr'  , @isstruct);
-p.addRequired('opt' , @isstruct);
+p.addRequired('cr'      , @isstruct);
+p.addRequired('subind'  , @isnumeric);
 
 % Parse. Assign result inside each case
-p.parse(cr, opt, varargin{:});
+p.parse(cr, subind, varargin{:});
 % Read here only the generic ones
 % opt = p.Results.opt;
+
+
+% Individual data
+subname         = cr.bk.list_sub{subind};
+opt             = cr.subj.(subname).params.prf;
+opt.p           = cr.defaults.prfrun.p;
+opt.params      = cr.defaults.prfrun.params;
 
 % The following parameters have been set in bk = bookKeeping():
 % session list. see bookKeeping
@@ -39,11 +46,10 @@ opt.list_numCheckers     = cr.bk.list_scanNum_Checkers_sessionRet;
 % list of knk scan number, corresponding to session list
 opt.list_numKnk          = cr.bk.list_scanNum_Knk_sessionRet;  
 
-
 %% 
     
     % directory with ret vista session. move here
-    dirVista = opt.list_path{opt.list_subInds};
+    dirVista = opt.list_path{subind};
     chdir(dirVista);
     
     % open the session
@@ -53,12 +59,13 @@ opt.list_numKnk          = cr.bk.list_scanNum_Knk_sessionRet;
     load mrSESSION; 
 
     % main anatomy path
-    dirAnatomy = cr.bk.list_anatomy{opt.list_subInds};
+    dirAnatomy = cr.bk.list_anatomy{subind};
     
     % ret parameters based on the subject
     % scan number with checkers and knk, for clip frame information
-    opt.p.scanNum_Knk                  = opt.list_numKnk(opt.list_subInds);
-    opt.p.scanNum_Checkers             = opt.list_numCheckers(opt.list_subInds);
+    opt.p.scanNum_Knk                  = opt.list_numKnk(subind);
+    opt.p.scanNum_Checkers             = opt.list_numCheckers(subind);
+    
     
     %% loop over the datatypes
     for kk = 1:length(opt.list_rmName)
@@ -128,14 +135,25 @@ opt.list_numKnk          = cr.bk.list_scanNum_Knk_sessionRet;
                 
                 % load the current roi
                 roiName = opt.list_rois{jj};
-                roiPath = fullfile(dirAnatomy, 'ROIs', roiName);
+                % sigh... anatomy was in two different places, with
+                % different names even... ROIs where in one place and fs in
+                % another. I copied all fs directory to our project, and
+                % then used a matlab script to copy only the ROIs folder
+                % and other loose files at the same level where the folders
+                % where, just in case. Well, Matlan copied all the files
+                % inside all the subfolders, so now all ROIs are loose
+                % under the anatomy/subject folder. I comment the original
+                % line and edit it removing the ROIs folder
+                % roiPath = fullfile(dirAnatomy, 'ROIs', roiName);
+                roiPath = fullfile(dirAnatomy, roiName);
                 vw = loadROI(vw, roiPath, [], [], 1, 0);
                 
                 % name the ret model
                 outFileName = ['retModel-' rmName '-' opt.prfModel{1} '-' roiName];
                 
                 % run the model!
-                vw = rmMain(vw, [], opt.wSearch, 'model', opt.prfModel, 'matFileName', outFileName);
+                vw = rmMain(vw, [], opt.wSearch, 'model', opt.prfModel, ...
+                            'matFileName', outFileName);
                 
             end
             
@@ -145,7 +163,8 @@ opt.list_numKnk          = cr.bk.list_scanNum_Knk_sessionRet;
             outFileName = ['retModel-' rmName '-' opt.prfModel{1}];
             
             % no need to load rois, just run it!
-            vw = rmMain(vw, [], wSearch, 'model', opt.prfModel, 'matFileName', outFileName);
+            vw = rmMain(vw, [], wSearch, 'model', opt.prfModel, ...
+                        'matFileName', outFileName);
 
         end
            

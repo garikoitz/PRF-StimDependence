@@ -1,4 +1,4 @@
-function [RFcov,weight, data] = figFunction_coverage_individual(cr, opt, varargin)
+function [RFcov,weight, data] = figFunction_coverage_individual(cr, subind, varargin)
 %Reading circuitry field of view paper (2016).
 % Makes figures related to individual visual field coverage
 % Includes options for contours and ellipses
@@ -20,22 +20,28 @@ varargin = mrvParamFormat(varargin);
 % Parse
 p = inputParser;
 p.addRequired('cr'  , @isstruct);
-p.addRequired('opt' , @isstruct);
+p.addRequired('subind' , @isnumeric);
 
 % Parse. Assign result inside each case
-p.parse(cr, opt, varargin{:});
+p.parse(cr, subind, varargin{:});
 % Read here only the generic ones
 % opt = p.Results.opt;
 
 
-%%
+% Individual data
+subname         = cr.bk.list_sub{subind};
+opt             = cr.subj.(subname).params.covfig;
 
+
+%%
+    dirVista    = cr.bk.list_sessionRet{subind};
+    dirAnatomy  = cr.bk.list_anatomy{subind};
+    subInitials = cr.bk.list_sub{subind};
     
-    dirVista    = opt.list_path{opt.list_subInds}; 
-    dirAnatomy  = cr.bk.list_anatomy{opt.list_subInds};
-    subInitials = cr.bk.list_sub{opt.list_subInds};
     chdir(dirVista); 
+    
     vw          = initHiddenGray; 
+    
     
     for kk = 1:length(opt.list_dtNames)
         
@@ -51,6 +57,11 @@ p.parse(cr, opt, varargin{:});
             % load the roi
             roiName = opt.list_roiNames{jj}; 
             roiPath = fullfile(dirAnatomy, 'ROIs', [roiName '.mat']);
+            % GLU ADDED THIS
+            % CHeck Gomez: 
+            % G = load('/share/kalanit/biac2/kgs/3Danat/jesse/ROIs/lVOTRC.mat')
+            % D = load('/black/localhome/glerma/TESTDATA/PRF-StimDependence/DATA/anatomy/dames/lVOTRC.mat')
+            % D2= load('/share/wandell/data/anatomy/dames/ROIs/lVOTRC.mat')
             [vw, roiExists] = loadROI(vw, roiPath, [], [], 1, 0);
             
             % if roi and ret model exists ...
@@ -70,10 +81,13 @@ p.parse(cr, opt, varargin{:});
                 contourLevel = opt.vfc.ellipseLevel; 
                 roiNameDescript = ff_stringRemove(roiName, '_rl');                     
                 infoString = [roiNameDescript '. ' rmDescript '. Contour ' num2str(contourLevel) '. ' subInitials];
-                    
+                
+                pp = split(rmPath,filesep);
+                
+                
                 % title
                 titleName = {
-                    opt.titleDescript;
+                    [opt.titleDescript  ' ' num2str(subind) ' ' pp{end-4}];
                     infoString; 
                     ['vfc.method: ' opt.vfc.method]
                     mfilename;
@@ -83,7 +97,7 @@ p.parse(cr, opt, varargin{:});
                 set(gcf, 'Color', 'w');
                 
                 % save
-                % ff_dropboxSave; 
+                ff_dropboxSave('saveto',cr.dirs.FIG); 
 
                 %% Plot just the ellipse                         
                 %% Plot the ellipse and the contourLevel

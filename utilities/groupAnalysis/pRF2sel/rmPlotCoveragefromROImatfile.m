@@ -541,11 +541,15 @@ return
 % /--------------------------------------------------------------------/ %
 function figHandle = createCoveragePlot(RFcov, vfc,rm, data, m)
 % plotting subroutine for rmPlotCoverage. Broken off by ras 10/2009.
-if vfc.newfig
-    figHandle = figure('Color', 'w');
-else
-    figHandle = selectGraphWin;
-end
+% This is not working for me, can't write figures in loop
+% if vfc.newfig
+%     figHandle = figure('Color', 'w');
+% else
+%     figHandle = selectGraphWin;
+% end
+
+figHandle = mrvNewGraphWin;
+
 
 % headerStr = sprintf('Visual field coverage, ROI %s, scan %i', ...
 % 					roi.name, vw.curScan);
