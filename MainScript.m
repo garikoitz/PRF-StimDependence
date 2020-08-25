@@ -10,6 +10,7 @@ cr.codeDir = crRootPath;
 
 % WHERE THE NEW DATA IS
 cr.dirs.BASE     = '/black/localhome/glerma/TESTDATA/PRF-StimDependence';
+cr.dirs.BASE     = fullfile(crRootPath,'DATA');
 cr.dirs.DATA     = fullfile(cr.dirs.BASE,'DATA');
 cr.dirs.ANALYSIS = fullfile(cr.dirs.BASE,'ANALYSIS');
 cr.dirs.ORG      = fullfile(cr.dirs.ANALYSIS,'matlabFiles','organization');
@@ -386,6 +387,23 @@ list_dtNames = {'Words';'Checkers'};
 % ret model names
 list_rmNames = {'retModel-Words-css.mat';'retModel-Checkers-css.mat'};
 list_rmDescripts = {'Words';'Checkers'};
+
+%% Get the cell of rms so that we can threshold
+if 0
+    rmroiCell = ff_rmroiCell(cr,list_subInds, list_roiNames, list_dtNames, ...
+            list_rmNames, 'list_path', list_path);
+    % SAVE THIS TO WORK LOCALLY
+    mkdir(fullfile(crRootPath,'DATA'))
+    save(fullfile(crRootPath,'DATA','rmroicell_1to20.mat'),'rmroiCell');
+end
+if 1
+    load(fullfile(crRootPath,'DATA','rmroicell_1to20.mat'));
+end
+        
+        
+        
+        
+%%  Threshold and get identical voxels for each subject
 % values to threshold the RM struct by
 % vfc = ff_vfcDefault_Hebrew;
 % The defaults are different for the two projects, sofor now use the most
@@ -451,21 +469,6 @@ Ecc_rm1 = cell(1, numRois);
 Ecc_rm2 = cell(1, numRois);
 rmDescript1 = list_rmDescripts{1};
 rmDescript2 = list_rmDescripts{2};
-% get the cell of rms so that we can threshold
-rmroiCell = ff_rmroiCell(cr,list_subInds, list_roiNames, list_dtNames, ...
-            list_rmNames, 'list_path', list_path);
-                     
-        
-        
-% SAVE THIS TO WORK LOCALLY
-mkdir(fullfile(crRootPath,'DATA'))
-save(fullfile(crRootPath,'DATA','rmroicell_1to20.mat'),'rmroiCell');
-        
-        
-        
-        
-        
-%%  Threshold and get identical voxels for each subject
 % In comparing ret models, the collection of voxels may not be the same
 % because of the thresholding. In this cell we redefine the rmroi
 rmroiCellSameVox = cell(size(rmroiCell));
@@ -578,6 +581,7 @@ cmapValuesHist = colormap('pink');
 close; 
 
 %% PLOT IT
+for fov      = [ 1.5]
 xx = mrvNewGraphWin('LineRadiality and Scatterplot','wide');
 set(xx,'Position',[0.005 0.062 .95 .55 ]);
 for jj = 1:numRois  
@@ -633,10 +637,10 @@ for jj = 1:numRois
 %     sm_rm2  = sm_rm2(sInd);
 %     % histogram(sm_rm1);hold on;histogram(sm_rm2);legend()
     % Obtain angle and ecc again, just in case
-    [PW,ECCW] = cart2pol(X1,Y1);
-    [PC,ECCC] = cart2pol(X2,Y2);
+    % [PW,ECCW] = cart2pol(X1,Y1);
+    % [PC,ECCC] = cart2pol(X2,Y2);
     
-   if 1
+   if 0
         fovs   = [0,0.5,1,1.5, 2,3,4,5];
         for ff = 1:length(fovs)
             fov = fovs(ff);
@@ -665,7 +669,9 @@ for jj = 1:numRois
             fprintf('Same quadrant and word inside %g deg and cb out, %i out of %i, %0.2f%%\n',...
                     fov,counter,length(X1),counter*100/length(X1))
         end
-    end
+   end
+    testing = false;
+    radialityCone=true;
    if 1
         % initialize polar plot
         % Limit plot to visual field circle
@@ -682,16 +688,28 @@ for jj = 1:numRois
         % colormap(cr.defaults.covfig.vfc.cmapValues)
         % set(c, 'Color', [1 1 1])
         % caxis(cr.defaults.covfig.vfc.cmapRange)
-        counter = 0;
-        fov     = 1.5;
+        counter  = 0;
+        
+        maxang15 = [];
+        minang15 = [];
+        maxang5  = [];
+        minang5  = [];
         for pp = 1:length(X1)
+            % pp = 555;
             % lineColor = C(pp,:);
-            pw   = rad2deg(PW(pp));
-            pc   = rad2deg(PC(pp));
-            qw   = floor(pw/90)+1;
-            qc   = floor(pc/90)+1;
-            eccw = ECCW(pp);
-            eccc = ECCC(pp);
+            % pw   = rad2deg(PW(pp));
+            % pc   = rad2deg(PC(pp));
+            % qw   = floor(pw/90)+1;
+            % qc   = floor(pc/90)+1;
+            % eccw = ECCW(pp);
+            % eccc = ECCC(pp);
+            
+            pw   = ph_rm1(pp);
+            pc   = ph_rm2(pp);
+            eccw = ecc_rm1(pp);
+            eccc = ecc_rm2(pp);
+            
+            
 
             % if qw==qc ; lineColor = [1 1 1];
             % else; lineColor = [.5 .5 .5]; end
@@ -701,7 +719,7 @@ for jj = 1:numRois
 
             % if qw==qc && eccw < 5 && eccc > 5; counter=counter+1; end
             if (abs(eccc - eccw)  > fov)
-                if  ((eccc - eccw) > fov) % qw==qc &&
+                if  ((eccc - eccw) > 0) % qw==qc &&
                     counter=counter+1; 
                     lineColor = [.1 .1 .1];
                     lineStyle = ['-'];
@@ -709,11 +727,72 @@ for jj = 1:numRois
                     lineColor = [.5 .5 .5];
                     lineStyle = [':'];
                 end
-
-
-                plot([X1(pp) X2(pp)], [Y1(pp), Y2(pp)], ...
-                    'Color', lineColor, 'LineStyle', lineStyle, ...
-                     'LineWidth',1);       
+                
+                if radialityCone
+                    % WORDS
+                    x1 = X1(pp);
+                    y1 = Y1(pp);
+                    % CB 
+                    x2 = X2(pp);
+                    y2 = Y2(pp);
+                    % We know the polar angle and the ecc, rotate & translate
+                    % Rotate angle
+                    pcn    = 0;
+                    pwn    = pw - pc;
+                    % Convert to cartesian
+                    [x1n, y1n] = pol2cart(pwn, eccw);
+                    [x2n, y2n] = pol2cart(pcn, eccc);
+                    % Do the translation only in the x axis
+                    if eccc > 5
+                        x2nt  = 15;
+                        x2dif = x2nt - x2n;
+                        x1nt  = x1n + x2dif;
+                        % Plot with the same y
+                        line([x1nt x2nt], [y1n, y2n], ...
+                            'Color', lineColor, 'LineStyle', lineStyle, 'LineWidth',1); 
+                    else
+                         x2nt  = 5;
+                         x2dif = x2nt - x2n;
+                         x1nt  = x1n + x2dif;
+%                         % Plot with the same y
+%                         line([x1nt x2nt], [y1n, y2n], ...
+%                             'Color', lineColor, 'LineStyle', lineStyle, 'LineWidth',1); 
+                    end
+                    
+                     % Calculate angles
+                     angle = atand(y1n/(x2nt-x1nt));
+                    if  ((eccc - eccw) > fov)
+                        if eccc > 5
+                            if angle > 0
+                                maxang15 = [maxang15 angle];
+                            end
+                            if angle < 0
+                                minang15 = [minang15 angle];
+                            end
+                        else
+                            if angle > 0
+                                maxang5 = [maxang5 angle];
+                            end
+                            if angle < 0
+                                minang5 = [minang5 angle];
+                            end
+                        end
+                    end
+                    
+                    if testing
+                        line([x1 x2], [y1, y2], ...
+                            'Color', 'r', 'LineStyle', lineStyle, ...
+                             'LineWidth',1); 
+                         % Assertions that the calculations are right
+                        d      = sqrt((x2-x1)^2 +  (y2-y1)^2)
+                        dn     = sqrt((x2nt-x1nt)^2 +  (y2n-y1n)^2)
+                    end
+                    
+                else
+                    plot([X1(pp) X2(pp)], [Y1(pp), Y2(pp)], ...
+                        'Color', lineColor, 'LineStyle', lineStyle, ...
+                         'LineWidth',1);       
+                end
             end
         end
 
@@ -730,15 +809,50 @@ for jj = 1:numRois
             % ['ci: ' num2str(ci')];
             % [num2str(numVoxels) ' voxels']
             };
-
-        title(titleName, 'fontweight', 'bold', 'color', [.1 .1 .1], 'fontsize', 14);
+        ttext = strrep(titleName{1},'\_left','');
+        
+        % title(titleName, 'fontweight', 'bold', 'color', [.1 .1 .1], 'fontsize', 14);
+        text(-9, 11, ttext,'Color','k','FontWeight','Bold','FontSize',16)
+        
+        if ~isempty(maxang15)
+            text(-9, 3,sprintf('+%1.1f°',max(maxang15)),'Color','k','FontSize',10)
+            text(-9, 1,sprintf('+%1.1f°',median(maxang15)),'Color','r','FontSize',10)
+            line([15+5*cosd(180-median(maxang15)),15],[5*sind(median(maxang15)),0],'Color','r')
+        end
+        if ~isempty(minang15)
+            text(-9, -1,sprintf('%1.1f°',median(minang15)),'Color','r','FontSize',10)
+            text(-9, -3,sprintf('%1.1f°',min(minang15)),'Color','k','FontSize',10)
+            line([15+5*cosd(180-median(minang15)),15],[5*sind(median(minang15)),0],'Color','r')
+        end
+        
+%         if ~isempty(maxang5)
+%             text(-9, 3,sprintf('+%1.1f°',max(maxang5)),'Color','k','FontSize',10)
+%             text(-9, 1,sprintf('+%1.1f°',median(maxang5)),'Color','r','FontSize',10)
+%             line([5+5*cosd(180-median(maxang5)),5],[5*sind(median(maxang5)),0],'Color','r')
+%         end
+%         if ~isempty(minang5)
+%             text(-9, -1,sprintf('%1.1f°',median(minang5)),'Color','r','FontSize',10)
+%             text(-9, -3,sprintf('%1.1f°',min(minang5)),'Color','k','FontSize',10)
+%             line([5+5*cosd(180-median(minang5)),5],[5*sind(median(minang5)),0],'Color','r')
+%         end
+        xlim([-15, 18])
         % titlefile = strrep(titleName{1},' ','_');
         % saveas(gcf, fullfile(crRootPath,'local','png',[titlefile '.png']), 'png') 
+%         subplot(2,numRois,numRois+jj); 
+%         polarhistogram(deg2rad([maxang5 minang5]),100, 'Normalization','probability',...
+%             'EdgeAlpha',1, 'EdgeColor','k','FaceAlpha',1, 'FaceColor','k'); 
+%         hold on;
+%         polarhistogram(deg2rad([maxang15 minang15]),100, 'Normalization','probability',...
+%             'EdgeAlpha',1, 'EdgeColor','b','FaceAlpha',.4, 'FaceColor','b'); 
+%         legend({'< 5°','> 5°'})
+        
+
    end
 end
-saveas(gcf, fullfile(crRootPath,'local','png',['Radiality Plots' '.png']), 'png')    
-saveas(gcf, fullfile(crRootPath,'local','svg',['Radiality Plots' '.svg']), 'svg')    
-
+saveas(gcf, fullfile(crRootPath,'local','png',['Radiality_Plots_2x' num2str(fov) '.png']), 'png')    
+saveas(gcf, fullfile(crRootPath,'local','svg',['Radiality_Plots_2x' num2str(fov) '.svg']), 'svg')    
+close all
+end
 
 %% SCATTERPLOTS
 
@@ -762,14 +876,14 @@ subIndividually = false;
 %     'meanMax'     : mean of the top 8 values
 %     'meanPeaks'   : mean of the outputs of matlab's meanPeaks
 list_fieldNames  = {    
-%     'co'
+    'co'
     'ecc'
 %     'sigma'
 %     'ph'
     }; 
 
 list_fieldDescripts = {
-%     'variance explained'
+    'variance explained'
     'eccentricity'
 %     'sigma'
 %     'polar angle'
@@ -829,40 +943,53 @@ A = cell(numFields*numRois, 5);
 
 % close all;
 
-for jj = 1:numRois
+
     % subplot(2,numRois,numRois+jj); 
 
-    roiName = list_roiNames{jj};
+    
+for ff = 1:numFields
 
-    for ff = 1:numFields
+    % field-specific properties
+    fieldName = list_fieldNames{ff};
+    fieldNameDescript = list_fieldDescripts{ff}; 
 
-        % field-specific properties
-        fieldName = list_fieldNames{ff};
-        fieldNameDescript = list_fieldDescripts{ff}; 
+    if strcmp(fieldName, 'sigma1') 
+        maxValue = cr.defaults.covfig.vfc.sigmaMajthresh(2);
+    elseif strcmp(fieldName, 'sigma')          
+        maxValue = cr.defaults.covfig.vfc.sigmaEffthresh(2);
+    elseif strcmp(fieldName, 'ecc')
+        maxValue = cr.defaults.covfig.vfc.eccthresh(2);
+        fov = 1.5; % width of the band
+        nrows = 2; ncols = 3;
+        position = [0.005 0.062 .9 .7 ];
+    elseif strcmp(fieldName, 'co')
+        maxValue = 1; 
+        fov = 0.2; % width of the band
+        nrows = 1; ncols = 6;
+        position = [0.005 0.062 .9 .5 ];
+    elseif strcmp(fieldName, 'exponent')
+        maxValue = 2; 
+    elseif strcmp(fieldName, 'meanMax')
+        maxValue = 20; 
+    elseif strcmp(fieldName, 'meanPeaks')
+        maxValue = 10; 
+    elseif strcmp(fieldName, 'betaScale')
+        maxValue = 5; 
+    elseif strcmp(fieldName, 'x0') || strcmp(fieldName, 'y0')
+        maxValue = cr.defaults.covfig.vfc.fieldRange;
+    elseif strcmp(fieldName, 'ph')
+        maxValue = 2*pi; 
+    else
+        error('Define the maxValue so we can normalize and fit the beta distribution.');
+    end
+    
+    xx = mrvNewGraphWin('Scatterplots');
+    set(xx,'Position',position);
+    for jj = 1:numRois
+        roiName = list_roiNames{jj};
+        subplot(nrows,ncols,jj);
+    
 
-        if strcmp(fieldName, 'sigma1') 
-            maxValue = cr.defaults.covfig.vfc.sigmaMajthresh(2);
-        elseif strcmp(fieldName, 'sigma')          
-            maxValue = cr.defaults.covfig.vfc.sigmaEffthresh(2);
-        elseif strcmp(fieldName, 'ecc')
-            maxValue = cr.defaults.covfig.vfc.eccthresh(2);
-        elseif strcmp(fieldName, 'co')
-            maxValue = 1; 
-        elseif strcmp(fieldName, 'exponent')
-            maxValue = 2; 
-        elseif strcmp(fieldName, 'meanMax')
-            maxValue = 20; 
-        elseif strcmp(fieldName, 'meanPeaks')
-            maxValue = 10; 
-        elseif strcmp(fieldName, 'betaScale')
-            maxValue = 5; 
-        elseif strcmp(fieldName, 'x0') || strcmp(fieldName, 'y0')
-            maxValue = cr.defaults.covfig.vfc.fieldRange;
-        elseif strcmp(fieldName, 'ph')
-            maxValue = 2*pi; 
-        else
-            error('Define the maxValue so we can normalize and fit the beta distribution.');
-        end
         
         axisLims = [0 maxValue]; 
         BarData1 = [];
@@ -914,28 +1041,28 @@ for jj = 1:numRois
         end % end loop over subjects
         
         %% mixed effects: fit a line to individual subjects
-        slopes = nan(1, numSubs);   
-        slopesp = nan(1,numSubs);
-        interceptsp = nan(1,numSubs);
-        percents = percentAboveSubs(:,jj,ff);
+        % slopes = nan(1, numSubs);   
+        % slopesp = nan(1,numSubs);
+        % interceptsp = nan(1,numSubs);
+        % percents = percentAboveSubs(:,jj,ff);
         
-        for ii = 1:numSubs
-            b = subjectLines{ii,jj,ff}; 
-            if ~isempty(b)
-                slopes(ii) = b.slope; 
-            end
-        end
+        % for ii = 1:numSubs
+        %     b = subjectLines{ii,jj,ff}; 
+        %     if ~isempty(b)
+        %         slopes(ii) = b.slope; 
+        %     end
+        % end
 
         % the calculating. nan will cause bootci to error
-        slopes(isnan(slopes)) = []; 
-        percents(isnan(percents)) = [];
+        % slopes(isnan(slopes)) = []; 
+        % percents(isnan(percents)) = [];
         
         % table things. 
         % (1)roiName (2)fieldName (3) ciLow (4)ciHigh (5)mean
-        tind = (jj-1)*numFields + ff; 
+        % tind = (jj-1)*numFields + ff; 
         
         
-        if numSubs > 1
+        % if numSubs > 1
             % numbs = 1000; 
             % [ci, bootstat] = bootci(numbs, @mean, slopes);
             % meanSlope = mean(bootstat); 
@@ -948,63 +1075,59 @@ for jj = 1:numRois
             % A{tind,4} = ciPer(2);
             % A{tind,5} = mean(bootstatPer);
             
-        else
-            meanSlope = nan; 
-            ci = nan; 
-        end
+        % else
+        %     meanSlope = nan; 
+        %     ci = nan; 
+        %   end
                 
         %% calculations related to the percentage above the identityLine
-        percentabove = sum(BarData2 > BarData1) / length(BarData1);
-        percentAbovePooled(jj,ff) = percentabove;
+        % percentabove = sum(BarData2 > BarData1) / length(BarData1);
+        % percentAbovePooled(jj,ff) = percentabove;
         
         % properties related to both types of scatter plots
         % coloring by number of voxels or percentage of voxels
         npoints = 100; 
         
-        %% 3d histogram heat map -- absolute number of voxels
-        xx = mrvNewGraphWin([ff_stringRemove(roiName, 'WangAtlas_') '.' fieldName]);
-        % figure;  
-        hold on;
-        ff_histogramHeat(BarData1, BarData2, maxValue, maxValue, 50,cmapValuesHist,fov);
-        
+        % 3d histogram heat map -- absolute number of voxels
+        ff_histogramHeat(BarData1, BarData2, maxValue, maxValue, 50,cmapValuesHist,fov,roiName);
         numVoxels = length(BarData1); 
-
-        maxZ = max(get(gca, 'ZLim'));
-        zVec = maxZ*ones(1, npoints); 
-
-        % fitted line goes above everything else
-%         if numSubs > 1 
-%             bx = linspace(0, maxValue, npoints);
-%             by = bx * meanSlope; 
-%             bylower = bx * ci(1); 
-%             byupper = bx * ci(2);
-% 
-%             if plot_fit
-%                 % fitColor = [1 1 0]; % yellow
-%                 fitColor = [0 1 1]; % cyan
-%                 % fitColor = [0 0 1]; % blue
-%                 plot3(bx, by, zVec, ':', 'Linewidth',3, 'color', fitColor)
-%                 plot3(bx, bylower, zVec, '-', 'Linewidth',.1, 'color', fitColor)
-%                 plot3(bx, byupper, zVec, '-', 'Linewidth',.1, 'color', fitColor)
-%             end           
-%         end
-
         % axes and title
-        xlabel(rm1Descript)
-        ylabel(rm2Descript)
-        titleName = {
-            [strrep(ff_stringRemove(roiName, 'WangAtlas_'),'_','\_') '.' fieldName]; 
-            % ['slope: ' num2str(meanSlope)];
-            % ['ci: ' num2str(ci')];
-            % [num2str(numVoxels) ' voxels']
-             };
-        title(titleName, 'FontWeight', 'Bold');
-        % saveas(gcf, fullfile(crRootPath,'local','png',[titleName{1} '.png']), 'png')    
-       %  saveas(gcf, fullfile(crRootPath,'local','svg',[titleName{1} '.svg']), 'svg')    
+        switch fieldName
+            case {'ecc'}
+                if jj==1 || jj==4
+                    ylabel(['pRF eccentricity for ' rm2Descript ' (deg)'])
+                end
+                if jj>3
+                    xlabel(['pRF eccentricity for ' rm1Descript ' (deg)'])
+                end
+            case {'co'}
+                if jj==1 % || jj==4
+                    ylabel(['Variance explained for ' rm2Descript ' (%)'])
+                end
+                % if jj>3
+                    xlabel(['Variance explained for ' rm1Descript ' (%)'])
+                % end
+            otherwise
+                if jj==1 || jj==4
+                    ylabel(['' rm2Descript ''])
+                end
+                if jj>3
+                    xlabel(['' rm1Descript ''])
+                end
+        end
+        
+    end % loop over rois
 
-    end % loop over fields
-
-end % loop over rois
+    % titleName = {
+    %     [strrep(ff_stringRemove(roiName, 'WangAtlas_'),'_','\_') '.' fieldName];
+    % ['slope: ' num2str(meanSlope)];
+    % ['ci: ' num2str(ci')];
+    % [num2str(numVoxels) ' voxels']
+    %      };
+    % title(titleName, 'FontWeight', 'Bold');
+    saveas(gcf, fullfile(crRootPath,'local','png',[titleName{1} '_' fieldName '_band-2x' num2str(fov) '.png']), 'png')
+    saveas(gcf, fullfile(crRootPath,'local','svg',[titleName{1} '_' fieldName '_band-2x' num2str(fov) '.svg']), 'svg')
+end % loop over fields
 
 % percent above identityLine, pooled over subjects ... print out the 
 % percentAbovePoooled
@@ -1016,6 +1139,8 @@ end % loop over rois
 % }
 % T = cell2table(A, 'VariableNames', {'roiName', 'fieldName', 'ciLow', 'ciHigh', 'MeanPercent'});
 
+
+
 %% Notes
 % + this is lVOTRC, do the same for V1-4,hvo1 (the ones in the paper)
 % - two plots, or separate long versus short lines
@@ -1024,9 +1149,9 @@ end % loop over rois
 %      only a caption in the figure)
 % + DO NOT plot any ecc diff of +- 0.5 deg
 % - In the scatterplot with the light blue cones:
-%    --- Remove cone
-%    --- add +-0.5deg band
-%    --- below, we will only have about 3% of the data
+%    + Remove cone
+%    + add +-1.5deg band
+%    + below, we will only have about 3% of the data
 % - compare the - and + differences, they shuold be the same for V1 v2 and
 % then start changing
 % - when re-running the fits, use two different HRFs (simulate that they
