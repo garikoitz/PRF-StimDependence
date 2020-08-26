@@ -369,40 +369,55 @@ end
 % SELECT SUBJECTS AND MODELS
 onlyStanford  = [1:20];  % Why not the rest? Ask MBS/RL
 onlyHebrew    = [31:36 38:44]; 
-list_subInds  = [onlyStanford]; 
+list_subInds  = [onlyStanford onlyHebrew]; 
 list_path     = cr.bk.list_sessionRet; 
 list_roiNames = {'WangAtlas_V1v_left'
                  'WangAtlas_V2v_left'
                  'WangAtlas_V3v_left'
                  'WangAtlas_hV4_left'
                  'WangAtlas_VO1_left'
-                 'lVOTRC' };
+                 'lVOTRC'
+                 'WangAtlas_IPS0'
+                 'WangAtlas_IPS1'};
 % list_roiNames = {'LV1_rl'
 %                  'LV2v_rl'
 %                  'LV3v_rl'
 %                  'LhV4_rl'
 %                  'LVO1_rl'
 %                  'lVOTRC' };
-list_dtNames = {'Words';'Checkers'};
+list_dtNames = {'Words'...
+                'Checkers' ...
+                'Words_English'...
+                'Words_Hebrew'...
+                'FalseFont'};
 % ret model names
-list_rmNames = {'retModel-Words-css.mat';'retModel-Checkers-css.mat'};
-list_rmDescripts = {'Words';'Checkers'};
+list_rmNames = {'retModel-Words-css.mat'...
+                'retModel-Checkers-css.mat'...
+                'retModel-Words_English-css.mat'...
+                'retModel-Words_Hebrew-css.mat'...
+                'retModel-FalseFont-css.mat'};
+list_rmDescripts = {'Words'...  % Words (large bars)
+                    'Checkers'...
+                    'Words_English'...
+                    'Words_Hebrew'... % Words (smalls bars)
+                    'FalseFont'};
+
 
 %% Get the cell of rms so that we can threshold
-if 0
+if 1
     rmroiCell = ff_rmroiCell(cr,list_subInds, list_roiNames, list_dtNames, ...
             list_rmNames, 'list_path', list_path);
     % SAVE THIS TO WORK LOCALLY
     mkdir(fullfile(crRootPath,'DATA'))
-    save(fullfile(crRootPath,'DATA','rmroicell_1to20.mat'),'rmroiCell');
+    % 20 subs, words and CBs
+    % save(fullfile(crRootPath,'DATA','rmroicell_1to20.mat'),'rmroiCell');
+    % ALL subs, words and CBs and FF and Heb
+    save(fullfile(crRootPath,'DATA','rmroicell_allandall.mat'),'rmroiCell');
 end
-if 1
+if 0
     load(fullfile(crRootPath,'DATA','rmroicell_1to20.mat'));
 end
-        
-        
-        
-        
+                
 %%  Threshold and get identical voxels for each subject
 % values to threshold the RM struct by
 % vfc = ff_vfcDefault_Hebrew;
@@ -1138,8 +1153,6 @@ end % loop over fields
 %     [rm2Descript ' vs. ' rm1Descript]
 % }
 % T = cell2table(A, 'VariableNames', {'roiName', 'fieldName', 'ciLow', 'ciHigh', 'MeanPercent'});
-
-
 
 %% Notes
 % + this is lVOTRC, do the same for V1-4,hvo1 (the ones in the paper)
