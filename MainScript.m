@@ -417,7 +417,6 @@ end
 if 0
     % load(fullfile(crRootPath,'DATA','rmroicell_1to20.mat'));
     load(fullfile(crRootPath,'local','rmroicell_allandall.mat'));
-
 end
                 
 %%  Threshold and get identical voxels for each subject
