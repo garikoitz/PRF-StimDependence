@@ -3,6 +3,11 @@ function cr = cr_prfRun(cr, subind, varargin)
 % This was a script from Rosemary. I am going to create a function out of it. 
 % It shuold be very similar to the pmVistasoft.m script. We will test both later
 % on. 
+
+% GLU: many editions to be able to read all the specifics for each rmName
+% and sub, created the folder params to store all the specifics per subject
+
+
 % 
 % 
 % Rosemary's notes
@@ -40,11 +45,17 @@ opt.params      = cr.defaults.prfrun.params;
 
 % The following parameters have been set in bk = bookKeeping():
 % session list. see bookKeeping
-opt.list_path            = cr.bk.list_sessionRet; 
+opt.list_path   = cr.bk.list_sessionRet; 
+opt.list_rois   = opt.rois;
+
+
+
+
+% We will obtain this directly in each case, no names associated
 % list of checker scan number, corresponding to session list
-opt.list_numCheckers     = cr.bk.list_scanNum_Checkers_sessionRet; 
+% opt.list_numCheckers     = cr.bk.list_scanNum_Checkers_sessionRet; 
 % list of knk scan number, corresponding to session list
-opt.list_numKnk          = cr.bk.list_scanNum_Knk_sessionRet;  
+% opt.list_numKnk          = cr.bk.list_scanNum_Knk_sessionRet;  
 
 %% 
     
@@ -63,8 +74,8 @@ opt.list_numKnk          = cr.bk.list_scanNum_Knk_sessionRet;
     
     % ret parameters based on the subject
     % scan number with checkers and knk, for clip frame information
-    opt.p.scanNum_Knk                  = opt.list_numKnk(subind);
-    opt.p.scanNum_Checkers             = opt.list_numCheckers(subind);
+    % opt.p.scanNum_Knk                  = opt.list_numKnk(subind);
+    % opt.p.scanNum_Checkers             = opt.list_numCheckers(subind);
     
     
     %% loop over the datatypes
@@ -81,6 +92,15 @@ opt.list_numKnk          = cr.bk.list_scanNum_Knk_sessionRet;
         dataNum = viewGet(vw, 'curdt'); 
 
         % some variables depend on whether checkers or knk was run  
+        % Left below existing Rosemary code, created function
+        % addpath(fileparts(cr.bk.list_prfParams{subind}))
+        prf = prfRun_params_rmName(cr, subind, rmName);
+        % rmpath(fileparts(cr.bk.list_prfParams{subind}))
+        
+        opt.params.paramsFile = prf.p.paramsFile;
+        opt.params.imFile     = prf.p.imFile;
+        opt.p.scanNum         = prf.p.scanNum;
+        %{
         if length(rmName) > 7 && strcmp(rmName(1:8), 'Checkers')
             opt.params.paramsFile   = opt.p.paramsFile_Checkers; 
             opt.params.imFile       = opt.p.imFile_Checkers; 
@@ -90,14 +110,43 @@ opt.list_numKnk          = cr.bk.list_scanNum_Knk_sessionRet;
             opt.params.imFile       = opt.p.imFile_Knk; 
             opt.p.scanNum           = opt.p.scanNum_Knk; 
         end
+        %}
 
 
         %% getting parameter values for prf model fit ----------------------
-        opt.params.nFrames          = viewGet(vw, 'nFrames');       
+        % This is failing, trying next option
+        %{
+        opt.params.nFrames          = viewGet(vw, 'nFrames');  
+        
         opt.params.framePeriod      = viewGet(vw, 'framePeriod');   
         tem.totalFrames             = mrSESSION.functionals(opt.p.scanNum).totalFrames;  
         opt.params.prescanDuration  = (tem.totalFrames - opt.params.nFrames)*opt.params.framePeriod; 
+        %}
+        
+        barScans = prf.barScans;
+        
+        
+        % In the main files Rosemary ws using, she had the code above
+        % NOTE: nFrames and framePeriod are generic
+        % I made basScans to be the same as scanNum, so I guess hat the
+        % code now is different, plot them
+        opt.params.nFrames         = mrSESSION.functionals(barScans(1)).nFrames; 
+        opt.params.framePeriod     = mrSESSION.functionals(barScans(1)).framePeriod; 
+        tem.totalFrames            = mrSESSION.functionals(barScans(1)).totalFrames;  
+        opt.params.prescanDuration = (tem.totalFrames - opt.params.nFrames)*opt.params.framePeriod; 
 
+
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
         % store it
         dataTYPES(dataNum).retinotopyModelParams = opt.params;
 
@@ -163,7 +212,7 @@ opt.list_numKnk          = cr.bk.list_scanNum_Knk_sessionRet;
             outFileName = ['retModel-' rmName '-' opt.prfModel{1}];
             
             % no need to load rois, just run it!
-            vw = rmMain(vw, [], wSearch, 'model', opt.prfModel, ...
+            vw = rmMain(vw, [], opt.wSearch, 'model', opt.prfModel, ...
                         'matFileName', outFileName);
 
         end

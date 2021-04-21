@@ -99,11 +99,11 @@ vfc.list_dtNames = {
 
 % names of the rm in each dt
 vfc.list_rmNames = {
-    'retModel-Checkers-css.mat'
+    'retModel-Checkers-css-fFit.mat'
 %     'retModel-Words_Hebrew-css.mat'
 %     'retModel-Words_English-css.mat'
 %     'retModel-Checkers-css.mat'
-    'retModel-Words-css.mat'
+    'retModel-Words-css-fFit.mat'
 %     'retModel-WordLarge-css.mat'
 %     'retModel-WordSmall-css.mat';
 %     'retModel-FaceSmall-css.mat';

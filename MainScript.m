@@ -10,16 +10,31 @@ cr.codeDir = crRootPath;
 
 % WHERE THE NEW DATA IS
 cr.dirs.BASE     = '/black/localhome/glerma/TESTDATA/PRF-StimDependence';
+<<<<<<< HEAD
 cr.dirs.BASE     = fullfile(crRootPath);
 cr.dirs.DATA     = fullfile(cr.dirs.BASE,'DATA');
 cr.dirs.ANALYSIS = fullfile(cr.dirs.DATA,'ANALYSIS');
 cr.dirs.ORG      = fullfile(cr.dirs.ANALYSIS,'matlabFiles','organization');
 cr.dirs.DEF      = fullfile(cr.dirs.ANALYSIS,'matlabFiles','defineProjectDefaults');
+=======
+
+% cr.dirs.BASE    = fullfile(crRootPath,'DATA');
+rmpath(genpath(fullfile(crRootPath,'DATA')))
+cr.dirs.DATA     = fullfile(cr.dirs.BASE,'DATA');
+cr.dirs.ANALYSIS = fullfile(cr.dirs.BASE,'ANALYSIS');
+cr.dirs.ORG      = fullfile(cr.dirs.ANALYSIS,'matlabfiles','organization');
+cr.dirs.DEF      = fullfile(cr.dirs.ANALYSIS,'matlabfiles','defineProjectDefaults');
+>>>>>>> 69f7e6a2b0bc57aefb931ccf96a9f93807a27af1
 cr.dirs.FIG      = fullfile(cr.dirs.ANALYSIS,'figures');
+cr.dirs.FIGPNG  = fullfile(cr.dirs.FIG,'png');
+cr.dirs.FIGSVG  = fullfile(cr.dirs.FIG,'svg');
+if ~isfolder(cr.dirs.FIG); mkdir(cr.dirs.FIG); end
+if ~isfolder(cr.dirs.FIGPNG); mkdir(cr.dirs.FIGPNG); end
+if ~isfolder(cr.dirs.FIGSVG); mkdir(cr.dirs.FIGSVG); end
 
 % CONTINUE WITH THE NORMAL PROCESSING
 % add to path the required matlab files inside the project, with info to run the project
-addpath(genpath(fullfile(cr.dirs.ANALYSIS,'matlabFiles')));
+addpath(genpath(fullfile(cr.dirs.ANALYSIS,'matlabfiles')));
 
 % Rosemary relied on this file that contains most of the subjects and other
 % lists. Make it work with relative paths and store it in each project repository
@@ -28,37 +43,183 @@ addpath(genpath(fullfile(cr.dirs.ANALYSIS,'matlabFiles')));
 % - editing mrSession to reflect the file changes
 cr.bk = bookKeeping(cr);
 
-%% COVERAGE: individual plots (run PRFs again)
+%% Run PRFs again
+
 % subjects we want to do this for
 list_subInds        = [31:36 38:44];  % Hebrew
+list_subInds        = [1:20];  % Original 20
+% mw (13) for Words failed, continue with the next ones for now
+% list_subInds        = [18:20];
+%17 and 13 failed at beginning
 
-for subind = list_subInds
+
+% Fix it: 
+% list_subInds        = [13,17];
+
+for subind =list_subInds
+    
+    % subind = 13;
+    
     mrvCleanWorkspace;
     % subind  = list_subInds(ns);
     subname = cr.bk.list_sub{subind};
-    
+    [~,anatName]=fileparts(cr.bk.list_anatomy{subind});
+    fprintf('\nSubDetails:\nInd:%i, StrInd:%s, subname:%s, Name:%s, anatName:%s\n',...
+        subind,cr.bk.list_subNumberString{subind},subname,...
+        cr.bk.list_names{subind},anatName)
     % Change dir, we need to run analysis where mrSession is
     chdir(cr.bk.list_sessionRet{subind})
+    
     %% PRF analysis
     % Read the generic params for all subjects
     run(fullfile(cr.dirs.DEF,'prfrun_defaults.m'));
-    cr.defaults.prfrun.params = params; clear('params');
-    cr.defaults.prfrun.p      = p; clear('p');
+    cr.defaults.prfrun.params = params; 
+    cr.defaults.prfrun.p      = p; 
+    clear('params'); clear('p');
     % Read prfRun_params specific to this subject
-    run(cr.bk.list_prfParams{subind});
+    % run(cr.bk.list_prfParams{subind}); NOT NECESSARY
     prf.dirVistacc = cr.bk.list_sessionRet{subind};
     prf.dirAnatomy = cr.bk.list_anatomy{subind};
+    prf.list_rmName= cr.bk.list_rmName{subind};
+    prf.p.stimSize = cr.bk.list_stimSize(subind);
+    prf.wSearch    = cr.bk.list_wSearch(subind);
+    prf.prfModel   = cr.bk.list_prfModels{subind};
+    prf.rois       = cr.bk.list_ROIs{subind};
+    
     cr.subj.(subname).params.prf = prf;
     clear('prf');
     % This was on generics but requires specifics so... this is why I am
     % calling generics as many times as calling different subjects just in case
     cr.defaults.prfrun.params.stimSize = cr.subj.(subname).params.prf.p.stimSize; 
     % Run the prfModel with mrVista
-     %cr = cr_prfRun(cr, subind);
-    
+    % RUN USING mrVISTA NORMAL INSTALLATION
+        cr = cr_prfRun(cr, subind);
+        % Clean workspace of globals after each subject finishes
+        mrvCleanWorkspace;
+    % RUN USING container prfanalyze-vista:2.0.0 (no modelpred, we get r2)
+        % Generate the config file     
+        % Run the container
+        % pmLaunchDockerCommand('prfanalyze','ellipse','tr1dur300v3','afni6')
+        % Convert the data back so that the rest of the scripts continue working
+end
+
+%% PREPARE DATA
+% Generate the rmroicell that we will use in all plots in this script
+% This will read the results obtained by Rosemary or the re-run in 2021
+list_subInds  = [1:20];
+list_roiNames = {'WangAtlas_V1v_left'
+                 'WangAtlas_V2v_left'
+                 'WangAtlas_V3v_left'
+                 'WangAtlas_hV4_left'
+                 'WangAtlas_VO1_left'
+                 'lVOTRC' 
+                 'WangAtlas_IPS0'
+                 'WangAtlas_IPS1'};
+list_dtNames  = {'Checkers','Words','FalseFont'};
+list_rmNames  = {'retModel-Checkers-css-fFit.mat'
+                 'retModel-Words-css-fFit.mat' 
+                 'retModel-FalseFont-css-fFit.mat' };
+% {
+% Use the originals calculated by Rosemary
+list_rmNames  = {'retModel-Checkers-css.mat'
+                 'retModel-Words-css.mat' 
+                 'retModel-FalseFont-css.mat'};
+%}
+list_rmDescripts = {'Words'...  % Words (large bars)
+                    'Checkers'...
+                    ... % 'Words_English'...
+                    ... % 'Words_Hebrew'... % Words (smalls bars)
+                    'FalseFont'};
+
+rmroiCell=ff_rmroiCell(cr,list_subInds,list_roiNames,list_dtNames,list_rmNames);
+% Save rmroicell just in case
+% save(fullfile(crRootPath,'DATA',...
+%      'rmroicell_subInds-1to20_dtNames-cb-w-ff_fits-Rosemary.mat'),'rmroiCell')
+% load(fullfile(crRootPath,'DATA',...
+%      'rmroicell_subInds-1to20_dtNames-cb-w-ff_fits-Rosemary.mat'),'rmroiCell')
+
+%% FIGURE 1: (C) Groups coverage plots
+
+% (A) Explain how to obtain
+
+
+% (B) Explain how to obtain
+
+
+% 
+% With the new data the groups plots look different, but it seems that it
+% is due to thresholds
+% >> Check colormap limits  so that checker looks bigger than words
+
+% Group COVERAGE plots, take all subjects from list_subInds
+
+% Select subjects we want to plot
+% subinds = [1:20]; % Stanford Subjects, 1 is gomez, find anatomicals
+% subinds = [1:12,14:16,18:20];
+
+% Read the generic params for coverage for all subjects
+cr.defaults.covfig.vfc = ff_vfcDefault();
+cr.defaults.covfig.vfc.list_roiNames = list_roiNames;
+% data types we want to look at
+cr.defaults.covfig.vfc.list_dtNames = list_dtNames;
+% names of the rm in each dt
+cr.defaults.covfig.vfc.list_rmNames = list_rmNames;
+% subinds = [31:36 38:44]; % Hebrew
+% cr.defaults.covfig.vfc = ff_vfcDefault_Hebrew();
+
+% Launch the function
+figFunction_coverage_maxProfile_group(cr,list_subInds,'flip',false, ...
+                                      'savefig',true, 'vers','v01_oldfit',...
+                                      'rmroiCell',rmroiCell)
+                               
+%% FIGURE 2: (C) Scatterplots: word-checkerboard
+rmroiCell_WC    = rmroiCell(:,1:6,1:2);
+list_roiNames16 = list_roiNames(1:6);
+fname           = 'scatterplot_WordVsCheck_6ROIs_20subs_RosemaryFit_v01';
+[rmroiCellSameVox,C_data,cmapValuesHist,maxValue]=crThreshGetSameVoxel(...
+                                                                    cr,...
+                                                          rmroiCell_WC,...
+                                                          list_subInds,...
+                                                       list_roiNames16,...
+                                                          list_rmNames,...
+                                                      list_rmDescripts,...
+                                                                   fname);
+
+%% FIGURE 3: (B) Line plots
+
+
+%% COVERAGE: individual plots 
+for subind = 1 [1:12,14:16,18:20] % list_subInds
+    subname = cr.bk.list_sub{subind}
     %% Plot the coverage figures
     % Read the coverage figure params
-    run(cr.bk.list_coverageFigure_defaults{subind});
+    % run(cr.bk.list_coverageFigure_defaults{subind});
+    % Defaults
+    covfig.vfc              = ff_vfcDefault;
+    covfig.titleDescript    = 'FOV';
+    % vfc threshold
+    covfig.cothresh         = 0.2; 
+    covfig.vfc.cmap         = 'hot';
+    covfig.vfc.addCenters   = true;
+    covfig.vfc.contourPlot  = true;
+    % ROIs
+    covfig.list_roiNames    = {'lVOTRC'};
+    covfig.list_roiNames    = {'WangAtlas_VO1_left'};
+    % dt and rm names
+    covfig.list_dtNames     = {'Checkers','Words','FalseFont'};
+    covfig.list_rmNames     = {'retModel-Checkers-css-fFit.mat'
+                               'retModel-Words-css-fFit.mat'
+                               'retModel-FalseFont-css-fFit.mat'};
+    % {
+    % Old original fits, basically they are the same
+    covfig.list_rmNames     = {'retModel-Checkers-css.mat'
+                               'retModel-Words-css.mat'
+                               'retModel-FalseFont-css.mat'}; 
+    %}
+    covfig.list_rmDescripts = {'Checkers', 'Words','FalseFont'};
+    
+    
+    
     cr.subj.(subname).params.covfig = covfig;
     clear('covfig');
     % Plot it
@@ -67,18 +228,39 @@ for subind = list_subInds
     mrvCleanWorkspace;
 end
 
-%% Group COVERAGE plots, take all subjects from list_subInds
-% Select subjects we want to plot
-subinds = [1:20]; % Stanford Subjects, 1 is gomez, find anatomicals
-% Read the generic params for coverage for all subjects
-cr.defaults.covfig.vfc = ff_vfcDefault();
 
 
-% subinds = [31:36 38:44]; % Hebrew
-% cr.defaults.covfig.vfc = ff_vfcDefault_Hebrew();
+%% Notes
+% + this is lVOTRC, do the same for V1-4,hvo1 (the ones in the paper)
+% - two plots, or separate long versus short lines
+% + go to white background
+% - obtain numbers that show that eccc>eccw is basically noise (it will be
+%      only a caption in the figure)
+% + DO NOT plot any ecc diff of +- 0.5 deg
+% - In the scatterplot with the light blue cones:
+%    + Remove cone
+%    + add +-1.5deg band
+%    + below, we will only have about 3% of the data
+% - compare the - and + differences, they shuold be the same for V1 v2 and
+% then start changing
+% - when re-running the fits, use two different HRFs (simulate that they
+% will actually have size differences) and show that the effect and the
+% centers will not vary
+% - test: select and HRF that gives the correct size in V3 at 5deg eccen,
+% and run all the analyses with this HRF
+% - Use all V1, not only ventral
 
-% Launch the function
-figFunction_coverage_maxProfile_group(cr, subinds,'flip',false)
+
+% test of radiality from 5 to 7 deg and 8 to 12 degs, move CB to the horizontaal and maintain the angle for words
+
+
+
+% TODO: 
+% - print the line plots again  and finish figure 3
+% - plot the results in IPS to check if they hold
+
+%% DATA ANALYSIS DONE BY ROSEMARY
+%{
 
 %% (once) Upload data
 % Original data in black.stanford.edu
@@ -353,8 +535,7 @@ figFunction_coverage_individual(cr, opt);
 %}
 end
 
-
-
+%}
 
 %% Line plots: from checquerboard to word
 % Combine code in figScript_centers_* to create the plots Brian nd I
@@ -367,8 +548,10 @@ end
 %      - 
 
 % SELECT SUBJECTS AND MODELS
+%{
 onlyStanford  = [1:20];  % Why not the rest? Ask MBS/RL
 onlyHebrew    = [31:36 38:44]; 
+<<<<<<< HEAD
 list_subInds  = [onlyStanford]; 
 list_path     = cr.bk.list_sessionRet; 
 list_roiNames = {'WangAtlas_V1v_left'
@@ -379,6 +562,21 @@ list_roiNames = {'WangAtlas_V1v_left'
                  'lVOTRC'};
                  % 'WangAtlas_IPS0'
                  % 'WangAtlas_IPS1'};
+=======
+list_subInds  = [onlyStanford onlyHebrew]; 
+list_subInds  = [1:12]; 
+list_subInds = [1:12,14:16,18:20];
+
+list_path     = cr.bk.list_sessionRet; 
+list_roiNames = {'WangAtlas_V1v_left';
+                 'WangAtlas_V2v_left';
+                 'WangAtlas_V3v_left';
+                 'WangAtlas_hV4_left';
+                 'WangAtlas_VO1_left';
+                 'lVOTRC';
+                 'WangAtlas_IPS0';
+                 'WangAtlas_IPS1'};
+>>>>>>> 69f7e6a2b0bc57aefb931ccf96a9f93807a27af1
 % list_roiNames = {'LV1_rl'
 %                  'LV2v_rl'
 %                  'LV3v_rl'
@@ -386,13 +584,13 @@ list_roiNames = {'WangAtlas_V1v_left'
 %                  'LVO1_rl'
 %                  'lVOTRC' };
 list_dtNames = {'Words'...
-                'Checkers' ...
+                'Checkers'...
                 'Words_English'...
                 'Words_Hebrew'...
                 'FalseFont'};
 % ret model names
-list_rmNames = {'retModel-Words-css.mat'...
-                'retModel-Checkers-css.mat'...
+list_rmNames = {'retModel-Words-css-fFit.mat'...
+                'retModel-Checkers-css-fFit.mat'...
                 'retModel-Words_English-css.mat'...
                 'retModel-Words_Hebrew-css.mat'...
                 'retModel-FalseFont-css.mat'};
@@ -401,6 +599,7 @@ list_rmDescripts = {'Words'...  % Words (large bars)
                     'Words_English'...
                     'Words_Hebrew'... % Words (smalls bars)
                     'FalseFont'};
+<<<<<<< HEAD
 
 
 %% Get the cell of rms so that we can threshold
@@ -1191,6 +1390,9 @@ end % loop over fields
 
 
 
+=======
+%}
+>>>>>>> 69f7e6a2b0bc57aefb931ccf96a9f93807a27af1
 
 
 
