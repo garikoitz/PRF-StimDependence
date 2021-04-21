@@ -10,9 +10,9 @@ cr.codeDir = crRootPath;
 
 % WHERE THE NEW DATA IS
 cr.dirs.BASE     = '/black/localhome/glerma/TESTDATA/PRF-StimDependence';
-cr.dirs.BASE     = fullfile(crRootPath,'DATA');
+cr.dirs.BASE     = fullfile(crRootPath);
 cr.dirs.DATA     = fullfile(cr.dirs.BASE,'DATA');
-cr.dirs.ANALYSIS = fullfile(cr.dirs.BASE,'ANALYSIS');
+cr.dirs.ANALYSIS = fullfile(cr.dirs.DATA,'ANALYSIS');
 cr.dirs.ORG      = fullfile(cr.dirs.ANALYSIS,'matlabFiles','organization');
 cr.dirs.DEF      = fullfile(cr.dirs.ANALYSIS,'matlabFiles','defineProjectDefaults');
 cr.dirs.FIG      = fullfile(cr.dirs.ANALYSIS,'figures');
@@ -369,16 +369,16 @@ end
 % SELECT SUBJECTS AND MODELS
 onlyStanford  = [1:20];  % Why not the rest? Ask MBS/RL
 onlyHebrew    = [31:36 38:44]; 
-list_subInds  = [onlyStanford onlyHebrew]; 
+list_subInds  = [onlyStanford]; 
 list_path     = cr.bk.list_sessionRet; 
 list_roiNames = {'WangAtlas_V1v_left'
                  'WangAtlas_V2v_left'
                  'WangAtlas_V3v_left'
                  'WangAtlas_hV4_left'
                  'WangAtlas_VO1_left'
-                 'lVOTRC'
-                 'WangAtlas_IPS0'
-                 'WangAtlas_IPS1'};
+                 'lVOTRC'};
+                 % 'WangAtlas_IPS0'
+                 % 'WangAtlas_IPS1'};
 % list_roiNames = {'LV1_rl'
 %                  'LV2v_rl'
 %                  'LV3v_rl'
@@ -404,7 +404,7 @@ list_rmDescripts = {'Words'...  % Words (large bars)
 
 
 %% Get the cell of rms so that we can threshold
-if 1
+if 0
     rmroiCell = ff_rmroiCell(cr,list_subInds, list_roiNames, list_dtNames, ...
             list_rmNames, 'list_path', list_path);
     % SAVE THIS TO WORK LOCALLY
@@ -417,6 +417,14 @@ end
 if 0
     % load(fullfile(crRootPath,'DATA','rmroicell_1to20.mat'));
     load(fullfile(crRootPath,'local','rmroicell_allandall.mat'));
+    % Only the 20
+    list_subInds  = [1:20]; 
+    rmroiCell = rmroiCell(list_subInds,(1:6),[1,2]);
+    % Only the ones with FF
+    % list_subInds  = [1:12]; 
+    % rmroiCell = rmroiCell(list_subInds,(1:6),[1,5]);
+    % Only the Hebrew
+    % rmroiCell = rmroiCell((21:end),(1:6),[1,5]);
 end
                 
 %%  Threshold and get identical voxels for each subject
