@@ -10,22 +10,11 @@ cr.codeDir = crRootPath;
 
 % WHERE THE NEW DATA IS
 cr.dirs.BASE     = '/black/localhome/glerma/TESTDATA/PRF-StimDependence';
-<<<<<<< HEAD
-cr.dirs.BASE     = fullfile(crRootPath);
-cr.dirs.DATA     = fullfile(cr.dirs.BASE,'DATA');
-cr.dirs.ANALYSIS = fullfile(cr.dirs.DATA,'ANALYSIS');
-cr.dirs.ORG      = fullfile(cr.dirs.ANALYSIS,'matlabFiles','organization');
-cr.dirs.DEF      = fullfile(cr.dirs.ANALYSIS,'matlabFiles','defineProjectDefaults');
-=======
-
-% cr.dirs.BASE    = fullfile(crRootPath,'DATA');
-rmpath(genpath(fullfile(crRootPath,'DATA')))
 cr.dirs.DATA     = fullfile(cr.dirs.BASE,'DATA');
 cr.dirs.ANALYSIS = fullfile(cr.dirs.BASE,'ANALYSIS');
-cr.dirs.ORG      = fullfile(cr.dirs.ANALYSIS,'matlabfiles','organization');
-cr.dirs.DEF      = fullfile(cr.dirs.ANALYSIS,'matlabfiles','defineProjectDefaults');
->>>>>>> 69f7e6a2b0bc57aefb931ccf96a9f93807a27af1
-cr.dirs.FIG      = fullfile(cr.dirs.ANALYSIS,'figures');
+cr.dirs.ORG      = fullfile(cr.codeDir,'DATA','ANALYSIS','matlabfiles','organization');
+cr.dirs.DEF      = fullfile(cr.codeDir,'DATA','ANALYSIS','matlabfiles','defineProjectDefaults');
+cr.dirs.FIG      = fullfile(cr.codeDir,'DATA','figures');
 cr.dirs.FIGPNG  = fullfile(cr.dirs.FIG,'png');
 cr.dirs.FIGSVG  = fullfile(cr.dirs.FIG,'svg');
 if ~isfolder(cr.dirs.FIG); mkdir(cr.dirs.FIG); end
@@ -44,7 +33,7 @@ addpath(genpath(fullfile(cr.dirs.ANALYSIS,'matlabfiles')));
 cr.bk = bookKeeping(cr);
 
 %% Run PRFs again
-
+if 0
 % subjects we want to do this for
 list_subInds        = [31:36 38:44];  % Hebrew
 list_subInds        = [1:20];  % Original 20
@@ -102,6 +91,7 @@ for subind =list_subInds
         % pmLaunchDockerCommand('prfanalyze','ellipse','tr1dur300v3','afni6')
         % Convert the data back so that the rest of the scripts continue working
 end
+end
 
 %% PREPARE DATA
 % Generate the rmroicell that we will use in all plots in this script
@@ -130,13 +120,16 @@ list_rmDescripts = {'Words'...  % Words (large bars)
                     ... % 'Words_English'...
                     ... % 'Words_Hebrew'... % Words (smalls bars)
                     'FalseFont'};
-
-rmroiCell=ff_rmroiCell(cr,list_subInds,list_roiNames,list_dtNames,list_rmNames);
-% Save rmroicell just in case
-% save(fullfile(crRootPath,'DATA',...
-%      'rmroicell_subInds-1to20_dtNames-cb-w-ff_fits-Rosemary.mat'),'rmroiCell')
-% load(fullfile(crRootPath,'DATA',...
-%      'rmroicell_subInds-1to20_dtNames-cb-w-ff_fits-Rosemary.mat'),'rmroiCell')
+readExisting = true;
+if readExisting
+    load(fullfile(crRootPath,'DATA',...
+      'rmroicell_subInds-1to20_dtNames-cb-w-ff_fits-Rosemary.mat'),'rmroiCell');
+else
+    rmroiCell=ff_rmroiCell(cr,list_subInds,list_roiNames,list_dtNames,list_rmNames);
+    % Save rmroicell just in case
+    save(fullfile(crRootPath,'DATA',...
+          'rmroicell_subInds-1to20_dtNames-cb-w-ff_fits-Rosemary.mat'),'rmroiCell')
+end
 
 %% FIGURE 1: (C) Groups coverage plots
 
@@ -187,7 +180,6 @@ fname           = 'scatterplot_WordVsCheck_6ROIs_20subs_RosemaryFit_v01';
 
 %% FIGURE 3: (B) Line plots
 
-
 %% COVERAGE: individual plots 
 for subind = 1 [1:12,14:16,18:20] % list_subInds
     subname = cr.bk.list_sub{subind}
@@ -227,8 +219,6 @@ for subind = 1 [1:12,14:16,18:20] % list_subInds
     % Clean workspace of globals after each subject finishes
     mrvCleanWorkspace;
 end
-
-
 
 %% Notes
 % + this is lVOTRC, do the same for V1-4,hvo1 (the ones in the paper)
@@ -551,18 +541,6 @@ end
 %{
 onlyStanford  = [1:20];  % Why not the rest? Ask MBS/RL
 onlyHebrew    = [31:36 38:44]; 
-<<<<<<< HEAD
-list_subInds  = [onlyStanford]; 
-list_path     = cr.bk.list_sessionRet; 
-list_roiNames = {'WangAtlas_V1v_left'
-                 'WangAtlas_V2v_left'
-                 'WangAtlas_V3v_left'
-                 'WangAtlas_hV4_left'
-                 'WangAtlas_VO1_left'
-                 'lVOTRC'};
-                 % 'WangAtlas_IPS0'
-                 % 'WangAtlas_IPS1'};
-=======
 list_subInds  = [onlyStanford onlyHebrew]; 
 list_subInds  = [1:12]; 
 list_subInds = [1:12,14:16,18:20];
@@ -576,7 +554,6 @@ list_roiNames = {'WangAtlas_V1v_left';
                  'lVOTRC';
                  'WangAtlas_IPS0';
                  'WangAtlas_IPS1'};
->>>>>>> 69f7e6a2b0bc57aefb931ccf96a9f93807a27af1
 % list_roiNames = {'LV1_rl'
 %                  'LV2v_rl'
 %                  'LV3v_rl'
@@ -599,8 +576,6 @@ list_rmDescripts = {'Words'...  % Words (large bars)
                     'Words_English'...
                     'Words_Hebrew'... % Words (smalls bars)
                     'FalseFont'};
-<<<<<<< HEAD
-
 
 %% Get the cell of rms so that we can threshold
 if 0
@@ -1392,7 +1367,6 @@ end % loop over fields
 
 =======
 %}
->>>>>>> 69f7e6a2b0bc57aefb931ccf96a9f93807a27af1
 
 
 
