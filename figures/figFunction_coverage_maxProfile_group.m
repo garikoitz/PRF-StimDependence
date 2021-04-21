@@ -15,15 +15,21 @@ function figFunction_coverage_maxProfile_group(cr, subinds, varargin)
 varargin = mrvParamFormat(varargin);
 % Parse
 p = inputParser;
-p.addRequired('cr'  , @isstruct);
-p.addRequired('subinds' , @isnumeric);
-p.addOptional('flip',true, @islogical);
+p.addRequired('cr'        , @isstruct);
+p.addRequired('subinds'   , @isnumeric);
+p.addOptional('flip'      , true,  @islogical);
+p.addOptional('savefig'   , false, @islogical);
+p.addOptional('vers','v01', @ischar);
+p.addOptional('rmroiCell' , {}, @iscell);
 
 % Parse. Assign result inside each case
 p.parse(cr, subinds, varargin{:});
 % Read here only the generic ones
-flip = p.Results.flip;
-    
+flip      = p.Results.flip;
+savefig   = p.Results.savefig;
+vers      = p.Results.vers;
+rmroiCell = p.Results.rmroiCell;
+
 %%
 vfc = cr.defaults.covfig.vfc;
 % visual field plotting thresholds
@@ -32,24 +38,24 @@ vfc = cr.defaults.covfig.vfc;
 % vfc.method = 'max'; % avg | 'max'
 
 % session list, see bookKeeping
-list_path = cr.bk.list_sessionRet; 
+list_path     = cr.bk.list_sessionRet; 
 
 % subjects to do this for, see bookKeeping
 % %[31:36 38 39:44] % Hebrew
-list_subInds = subinds; 
+list_subInds  = subinds; 
 
 % whether we want to plot the half max contour
-plotContour = vfc.contourPlot; 
-contourLevel = vfc.contourLevel; 
+plotContour   = vfc.contourPlot; 
+contourLevel  = vfc.contourLevel; 
 
 % rois we want to look at
 list_roiNames = vfc.list_roiNames;
 
 % data types we want to look at
-list_dtNames = vfc.list_dtNames;
+list_dtNames  = vfc.list_dtNames;
 
 % names of the rm in each dt
-list_rmNames = vfc.list_rmNames;
+list_rmNames  = vfc.list_rmNames;
 
 %% define things
 numRois = length(list_roiNames);
@@ -57,8 +63,15 @@ numRms = length(list_dtNames);
 numSubs = length(list_subInds);
 
 %% get the rmroi cell
-rmroiCell = ff_rmroiCell(cr,list_subInds, list_roiNames, list_dtNames, list_rmNames);
-
+if isempty(rmroiCell)
+    % Calculate rmroiCell
+    rmroiCell = ff_rmroiCell(cr,list_subInds, list_roiNames, list_dtNames, list_rmNames);
+else
+    % Check if the size is ok: 
+    if ~isequal(size(rmroiCell),[length(list_subInds),length(list_roiNames),length(list_dtNames)])
+        error('Size of rmroiCell is not the same as its components')
+    end
+end
 
 %% make averaged coverage plot for each roi and rm model
 %% loop over rois
@@ -113,9 +126,20 @@ for jj = 1:numRois
             ['vfc.method: ' vfc.method]
             };
         title(titleName, 'FontWeight', 'Bold')
-
+        if savefig
+            % Save the figure
+            saveas(gcf,fullfile(cr.dirs.FIGPNG, ...
+                strcat([strrep(strjoin(titleName),' ','_'), '_' vers],'.png')),'png');
+            saveas(gcf,fullfile(cr.dirs.FIGSVG, ...
+                strcat([strrep(strjoin(titleName),' ','_'), '_' vers],'.svg')),'svg');
+        end
                 
     end
     
 end
+
+
+
+
+
 end
