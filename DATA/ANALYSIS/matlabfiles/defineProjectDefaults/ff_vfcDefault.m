@@ -33,6 +33,7 @@ vfc.tickLabel       = false;
 vfc.contourBootstrap= false; 
 vfc.cothreshceil    = 1;        % don't get voxels higher than this
 vfc.gridColor       = [.6 .6 .6];
+vfc.gridLineWidth   = 2;
 
 
 

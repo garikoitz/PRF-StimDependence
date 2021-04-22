@@ -1,4 +1,9 @@
-function  crCreateLinePlot(cr,R,list_roiNames)
+function  crCreateLinePlot(  R, C_data, cr, ...
+                                list_subInds,...
+                                list_roiNames,...
+                                list_rmNames,...
+                                list_rmDescripts,...
+                                fname)
 % Line plots: from checquerboard to word
 % Combine code in figScript_centers_* to create the plots Brian nd I
 % discussed
@@ -15,24 +20,24 @@ xx = mrvNewGraphWin('LineRadiality and Scatterplot','wide');
 set(xx,'Position',[0.005 0.062 .95 .55 ]);
 for jj = 1:numRois  
     % data
-    ldata = L_data{jj}; 
+    ldata = R.L_data{jj}; 
     
-    X1 = X_rm1{jj};
-    Y1 = Y_rm1{jj};
+    X1 = R.X_rm1{jj};
+    Y1 = R.Y_rm1{jj};
     
-    X2 = X_rm2{jj};
-    Y2 = Y_rm2{jj};
+    X2 = R.X_rm2{jj};
+    Y2 = R.Y_rm2{jj};
     
     C = C_data{jj};
     
-    ecc_rm1 = Ecc_rm1{jj}; 
-    ecc_rm2 = Ecc_rm2{jj};
+    ecc_rm1 = R.Ecc_rm1{jj}; 
+    ecc_rm2 = R.Ecc_rm2{jj};
     
-    ph_rm1 = Ph_rm1{jj}; 
-    ph_rm2 = Ph_rm2{jj};
+    ph_rm1 = R.Ph_rm1{jj}; 
+    ph_rm2 = R.Ph_rm2{jj};
     
-    sm_rm1 = Sm_rm1{jj}; 
-    sm_rm2 = Sm_rm2{jj};
+    sm_rm1 = R.Sm_rm1{jj}; 
+    sm_rm2 = R.Sm_rm2{jj};
     
     roiName = list_roiNames{jj};
     
@@ -154,7 +159,7 @@ for jj = 1:numRois
                     lineStyle = ['-'];
                 else
                     lineColor = [.5 .5 .5];
-                    lineStyle = [':'];
+                    lineStyle = ['-'];
                 end
                 
                 if radialityCone
@@ -211,7 +216,7 @@ for jj = 1:numRois
                     if testing
                         line([x1 x2], [y1, y2], ...
                             'Color', 'r', 'LineStyle', lineStyle, ...
-                             'LineWidth',1); 
+                             'LineWidth',1.5); 
                          % Assertions that the calculations are right
                         d      = sqrt((x2-x1)^2 +  (y2-y1)^2)
                         dn     = sqrt((x2nt-x1nt)^2 +  (y2n-y1n)^2)
@@ -220,7 +225,7 @@ for jj = 1:numRois
                 else
                     plot([X1(pp) X2(pp)], [Y1(pp), Y2(pp)], ...
                         'Color', lineColor, 'LineStyle', lineStyle, ...
-                         'LineWidth',1);       
+                         'LineWidth',1.5);       
                 end
             end
         end
@@ -278,9 +283,14 @@ for jj = 1:numRois
 
    end
 end
-saveas(gcf, fullfile(crRootPath,'local','png',['Radiality_Plots_2x' num2str(fov) '.png']), 'png')    
-saveas(gcf, fullfile(crRootPath,'local','svg',['Radiality_Plots_2x' num2str(fov) '.svg']), 'svg')    
-close all
+
+    set(gcf,'color','w');
+    if ~isempty(fname)
+        saveas(gcf, fullfile(cr.dirs.FIGPNG, [fname '.png']), 'png')
+        saveas(gcf, fullfile(cr.dirs.FIGSVG,[fname '.svg']), 'svg')
+    end
+
+
 end
 
 end

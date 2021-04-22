@@ -6,6 +6,7 @@ function ff_polarPlot(vfc)
 p.ringTicks = (1:3)/3*vfc.fieldRange;
 p.gridColor = vfc.gridColor;                % default is [.6 .6 .6]
 p.backgroundColor = vfc.backgroundColor;    % what it will be displayed as (fig)
+p.gridLineWidth=vfc.gridLineWidth;
 
 % what the png will be saved as
 if ~isfield(vfc, 'fillColor')

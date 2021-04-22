@@ -17,18 +17,22 @@ varargin = mrvParamFormat(varargin);
 p = inputParser;
 p.addRequired('cr'        , @isstruct);
 p.addRequired('subinds'   , @isnumeric);
+
 p.addOptional('flip'      , true,  @islogical);
-p.addOptional('savefig'   , false, @islogical);
+p.addOptional('rmroicell' , {}, @iscell);
 p.addOptional('vers','v01', @ischar);
-p.addOptional('rmroiCell' , {}, @iscell);
+p.addOptional('fname',''  , @ischar);
+
 
 % Parse. Assign result inside each case
 p.parse(cr, subinds, varargin{:});
 % Read here only the generic ones
 flip      = p.Results.flip;
-savefig   = p.Results.savefig;
+rmroiCell = p.Results.rmroicell;
 vers      = p.Results.vers;
-rmroiCell = p.Results.rmroiCell;
+fname     = p.Results.fname;
+
+if isempty(fname);savefig=false;else;savefig=true;end
 
 %%
 vfc = cr.defaults.covfig.vfc;
@@ -129,9 +133,9 @@ for jj = 1:numRois
         if savefig
             % Save the figure
             saveas(gcf,fullfile(cr.dirs.FIGPNG, ...
-                strcat([strrep(strjoin(titleName),' ','_'), '_' vers],'.png')),'png');
+                strcat([fname strrep(strjoin(titleName),' ','_') '_' vers],'.png')),'png');
             saveas(gcf,fullfile(cr.dirs.FIGSVG, ...
-                strcat([strrep(strjoin(titleName),' ','_'), '_' vers],'.svg')),'svg');
+                strcat([fname strrep(strjoin(titleName),' ','_') '_' vers],'.svg')),'svg');
         end
                 
     end
