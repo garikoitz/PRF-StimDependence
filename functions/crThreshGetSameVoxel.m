@@ -33,6 +33,10 @@ fieldRange    = p.Results.fieldrange;
 % The defaults are different for the two projects, so for now use the most
 % restrictive one
 % vfc threshold
+
+vfc = ff_vfcDefault();
+
+
 vfc.prf_size         = true;
 vfc.fieldRange       = fieldRange; % 15 CNI % 7 Israel;
 vfc.method           = 'max';
@@ -99,8 +103,12 @@ for jj = 1:numRois
     for ii = 1:numSubs        
         % get identical voxels for each subject's roi over all ret models
         D = rmroiCell(ii,jj,:);
-        % GLU EDIT function: remove voxels from the oppossite hemifield
-        rmroiCellSameVox(ii,jj,:) = ff_rmroiGetSameVoxels(D, cr.defaults.covfig.vfc);
+        if (~isempty(D{1,1,1}) && ~isempty(D{1,1,2})) 
+            % GLU EDIT function: remove voxels from the oppossite hemifield
+            rmroiCellSameVox(ii,jj,:) = ff_rmroiGetSameVoxels(D, cr.defaults.covfig.vfc);
+        else
+            disp('')
+        end
     end
 end
 

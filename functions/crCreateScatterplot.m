@@ -1,22 +1,9 @@
 function  crCreateScatterplot(  R, C_data, cr, ...
                                 list_subInds,...
                                 list_roiNames,...
-                                list_rmNames,...
                                 list_rmDescripts,...
                                 fieldName, ...
                                 fname)
-
-% rmDescript1 = list_rmDescripts{1};
-% rmDescript2 = list_rmDescripts{2};
-
-
-
-
-
-
-
-
-
 %%
 % colormap for histogram
 % cmapValuesHist = colormap('pink');
@@ -75,7 +62,6 @@ cbarLocation = 'eastoutside';
 
 numSubs = length(list_subInds);
 numRois = length(list_roiNames);
-numRms  = length(list_rmNames);
 
 % number of fields
 % numFields = length(list_fieldNames);
@@ -136,8 +122,10 @@ A = cell(numRois, 5);
     elseif strcmp(fieldName, 'co')
         maxValue = 1; 
         fov = 0.2; % width of the band
-        nrows = 1; ncols = 6;
-        position = [0.005 0.062 .95 .6 ];
+        % nrows = 1; ncols = 6;
+        nrows = 2; ncols = 3;
+        % position = [0.005 0.062 .95 .6 ];
+        position = [0.005 0.062 .95 .7 ];
     elseif strcmp(fieldName, 'exponent')
         maxValue = 2; 
     elseif strcmp(fieldName, 'meanMax')
@@ -274,12 +262,12 @@ A = cell(numRois, 5);
                     xlabel(['pRF eccentricity for ' rm1Descript ' (deg)'])
                 end
             case {'co'}
-                if jj==1 % || jj==4
+                if jj==1 || jj==4
                     ylabel(['Variance explained for ' rm2Descript ' (%)'])
                 end
-                % if jj>3
+                if jj>3
                     xlabel(['Variance explained for ' rm1Descript ' (%)'])
-                % end
+                end
             otherwise
                 if jj==1 || jj==4
                     ylabel(['' rm2Descript ''])
@@ -300,6 +288,7 @@ A = cell(numRois, 5);
     % title(titleName, 'FontWeight', 'Bold');
     % fname = [titleName{1} '_' fieldName '_band-2x' num2str(fov)];
     if ~isempty(fname)
+        set(gcf, 'InvertHardcopy', 'off')
         saveas(gcf, fullfile(cr.dirs.FIGPNG, [fname '.png']), 'png')
         saveas(gcf, fullfile(cr.dirs.FIGSVG,[fname '.svg']), 'svg')
     end

@@ -131,6 +131,16 @@ else
           'rmroicell_subInds-1to20_dtNames-cb-w-ff_fits-Rosemary.mat'),'rmroiCell')
 end
 
+% Read the generic params for coverage for all subjects
+cr.defaults.covfig.vfc = ff_vfcDefault();
+cr.defaults.covfig.vfc.list_roiNames = list_roiNames;
+% data types we want to look at
+cr.defaults.covfig.vfc.list_dtNames = list_dtNames;
+% names of the rm in each dt
+cr.defaults.covfig.vfc.list_rmNames = list_rmNames;
+% subinds = [31:36 38:44]; % Hebrew
+% cr.defaults.covfig.vfc = ff_vfcDefault_Hebrew();
+
 %% FIGURE 1: (C) Groups coverage plots
 
 % (A) Explain how to obtain
@@ -150,15 +160,7 @@ end
 % subinds = [1:20]; % Stanford Subjects, 1 is gomez, find anatomicals
 % subinds = [1:12,14:16,18:20];
 
-% Read the generic params for coverage for all subjects
-cr.defaults.covfig.vfc = ff_vfcDefault();
-cr.defaults.covfig.vfc.list_roiNames = list_roiNames;
-% data types we want to look at
-cr.defaults.covfig.vfc.list_dtNames = list_dtNames;
-% names of the rm in each dt
-cr.defaults.covfig.vfc.list_rmNames = list_rmNames;
-% subinds = [31:36 38:44]; % Hebrew
-% cr.defaults.covfig.vfc = ff_vfcDefault_Hebrew();
+
 
 % Launch the function
 fname = 'Fig1_'; % '' for not saving
@@ -166,11 +168,13 @@ figFunction_coverage_maxProfile_group(cr,list_subInds, 'flip',false, ...
                                       'rmroiCell',rmroiCell,...
                                       'fname', fname, 'vers','v01_oldfit');
                                
-%% FIGURE 2: (C) Scatterplots: word-checkerboard
+%% FIGURE 2: (C) Eccentricity: Scatterplots: word-checkerboard
 % Order is CB, W, FF, invert it so that it is W then CB
-rmroiCell_WC    = rmroiCell(:,1:6,1:2);
-rmroiCell_WC    = flipdim(rmroiCell_WC,3);
-list_roiNames16 = list_roiNames(1:6);
+rmroiCell_WC     = rmroiCell(:,1:6,1:2);
+rmroiCell_WC     = flip(rmroiCell_WC,3);
+list_roiNames16  = list_roiNames(1:6);
+list_rmDescripts = {'Words','Checkers'};%    {'FalseFont'}
+
 
 % Obtain equally thresholded voxels to scatterplot
 [R,C_data,cr]=crThreshGetSameVoxel(cr,...
@@ -181,11 +185,10 @@ list_roiNames16 = list_roiNames(1:6);
                                    'fieldrange', 15);
 
 % Plot it
-fname = 'scatterplot_WordVsCheck_6ROIs_20subs_RosemaryFit_v01';
+fname = 'scatterplot_eccentricity_WordVsCheck_6ROIs_20subs_RosemaryFit_v01';
 crCreateScatterplot(R,C_data,cr,...
                     list_subInds,...
                     list_roiNames16,...
-                    list_rmNames,...
                     list_rmDescripts,...
                     'ecc', ...  % 'co'
                     fname);
@@ -204,10 +207,81 @@ crCreateLinePlot(R,C_data,cr,...
                  list_rmDescripts,...
                  fname);
              
+             
+%% FIGURE 4: (A) Variance Explained: Scatterplot: word-checkerboard
+% Uses the same voxel calculations from the previous plot
+% If doubt or this is moved, calculate it again here
+
+% Plot it
+fname = 'scatterplot_varianceExplained_WordVsCheck_6ROIs_20subs_RosemaryFit_v01';
+crCreateScatterplot(R,C_data,cr,...
+                    list_subInds,...
+                    list_roiNames16,...
+                    list_rmDescripts,...
+                    'co', ...  % 'co'
+                    fname);
+
+%% FIGURE 5: (A) Variance Explained: Scatterplot: word-checkerboard
+% Order is CB, W, FF, invert it so that it is W then CB
+rmroiCell_WF    = rmroiCell(:,1:6,2:3);
+list_roiNames16 = list_roiNames(1:6);
+list_rmDescripts = {'Words','FalseFont'};
+
+% Obtain equally thresholded voxels to scatterplot
+[R,C_data,cr]=crThreshGetSameVoxel(cr,...
+                                   rmroiCell_WF,...
+                                   list_subInds,...
+                                   list_roiNames16,...
+                                   'cothres', 0.2,...
+                                   'fieldrange', 15);
+
+fname = 'scatterplot_eccentricity_WordVsFF_6ROIs_20subs_RosemaryFit_v01';
+crCreateScatterplot(R,C_data,cr,...
+                    list_subInds,...
+                    list_roiNames16,...
+                    list_rmDescripts,...
+                    'ecc', ...  % 'co'
+                    fname);
 
 
+% FIGURE 5: (B) Variance Explained: Scatterplot: word-falsefont
+% Uses the same voxel calculations from the previous plot
+% If doubt or this is moved, calculate it again here
 
+% Plot it
+fname = 'scatterplot_varianceExplained_WordVsFF_6ROIs_20subs_RosemaryFit_v01';
+crCreateScatterplot(R,C_data,cr,...
+                    list_subInds,...
+                    list_roiNames16,...
+                    list_rmDescripts,...
+                    'co', ...  % 'co'
+                    fname);
+                
 
+% FIGURE 5: (C) Variance Explained: Scatterplot: word-checkerboard                
+rmroiCell_FC    = rmroiCell(:,1:6,[1,3]);
+rmroiCell_FC    = flip(rmroiCell_FC,3);
+list_roiNames16 = list_roiNames(1:6);
+list_rmDescripts = {'FalseFont','Checkers'};
+
+% Obtain equally thresholded voxels to scatterplot
+[R,C_data,cr]=crThreshGetSameVoxel(cr,...
+                                   rmroiCell_FC,...
+                                   list_subInds,...
+                                   list_roiNames16,...
+                                   'cothres', 0.2,...
+                                   'fieldrange', 15);
+
+fname = 'scatterplot_eccentricity_FFVsCB_6ROIs_20subs_RosemaryFit_v01';
+crCreateScatterplot(R,C_data,cr,...
+                    list_subInds,...
+                    list_roiNames16,...
+                    list_rmDescripts,...
+                    'ecc', ...  % 'co'
+                    fname);
+                
+                
+                
 %% COVERAGE: individual plots 
 for subind = 1 [1:12,14:16,18:20] % list_subInds
     subname = cr.bk.list_sub{subind}
