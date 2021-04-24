@@ -125,11 +125,36 @@ if readExisting
     load(fullfile(crRootPath,'DATA',...
       'rmroicell_subInds-1to20_dtNames-cb-w-ff_fits-Rosemary.mat'),'rmroiCell');
 else
-    rmroiCell=ff_rmroiCell(cr,list_subInds,list_roiNames,list_dtNames,list_rmNames);
+    rmroiCell=ff_rmroiCell(cr,list_subInds,list_roiNames,list_dtNames,...
+                           list_rmNames,'list_path',cr.bk.list_sessionRet);
     % Save rmroicell just in case
     save(fullfile(crRootPath,'DATA',...
           'rmroicell_subInds-1to20_dtNames-cb-w-ff_fits-Rosemary.mat'),'rmroiCell')
 end
+
+% Do the same with the small and large words
+list_subInds     = [1,3,4,13:20];
+list_dtNames     = {'WordSmall','WordLarge'};
+list_rmNames     = {'retModel-WordSmall-css.mat'
+                    'retModel-WordLarge-css.mat' };
+list_rmDescripts = {'WordSmall'... 
+                    'WordLarge'};
+readExisting = true;
+if readExisting
+    load(fullfile(crRootPath,'DATA',...
+      'rmroicell_subInds-1-3-4-13to20_dtNames-Wsmall-Wlarge_fits-Rosemary.mat'),'rmroiCell');
+else
+    rmroiCell=ff_rmroiCell(cr,list_subInds,list_roiNames,list_dtNames,...
+                           list_rmNames,'list_path',cr.bk.list_sessionSizeRet);
+    % Save rmroicell just in case
+    save(fullfile(crRootPath,'DATA',...
+      'rmroicell_subInds-1-3-4-13to20_dtNames-Wsmall-Wlarge_fits-Rosemary.mat'),'rmroiCell')
+end
+
+
+
+
+
 
 % Read the generic params for coverage for all subjects
 cr.defaults.covfig.vfc = ff_vfcDefault();
