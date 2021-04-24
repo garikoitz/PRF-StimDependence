@@ -109,7 +109,7 @@ A = cell(numRois, 5);
     % field-specific properties
     % fieldName = list_fieldNames{ff}; % We pass it now...
     % fieldNameDescript = list_fieldDescripts{ff}; 
-
+    radius = 1;
     if strcmp(fieldName, 'sigma1') 
         maxValue = cr.defaults.covfig.vfc.sigmaMajthresh(2);
     elseif strcmp(fieldName, 'sigma')          
@@ -119,6 +119,7 @@ A = cell(numRois, 5);
         fov = 1.5; % width of the band
         nrows = 2; ncols = 3;
         position = [0.005 0.062 .95 .7 ];
+        radius = 2;
     elseif strcmp(fieldName, 'co')
         maxValue = 1; 
         fov = 0.2; % width of the band
@@ -126,6 +127,7 @@ A = cell(numRois, 5);
         nrows = 2; ncols = 3;
         % position = [0.005 0.062 .95 .6 ];
         position = [0.005 0.062 .95 .7 ];
+        radius = .15;
     elseif strcmp(fieldName, 'exponent')
         maxValue = 2; 
     elseif strcmp(fieldName, 'meanMax')
@@ -250,7 +252,7 @@ A = cell(numRois, 5);
         npoints = 100; 
         
         % 3d histogram heat map -- absolute number of voxels
-        ff_histogramHeat(BarData1, BarData2, maxValue, maxValue, 50,cmapValuesHist,fov,roiName);
+        ff_histogramHeat(BarData1, BarData2, maxValue, maxValue,radius,cmapValuesHist,fov,roiName);
         numVoxels = length(BarData1); 
         % axes and title
         switch fieldName

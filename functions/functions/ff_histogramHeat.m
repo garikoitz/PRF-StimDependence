@@ -8,6 +8,8 @@ function ff_histogramHeat(x, y, maxValueX, maxValueY, numHistBins,cmapValuesHist
 % maxValue:     limits of the x and y axis
 % numHistBins   something around 50
 
+% GLU: used numHistBins as the radius of scatplot now, it was unused
+
 %% 
 minValueX = 0; %-2.3; % 0
 minValueY = 0; %-2.3; % 0
@@ -25,7 +27,8 @@ axisLimsY = [minValueY maxValueY];
 
 
 % New GLU: 2D plot, simpler and more control
-scatplot(x,y,'squares',2,100,5,1,10,cmapValuesHist);
+% scatplot(x,y,method,radius,N,n,po,ms,colormap)
+scatplot(x,y,'squares',numHistBins,100,5,1,10,cmapValuesHist);
 set(gca,'color','k');
 set(gca, 'xlim', axisLimsX);
 set(gca, 'ylim', axisLimsY);

@@ -1,4 +1,4 @@
-%% STEPS
+%% INIT
 % This repository is based on the code created by Rosemary Le, part of coverageReading
 % repository. For the Stimulus Dependence paper (2019) we tried to make it into
 % a reproducible and reusable process. The thing is that we need to separate
@@ -93,9 +93,16 @@ for subind =list_subInds
 end
 end
 
-%% PREPARE DATA
+%% -----------------------------------------------------------------------------
+
+%% PREPARE DATA: WORDS, CHECKERS AND FALSEFONTS
 % Generate the rmroicell that we will use in all plots in this script
 % This will read the results obtained by Rosemary or the re-run in 2021
+
+readExisting = true;
+
+
+% 
 list_subInds  = [1:20];
 list_roiNames = {'WangAtlas_V1v_left'
                  'WangAtlas_V2v_left'
@@ -120,10 +127,9 @@ list_rmDescripts = {'Words'...  % Words (large bars)
                     ... % 'Words_English'...
                     ... % 'Words_Hebrew'... % Words (smalls bars)
                     'FalseFont'};
-readExisting = true;
 if readExisting
     load(fullfile(crRootPath,'DATA',...
-      'rmroicell_subInds-1to20_dtNames-cb-w-ff_fits-Rosemary.mat'),'rmroiCell');
+          'rmroicell_subInds-1to20_dtNames-cb-w-ff_fits-Rosemary.mat'),'rmroiCell');
 else
     rmroiCell=ff_rmroiCell(cr,list_subInds,list_roiNames,list_dtNames,...
                            list_rmNames,'list_path',cr.bk.list_sessionRet);
@@ -131,30 +137,6 @@ else
     save(fullfile(crRootPath,'DATA',...
           'rmroicell_subInds-1to20_dtNames-cb-w-ff_fits-Rosemary.mat'),'rmroiCell')
 end
-
-% Do the same with the small and large words
-list_subInds     = [1,3,4,13:20];
-list_dtNames     = {'WordSmall','WordLarge'};
-list_rmNames     = {'retModel-WordSmall-css.mat'
-                    'retModel-WordLarge-css.mat' };
-list_rmDescripts = {'WordSmall'... 
-                    'WordLarge'};
-readExisting = true;
-if readExisting
-    load(fullfile(crRootPath,'DATA',...
-      'rmroicell_subInds-1-3-4-13to20_dtNames-Wsmall-Wlarge_fits-Rosemary.mat'),'rmroiCell');
-else
-    rmroiCell=ff_rmroiCell(cr,list_subInds,list_roiNames,list_dtNames,...
-                           list_rmNames,'list_path',cr.bk.list_sessionSizeRet);
-    % Save rmroicell just in case
-    save(fullfile(crRootPath,'DATA',...
-      'rmroicell_subInds-1-3-4-13to20_dtNames-Wsmall-Wlarge_fits-Rosemary.mat'),'rmroiCell')
-end
-
-
-
-
-
 
 % Read the generic params for coverage for all subjects
 cr.defaults.covfig.vfc = ff_vfcDefault();
@@ -217,9 +199,8 @@ crCreateScatterplot(R,C_data,cr,...
                     list_rmDescripts,...
                     'ecc', ...  % 'co'
                     fname);
-
-                
-%% FIGURE 3: (B) Line plots
+   
+%% FIGURE 3: (B) Line plots: word-checkerboard 
 % Uses the same voxel calculations from the previous plot
 % If doubt or this is moved, calculate it again here
 
@@ -231,7 +212,6 @@ crCreateLinePlot(R,C_data,cr,...
                  list_rmNames,...
                  list_rmDescripts,...
                  fname);
-             
              
 %% FIGURE 4: (A) Variance Explained: Scatterplot: word-checkerboard
 % Uses the same voxel calculations from the previous plot
@@ -246,7 +226,7 @@ crCreateScatterplot(R,C_data,cr,...
                     'co', ...  % 'co'
                     fname);
 
-%% FIGURE 5: (A) Variance Explained: Scatterplot: word-checkerboard
+%% FIGURE 5: (A) Eccentricity and (B) Variance Explained: Scatterplot: word-falsefont
 % Order is CB, W, FF, invert it so that it is W then CB
 rmroiCell_WF    = rmroiCell(:,1:6,2:3);
 list_roiNames16 = list_roiNames(1:6);
@@ -304,6 +284,196 @@ crCreateScatterplot(R,C_data,cr,...
                     list_rmDescripts,...
                     'ecc', ...  % 'co'
                     fname);
+
+%% FIGURE 8: IPS Eccentricity: Scatterplots: word-checkerboard
+% Order is CB, W, FF, invert it so that it is W then CB
+rmroiCell_WCIPS     = rmroiCell(:,7:8,1:2);
+rmroiCell_WCIPS     = flip(rmroiCell_WCIPS,3);
+list_roiNames78  = list_roiNames(7:8);
+list_rmDescripts = {'Words','Checkers'};
+
+
+% Obtain equally thresholded voxels to scatterplot
+[R,C_data,cr]=crThreshGetSameVoxel(cr,...
+                                   rmroiCell_WCIPS,...
+                                   list_subInds,...
+                                   list_roiNames78,...
+                                   'cothres', 0.2,...
+                                   'fieldrange', 15);
+
+% Plot it
+fname = 'scatterplot_eccentricity_WordVsCheck_IPS01_20subs_RosemaryFit_v01';
+crCreateScatterplot(R,C_data,cr,...
+                    list_subInds,...
+                    list_roiNames78,...
+                    list_rmDescripts,...
+                    'ecc', ...
+                    '');
+fname = 'scatterplot_varianceExplained_WordVsCheck_IPS01_20subs_RosemaryFit_v01';
+crCreateScatterplot(R,C_data,cr,...
+                    list_subInds,...
+                    list_roiNames78,...
+                    list_rmDescripts,...
+                    'co', ...
+                    '');                
+                
+%% -----------------------------------------------------------------------------
+
+%% PREPARE DATA: WORDS LARGE AND SMALL
+% Generate the rmroicell that we will use in all plots in this script
+% This will read the results obtained by Rosemary or the re-run in 2021
+
+readExisting = true;
+% Do the same with the small and large words
+list_subInds     = [1,3,4,13:20];
+list_dtNames     = {'WordSmall','WordLarge'};
+list_roiNames = {'WangAtlas_V1v_left'
+                 'WangAtlas_V2v_left'
+                 'WangAtlas_V3v_left'
+                 'WangAtlas_hV4_left'
+                 'WangAtlas_VO1_left'
+                 'lVOTRC' 
+                 'WangAtlas_IPS0'
+                 'WangAtlas_IPS1'};
+list_rmNames     = {'retModel-WordSmall-css.mat'
+                    'retModel-WordLarge-css.mat' };
+list_rmDescripts = {'WordSmall'... 
+                    'WordLarge'};           
+if readExisting
+    load(fullfile(crRootPath,'DATA',...
+      'rmroicell_subInds-1-3-4-13to20_dtNames-Wsmall-Wlarge_fits-Rosemary.mat'),'rmroiCell');
+else
+    rmroiCell=ff_rmroiCell(cr,list_subInds,list_roiNames,list_dtNames,...
+                           list_rmNames,'list_path',cr.bk.list_sessionSizeRet);
+    % Save rmroicell just in case
+    save(fullfile(crRootPath,'DATA',...
+      'rmroicell_subInds-1-3-4-13to20_dtNames-Wsmall-Wlarge_fits-Rosemary.mat'),'rmroiCell')
+end
+
+% Read the generic params for coverage for all subjects
+cr.defaults.covfig.vfc = ff_vfcDefault();
+cr.defaults.covfig.vfc.list_roiNames = list_roiNames;
+% data types we want to look at
+cr.defaults.covfig.vfc.list_dtNames = list_dtNames;
+% names of the rm in each dt
+cr.defaults.covfig.vfc.list_rmNames = list_rmNames;
+% subinds = [31:36 38:44]; % Hebrew
+% cr.defaults.covfig.vfc = ff_vfcDefault_Hebrew();             
+                
+%% FIGURE 6: (A) Eccentricity and (B) Variance Explained: Scatterplot: word-falsefont
+% Order is WS,WL
+list_roiNames16 = list_roiNames(1:6);
+list_rmDescripts = {'WordSmall','WordLarge'};
+
+% Obtain equally thresholded voxels to scatterplot
+[R,C_data,cr]=crThreshGetSameVoxel(cr,...
+                                   rmroiCell,...
+                                   list_subInds,...
+                                   list_roiNames16,...
+                                   'cothres', 0.2,...
+                                   'fieldrange', 15);
+
+fname = 'scatterplot_eccentricity_WordSmallVsWordLarge_6ROIs_11subs_RosemaryFit_v01';
+crCreateScatterplot(R,C_data,cr,...
+                    list_subInds,...
+                    list_roiNames16,...
+                    list_rmDescripts,...
+                    'ecc', ...  % 'co'
+                    fname);
+
+
+% FIGURE 6: (B) Variance Explained: Scatterplot: wordLarge-WordSmall
+% Uses the same voxel calculations from the previous plot
+% If doubt or this is moved, calculate it again here
+
+% Plot it
+fname = 'scatterplot_varianceExplained_WordSmallVsWordLarge_6ROIs_11subs_RosemaryFit_v01';
+crCreateScatterplot(R,C_data,cr,...
+                    list_subInds,...
+                    list_roiNames16,...
+                    list_rmDescripts,...
+                    'co', ...  % 'co'
+                    fname);
+                
+%% -----------------------------------------------------------------------------
+                
+%% PREPARE DATA: ENGLISH AND HEBREW WORDS 
+% Generate the rmroicell that we will use in all plots in this script
+% This will read the results obtained by Rosemary or the re-run in 2021
+
+readExisting = true;
+% Do the same with the small and large words
+list_subInds     = [1,3,4,13:20];
+list_dtNames     = {'WordSmall','WordLarge'};
+list_roiNames = {'WangAtlas_V1v_left'
+                 'WangAtlas_V2v_left'
+                 'WangAtlas_V3v_left'
+                 'WangAtlas_hV4_left'
+                 'WangAtlas_VO1_left'
+                 'lVOTRC' 
+                 'WangAtlas_IPS0'
+                 'WangAtlas_IPS1'};
+list_rmNames     = {'retModel-WordSmall-css.mat'
+                    'retModel-WordLarge-css.mat' };
+list_rmDescripts = {'WordSmall'... 
+                    'WordLarge'};           
+if readExisting
+    load(fullfile(crRootPath,'DATA',...
+      'rmroicell_subInds-1-3-4-13to20_dtNames-Wsmall-Wlarge_fits-Rosemary.mat'),'rmroiCell');
+else
+    rmroiCell=ff_rmroiCell(cr,list_subInds,list_roiNames,list_dtNames,...
+                           list_rmNames,'list_path',cr.bk.list_sessionSizeRet);
+    % Save rmroicell just in case
+    save(fullfile(crRootPath,'DATA',...
+      'rmroicell_subInds-1-3-4-13to20_dtNames-Wsmall-Wlarge_fits-Rosemary.mat'),'rmroiCell')
+end
+
+% Read the generic params for coverage for all subjects
+cr.defaults.covfig.vfc = ff_vfcDefault();
+cr.defaults.covfig.vfc.list_roiNames = list_roiNames;
+% data types we want to look at
+cr.defaults.covfig.vfc.list_dtNames = list_dtNames;
+% names of the rm in each dt
+cr.defaults.covfig.vfc.list_rmNames = list_rmNames;
+% subinds = [31:36 38:44]; % Hebrew
+% cr.defaults.covfig.vfc = ff_vfcDefault_Hebrew();             
+                
+%% FIGURE 7: (A) Eccentricity and (B) Variance Explained: Scatterplot: EW-HW 
+% Order is WS,WL
+list_roiNames16 = list_roiNames(1:6);
+list_rmDescripts = {'WordSmall','WordLarge'};
+
+% Obtain equally thresholded voxels to scatterplot
+[R,C_data,cr]=crThreshGetSameVoxel(cr,...
+                                   rmroiCell,...
+                                   list_subInds,...
+                                   list_roiNames16,...
+                                   'cothres', 0.2,...
+                                   'fieldrange', 15);
+
+fname = 'scatterplot_eccentricity_WordSmallVsWordLarge_6ROIs_11subs_RosemaryFit_v01';
+crCreateScatterplot(R,C_data,cr,...
+                    list_subInds,...
+                    list_roiNames16,...
+                    list_rmDescripts,...
+                    'ecc', ...  % 'co'
+                    fname);
+
+
+% FIGURE 6: (B) Variance Explained: Scatterplot: wordLarge-WordSmall
+% Uses the same voxel calculations from the previous plot
+% If doubt or this is moved, calculate it again here
+
+% Plot it
+fname = 'scatterplot_varianceExplained_WordSmallVsWordLarge_6ROIs_11subs_RosemaryFit_v01';
+crCreateScatterplot(R,C_data,cr,...
+                    list_subInds,...
+                    list_roiNames16,...
+                    list_rmDescripts,...
+                    'co', ...  % 'co'
+                    fname);
+
+                
                 
                 
                 

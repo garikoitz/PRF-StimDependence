@@ -830,8 +830,7 @@ bk.list_sessionTiledLoc = {
     fullfile(dataDir,'heb_pilot04','RetAndLoc_noXform');      % heb_toba
     fullfile(dataDir,'heb_pilot05','RetAndLoc');              % heb_maya
     fullfile(dataDir,'heb_pilot06','writtenWordLoc_OTperscription');  % heb_yama
-    fullfile(dataDir,'heb_pilot07','RetAndHebrewLoc');                % heb_blta
-    'do not have';                                                  % heb_mibe
+    fullfile(dataDir,'heb_pilot07','RetAndHebrewLoc');                % heb_blta'do not have';                                                  % heb_mibe
     'do not have';                                                  % heb_avbe
     'do not have';                                                  % heb_nitr
     'do not have';                                                  % heb_gilo
