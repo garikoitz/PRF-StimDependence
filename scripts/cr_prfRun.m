@@ -114,28 +114,36 @@ opt.list_rois   = opt.rois;
 
 
         %% getting parameter values for prf model fit ----------------------
-        % This is failing, trying next option
-        %{
-        opt.params.nFrames          = viewGet(vw, 'nFrames');  
-        
-        opt.params.framePeriod      = viewGet(vw, 'framePeriod');   
-        tem.totalFrames             = mrSESSION.functionals(opt.p.scanNum).totalFrames;  
-        opt.params.prescanDuration  = (tem.totalFrames - opt.params.nFrames)*opt.params.framePeriod; 
-        %}
-        
-        barScans = prf.barScans;
         
         
-        % In the main files Rosemary ws using, she had the code above
-        % NOTE: nFrames and framePeriod are generic
-        % I made basScans to be the same as scanNum, so I guess hat the
-        % code now is different, plot them
-        opt.params.nFrames         = mrSESSION.functionals(barScans(1)).nFrames; 
-        opt.params.framePeriod     = mrSESSION.functionals(barScans(1)).framePeriod; 
-        tem.totalFrames            = mrSESSION.functionals(barScans(1)).totalFrames;  
-        opt.params.prescanDuration = (tem.totalFrames - opt.params.nFrames)*opt.params.framePeriod; 
+        switch subind
+            case{13,17}
+                % This is failing, trying next option
+
+                % Well, subjects 13 and 17 (mw and tl), it seems that this works
+                % {
+                opt.params.nFrames          = viewGet(vw, 'nFrames');  
+
+                opt.params.framePeriod      = viewGet(vw, 'framePeriod');   
+                tem.totalFrames             = mrSESSION.functionals(opt.p.scanNum).totalFrames;  
+                opt.params.prescanDuration  = (tem.totalFrames - opt.params.nFrames)*opt.params.framePeriod; 
+                %}
+            otherwise
+        
+                % {
+                barScans = prf.barScans;
 
 
+                % In the main files Rosemary ws using, she had the code above
+                % NOTE: nFrames and framePeriod are generic
+                % I made basScans to be the same as scanNum, so I guess hat the
+                % code now is different, plot them
+                opt.params.nFrames         = mrSESSION.functionals(barScans(1)).nFrames; 
+                opt.params.framePeriod     = mrSESSION.functionals(barScans(1)).framePeriod; 
+                tem.totalFrames            = mrSESSION.functionals(barScans(1)).totalFrames;  
+                opt.params.prescanDuration = (tem.totalFrames - opt.params.nFrames)*opt.params.framePeriod; 
+                %}
+        end
         
         
         

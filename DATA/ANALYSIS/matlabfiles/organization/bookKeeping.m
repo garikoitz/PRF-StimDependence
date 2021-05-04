@@ -830,7 +830,8 @@ bk.list_sessionTiledLoc = {
     fullfile(dataDir,'heb_pilot04','RetAndLoc_noXform');      % heb_toba
     fullfile(dataDir,'heb_pilot05','RetAndLoc');              % heb_maya
     fullfile(dataDir,'heb_pilot06','writtenWordLoc_OTperscription');  % heb_yama
-    fullfile(dataDir,'heb_pilot07','RetAndHebrewLoc');                % heb_blta'do not have';                                                  % heb_mibe
+    fullfile(dataDir,'heb_pilot07','RetAndHebrewLoc');                % heb_blta
+    'do not have';                                                  % heb_mibe
     'do not have';                                                  % heb_avbe
     'do not have';                                                  % heb_nitr
     'do not have';                                                  % heb_gilo
@@ -976,10 +977,491 @@ bk.list_fsDir = {
 %     'not yet collected'
 %     };
 
-
-
 %% retinotopy bookKeeping
+eightROIs = {    'WangAtlas_V1v_left';
+                 'WangAtlas_V2v_left';
+                 'WangAtlas_V3v_left';
+                 'WangAtlas_hV4_left';
+                 'WangAtlas_VO1_left';
+                 'lVOTRC';
+                 'WangAtlas_IPS0';
+                 'WangAtlas_IPS1'};
+eightROIs = {};             
+bk.list_ROIs = {
+    eightROIs;      % jg
+    eightROIs;      % ad
+    eightROIs;      % cc
+    eightROIs;      % jw
+    eightROIs;      % rs
+    eightROIs;      % sg
+    eightROIs;      % th
+    eightROIs;      % pv
+    eightROIs;      % sl
+    eightROIs;      % jv
+    eightROIs;      % dl
+    eightROIs;      % ak
+    eightROIs;      % mw
+    eightROIs;      % gt
+    eightROIs;      % ws
+    eightROIs;      % ol
+    eightROIs;      % tl
+    eightROIs;      % mv
+    eightROIs;      % vm
+    eightROIs;      % ab
+    eightROIs;      % bw
+    eightROIs;      % dys_ab
+    eightROIs;      % heb_ag
+    eightROIs;      % heb_aa
+    eightROIs;      % heb_ls
+    eightROIs;      % heb_toba
+    eightROIs;      % heb_maya
+    eightROIs;      % heb_yama
+    eightROIs;      % heb_blta
+    eightROIs;      % heb_mibe
+    eightROIs;
+    eightROIs;
+    eightROIs;
+    eightROIs;
+    eightROIs;
+    eightROIs;
+    eightROIs;
+    eightROIs;
+    eightROIs;
+    eightROIs;
+    eightROIs;
+    eightROIs;
+    eightROIs;
+    eightROIs
+};
 
+prfModel = {'css'};
+
+bk.list_prfModels = {
+    prfModel;      % jg
+    prfModel;      % ad
+    prfModel;      % cc
+    prfModel;      % jw
+    prfModel;      % rs
+    prfModel;      % sg
+    prfModel;      % th
+    prfModel;      % pv
+    prfModel;      % sl
+    prfModel;      % jv
+    prfModel;      % dl
+    prfModel;      % ak
+    prfModel;      % mw
+    prfModel;      % gt
+    prfModel;      % ws
+    prfModel;      % ol
+    prfModel;      % tl
+    prfModel;      % mv
+    prfModel;      % vm
+    prfModel;      % ab
+    prfModel;      % bw
+    prfModel;      % dys_ab
+    prfModel;      % heb_ag
+    prfModel;      % heb_aa
+    prfModel;      % heb_ls
+    prfModel;      % heb_toba
+    prfModel;      % heb_maya
+    prfModel;      % heb_yama
+    prfModel;      % heb_blta
+    prfModel;      % heb_mibe
+    prfModel;
+    prfModel;
+    prfModel;
+    prfModel;
+    prfModel;
+    prfModel;
+    prfModel;
+    prfModel;
+    prfModel;
+    prfModel;
+    prfModel;
+    prfModel;
+    prfModel;
+    prfModel
+};
+
+
+
+bk.list_rmName = [
+    {{'Checkers';'Words';'FalseFont'}}      % jg
+    {{'Checkers';'Words';'FalseFont'}}      % ad
+    {{'Checkers';'Words';'FalseFont'}}      % cc
+    {{'Checkers';'Words';'FalseFont'}}      % jw
+    {{'Checkers';'Words';'FalseFont'}}      % rs
+    {{'Checkers';'Words';'FalseFont'}}      % sg
+    {{'Checkers';'Words';'FalseFont'}}      % th
+    {{'Checkers';'Words';'FalseFont'}}      % pv
+    {{'Checkers';'Words';'FalseFont'}}      % sl
+    {{'Checkers';'Words';'FalseFont'}}      % jv
+    {{'Checkers';'Words';'FalseFont'}}      % dl
+    {{'Checkers';'Words';'FalseFont'}}      % ak
+    {{'Checkers';'Words'}}      % mw 13
+    {{'Checkers';'Words'}}      % gt
+    {{'Checkers';'Words'}}      % ws
+    {{'Checkers';'Words'}}      % ol
+    {{'Checkers';'Words'}}      % tl 17
+    {{'Checkers';'Words'}}      % mv
+    {{'Checkers';'Words'}}      % vm
+    {{'Checkers';'Words'}}      % ab
+    {{'Checkers';'Words'}}      % bw
+    {{'Checkers';'Words'}}      % dys_ab
+    {{'Words_English';'Words_Hebrew'}}      % heb_ag
+    {{'Words_English';'Words_Hebrew'}}      % heb_aa
+    {{'Words_English';'Words_Hebrew'}}      % heb_ls
+    {{'Words_English';'Words_Hebrew'}}      % heb_toba
+    {{'Words_English';'Words_Hebrew'}}      % heb_maya
+    {{'Words_English';'Words_Hebrew'}}      % heb_yama
+    {{'Words_English';'Words_Hebrew'}}      % heb_blta
+    {{'Words_English';'Words_Hebrew'}}      % heb_mibe
+    {{'Words_English';'Words_Hebrew'}}
+    {{'Words_English';'Words_Hebrew'}}
+    {{'Words_English';'Words_Hebrew'}}
+    {{'Words_English';'Words_Hebrew'}}
+    {{'Words_English';'Words_Hebrew'}}
+    {{'Words_English';'Words_Hebrew'}}
+    {{'Words_English';'Words_Hebrew'}}
+    {{'Words_English';'Words_Hebrew'}}
+    {{'Words_English';'Words_Hebrew'}}
+    {{'Words_English';'Words_Hebrew'}}
+    {{'Words_English';'Words_Hebrew'}}
+    {{'Words_English';'Words_Hebrew'}}
+    {{'Words_English';'Words_Hebrew'}}
+    {{'Words_English';'Words_Hebrew'}}
+    ];
+
+bk.list_imFile_Checkers = {
+    'Stimuli/images_8barswithblank_fliplr.mat';      % jg
+    'Stimuli/images_8barswithblank_fliplr.mat';      % ad
+    'Stimuli/images_8barswithblank_fliplr.mat';      % cc
+    'Stimuli/images_8barswithblank_fliplr.mat';      % jw
+    'Stimuli/images_8barswithblank_fliplr.mat';      % rs
+    'Stimuli/images_8barswithblank_fliplr.mat';      % sg
+    'Stimuli/images_8barswithblank_fliplr.mat';      % th
+    'Stimuli/images_8barswithblank_fliplr.mat';      % pv
+    'Stimuli/images_8barswithblank_fliplr.mat';      % sl
+    'Stimuli/images_8barswithblank_fliplr.mat';      % jv
+    'Stimuli/images_8barswithblank_fliplr.mat';      % dl
+    'Stimuli/images_8barswithblank_fliplr.mat';      % ak
+    'Stimuli/images_8barswithblank_fliplr.mat';      % mw
+    'Stimuli/images_8barswithblank_fliplr.mat';      % gt
+    'Stimuli/images_8barswithblank_fliplr.mat';      % ws
+    'Stimuli/images_8barswithblank_fliplr.mat';      % ol
+    'Stimuli/images_8barswithblank_fliplr.mat';      % tl
+    'Stimuli/images_8barswithblank_fliplr.mat';      % mv
+    'Stimuli/images_8barswithblank_fliplr.mat';      % vm
+    'Stimuli/images_8barswithblank_fliplr.mat';      % ab
+    'Stimuli/images_8barswithblank_fliplr.mat';      % bw
+    'Stimuli/images_8barswithblank_fliplr.mat';      % dys_ab
+    'Stimuli/images_8barswithblank_fliplr.mat';      % heb_ag
+    'Stimuli/images_8barswithblank_fliplr.mat';      % heb_aa
+    'Stimuli/images_8barswithblank_fliplr.mat';      % heb_ls
+    'Stimuli/images_8barswithblank_fliplr.mat';      % heb_toba
+    'Stimuli/images_8barswithblank_fliplr.mat';      % heb_maya
+    'Stimuli/images_8barswithblank_fliplr.mat';      % heb_yama
+    'Stimuli/images_8barswithblank_fliplr.mat';      % heb_blta
+    'Stimuli/images_8barswithblank_fliplr.mat';      % heb_mibe
+    'Stimuli/images_8barswithblank_fliplr.mat';
+    'Stimuli/images_8barswithblank_fliplr.mat';
+    'Stimuli/images_8barswithblank_fliplr.mat';
+    'Stimuli/images_8barswithblank_fliplr.mat';
+    'Stimuli/images_8barswithblank_fliplr.mat';
+    'Stimuli/images_8barswithblank_fliplr.mat';
+    'Stimuli/images_8barswithblank_fliplr.mat';
+    'Stimuli/images_8barswithblank_fliplr.mat';
+    'Stimuli/images_8barswithblank_fliplr.mat';
+    'Stimuli/images_8barswithblank_fliplr.mat';
+    'Stimuli/images_8barswithblank_fliplr.mat';
+    'Stimuli/images_8barswithblank_fliplr.mat';
+    'Stimuli/images_8barswithblank_fliplr.mat';
+    'Stimuli/images_8barswithblank_fliplr.mat';
+    };
+
+bk.list_imFile_KnK = {
+    'Stimuli/images_knk_fliplr.mat';      % jg
+    'Stimuli/images_knk_fliplr.mat';      % ad
+    'Stimuli/images_knk_fliplr.mat';      % cc
+    'Stimuli/images_knk_fliplr.mat';      % jw
+    'Stimuli/images_knk_fliplr.mat';      % rs
+    'Stimuli/images_knk_fliplr.mat';      % sg
+    'Stimuli/images_knk_fliplr.mat';      % th
+    'Stimuli/images_knk_fliplr.mat';      % pv
+    'Stimuli/images_knk_fliplr.mat';      % sl
+    'Stimuli/images_knk_fliplr.mat';      % jv
+    'Stimuli/images_knk_fliplr.mat';      % dl
+    'Stimuli/images_knk_fliplr.mat';      % ak
+    'Stimuli/images_knk_fliplr.mat';      % mw
+    'Stimuli/images_knk_fliplr.mat';      % gt
+    'Stimuli/images_knk_fliplr.mat';      % ws
+    'Stimuli/images_knk_fliplr.mat';      % ol
+    'Stimuli/images_knk_fliplr.mat';      % tl
+    'Stimuli/images_knk_fliplr.mat';      % mv
+    'Stimuli/images_knk_fliplr.mat';      % vm
+    'Stimuli/images_knk_fliplr.mat';      % ab
+    'Stimuli/images_knk_fliplr.mat';      % bw
+    'Stimuli/images_knk_fliplr.mat';      % dys_ab
+    'Stimuli/images_knk_fliplr.mat';      % heb_ag
+    'Stimuli/images_knk_fliplr.mat';      % heb_aa
+    'Stimuli/images_knk_fliplr.mat';      % heb_ls
+    'Stimuli/images_knk_fliplr.mat';      % heb_toba
+    'Stimuli/images_knk_fliplr.mat';      % heb_maya
+    'Stimuli/images_knk_fliplr.mat';      % heb_yama
+    'Stimuli/images_knk_fliplr.mat';      % heb_blta
+    'Stimuli/images_knk_fliplr.mat';      % heb_mibe
+    'Stimuli/images_knk_fliplr.mat';
+    'Stimuli/images_knk_fliplr.mat';
+    'Stimuli/images_knk_fliplr.mat';
+    'Stimuli/images_knk_fliplr.mat';
+    'Stimuli/images_knk_fliplr.mat';
+    'Stimuli/images_knk_fliplr.mat';
+    'Stimuli/images_knk_fliplr.mat';
+    'Stimuli/images_knk_fliplr.mat';
+    'Stimuli/images_knk_fliplr.mat';
+    'Stimuli/images_knk_fliplr.mat';
+    'Stimuli/images_knk_fliplr.mat';
+    'Stimuli/images_knk_fliplr.mat';
+    'Stimuli/images_knk_fliplr.mat';
+    'Stimuli/images_knk_fliplr.mat';
+    };
+
+
+bk.list_paramsFile_KnK = {
+    'Stimuli/params_knkfull_multibar_blank.mat';      % jg
+    'Stimuli/params_knkfull_multibar_blank.mat';      % ad
+    'Stimuli/params_knkfull_multibar_blank.mat';      % cc
+    'Stimuli/params_knkfull_multibar_blank.mat';      % jw
+    'Stimuli/params_knkfull_multibar_blank.mat';      % rs
+    'Stimuli/params_knkfull_multibar_blank.mat';      % sg
+    'Stimuli/params_knkfull_multibar_blank.mat';      % th
+    'Stimuli/params_knkfull_multibar_blank.mat';      % pv
+    'Stimuli/params_knkfull_multibar_blank.mat';      % sl
+    'Stimuli/params_knkfull_multibar_blank.mat';      % jv
+    'Stimuli/params_knkfull_multibar_blank.mat';      % dl
+    'Stimuli/params_knkfull_multibar_blank.mat';      % ak
+    'Stimuli/params_knkfull_multibar_blank.mat';      % mw
+    'Stimuli/params_knkfull_multibar_blank.mat';      % gt
+    'Stimuli/params_knkfull_multibar_blank.mat';      % ws
+    'Stimuli/params_knkfull_multibar_blank.mat';      % ol
+    'Stimuli/params_knkfull_multibar_blank.mat';      % tl
+    'Stimuli/params_knkfull_multibar_blank.mat';      % mv
+    'Stimuli/params_knkfull_multibar_blank.mat';      % vm
+    'Stimuli/params_knkfull_multibar_blank.mat';      % ab
+    'Stimuli/params_knkfull_multibar_blank.mat';      % bw
+    'Stimuli/params_knkfull_multibar_blank.mat';      % dys_ab
+    'Stimuli/params_knkfull_multibar_blank.mat';      % heb_ag
+    'Stimuli/params_knkfull_multibar_blank.mat';      % heb_aa
+    'Stimuli/params_knkfull_multibar_blank.mat';      % heb_ls
+    'Stimuli/params_knkfull_multibar_blank.mat';      % heb_toba
+    'Stimuli/params_knkfull_multibar_blank.mat';      % heb_maya
+    'Stimuli/params_knkfull_multibar_blank.mat';      % heb_yama
+    'Stimuli/params_knkfull_multibar_blank.mat';      % heb_blta
+    'Stimuli/params_knkfull_multibar_blank.mat';      % heb_mibe
+    'Stimuli/params_knkfull_multibar_blank.mat';
+    'Stimuli/params_knkfull_multibar_blank.mat';
+    'Stimuli/params_knkfull_multibar_blank.mat';
+    'Stimuli/params_knkfull_multibar_blank.mat';
+    'Stimuli/params_knkfull_multibar_blank.mat';
+    'Stimuli/params_knkfull_multibar_blank.mat';
+    'Stimuli/params_knkfull_multibar_blank.mat';
+    'Stimuli/params_knkfull_multibar_blank.mat';
+    'Stimuli/params_knkfull_multibar_blank.mat';
+    'Stimuli/params_knkfull_multibar_blank.mat';
+    'Stimuli/params_knkfull_multibar_blank.mat';
+    'Stimuli/params_knkfull_multibar_blank.mat';
+    'Stimuli/params_knkfull_multibar_blank.mat';
+    'Stimuli/params_knkfull_multibar_blank.mat';
+    };
+
+bk.list_paramsFile_Checkers = {
+    'Stimuli/params_checkers.mat';      % jg
+    'Stimuli/params_checkers.mat';      % ad
+    'Stimuli/params_checkers.mat';      % cc
+    'Stimuli/params_checkers.mat';      % jw
+    'Stimuli/params_checkers.mat';      % rs
+    'Stimuli/params_checkers.mat';      % sg
+    'Stimuli/params_checkers.mat';      % th
+    'Stimuli/params_checkers.mat';      % pv
+    'Stimuli/params_checkers.mat';      % sl
+    'Stimuli/params_checkers.mat';      % jv
+    'Stimuli/params_checkers.mat';      % dl
+    'Stimuli/params_checkers.mat';      % ak
+    'Stimuli/params_checkers.mat';      % mw
+    'Stimuli/params_checkers.mat';      % gt
+    'Stimuli/params_checkers.mat';      % ws
+    'Stimuli/params_checkers.mat';      % ol
+    'Stimuli/params_checkers.mat';      % tl
+    'Stimuli/params_checkers.mat';      % mv
+    'Stimuli/params_checkers.mat';      % vm
+    'Stimuli/params_checkers.mat';      % ab
+    'Stimuli/params_checkers.mat';      % bw
+    'Stimuli/params_checkers.mat';      % dys_ab
+    'Stimuli/params_checkers.mat';      % heb_ag
+    'Stimuli/params_checkers.mat';      % heb_aa
+    'Stimuli/params_checkers.mat';      % heb_ls
+    'Stimuli/params_checkers.mat';      % heb_toba
+    'Stimuli/params_checkers.mat';      % heb_maya
+    'Stimuli/params_checkers.mat';      % heb_yama
+    'Stimuli/params_checkers.mat';      % heb_blta
+    'Stimuli/params_checkers.mat';      % heb_mibe
+    'Stimuli/params_checkers.mat';
+    'Stimuli/params_checkers.mat';
+    'Stimuli/params_checkers.mat';
+    'Stimuli/params_checkers.mat';
+    'Stimuli/params_checkers.mat';
+    'Stimuli/params_checkers.mat';
+    'Stimuli/params_checkers.mat';
+    'Stimuli/params_checkers.mat';
+    'Stimuli/params_checkers.mat';
+    'Stimuli/params_checkers.mat';
+    'Stimuli/params_checkers.mat';
+    'Stimuli/params_checkers.mat';
+    'Stimuli/params_checkers.mat';
+    'Stimuli/params_checkers.mat';
+    };
+
+% bk.list_paramsFile_Checkers = {
+%     'Stimuli/20150113T200620.mat';      % jg
+%     'Stimuli/20150113T200620.mat';      % ad
+%     'Stimuli/20150113T200620.mat';      % cc
+%     'Stimuli/20150113T200620.mat';      % jw
+%     'Stimuli/20150113T200620.mat';      % rs
+%     'Stimuli/20150113T200620.mat';      % sg
+%     'Stimuli/20150113T200620.mat';      % th
+%     'Stimuli/20150113T200620.mat';      % pv
+%     'Stimuli/20150113T200620.mat';      % sl
+%     'Stimuli/20150113T200620.mat';      % jv
+%     'Stimuli/20150113T200620.mat';      % dl
+%     'Stimuli/20150113T200620.mat';      % ak
+%     'Stimuli/20150113T200620.mat';      % mw
+%     'Stimuli/20150113T200620.mat';      % gt
+%     'Stimuli/20150113T200620.mat';      % ws
+%     'Stimuli/20150113T200620.mat';      % ol
+%     'Stimuli/20150113T200620.mat';      % tl
+%     'Stimuli/20150113T200620.mat';      % mv
+%     'Stimuli/20150113T200620.mat';      % vm
+%     'Stimuli/20150113T200620.mat';      % ab
+%     'Stimuli/20150113T200620.mat';      % bw
+%     'Stimuli/20150113T200620.mat';      % dys_ab
+%     'Stimuli/20150113T200620.mat';      % heb_ag
+%     'Stimuli/20150113T200620.mat';      % heb_aa
+%     'Stimuli/20150113T200620.mat';      % heb_ls
+%     'Stimuli/20150113T200620.mat';      % heb_toba
+%     'Stimuli/20150113T200620.mat';      % heb_maya
+%     'Stimuli/20150113T200620.mat';      % heb_yama
+%     'Stimuli/20150113T200620.mat';      % heb_blta
+%     'Stimuli/20150113T200620.mat';      % heb_mibe
+%     'Stimuli/20150113T200620.mat';
+%     'Stimuli/20150113T200620.mat';
+%     'Stimuli/20150113T200620.mat';
+%     'Stimuli/20150113T200620.mat';
+%     'Stimuli/20150113T200620.mat';
+%     'Stimuli/20150113T200620.mat';
+%     'Stimuli/20150113T200620.mat';
+%     'Stimuli/20150113T200620.mat';
+%     'Stimuli/20150113T200620.mat';
+%     'Stimuli/20150113T200620.mat';
+%     'Stimuli/20150113T200620.mat';
+%     'Stimuli/20150113T200620.mat';
+%     'Stimuli/20150113T200620.mat';
+%     'Stimuli/20150113T200620.mat';
+%     };
+
+bk.list_wSearch = [
+    '3';      % jg
+    '3';      % ad
+    '3';      % cc
+    '3';      % jw
+    '3';      % rs
+    '3';      % sg
+    '3';      % th
+    '3';      % pv
+    '3';      % sl
+    '3';      % jv
+    '3';      % dl
+    '3';      % ak
+    '3';      % mw
+    '3';      % gt
+    '3';      % ws
+    '3';      % ol
+    '3';      % tl
+    '3';      % mv
+    '3';      % vm
+    '3';      % ab
+    '3';      % bw
+    '3';      % dys_ab
+    '3';      % heb_ag
+    '3';      % heb_aa
+    '3';      % heb_ls
+    '3';      % heb_toba
+    '3';      % heb_maya
+    '3';      % heb_yama
+    '3';      % heb_blta
+    '3';      % heb_mibe
+    '3';
+    '3';
+    '3';
+    '3';
+    '3';
+    '3';
+    '3';
+    '3';
+    '3';
+    '3';
+    '3';
+    '3';
+    '3';
+    '3';
+    ];
+
+
+bk.list_stimSize = [
+    16;      % jg
+    16;      % ad
+    16;      % cc
+    16;      % jw
+    16;      % rs
+    16;      % sg
+    16;      % th
+    16;      % pv
+    16;      % sl
+    16;      % jv
+    16;      % dl
+    16;      % ak
+    16;      % mw
+    16;      % gt
+    16;      % ws
+    16;      % ol
+    16;      % tl
+    16;      % mv
+    16;      % vm
+    16;      % ab
+    16;      % bw
+    16;      % dys_ab
+    7;      % heb_ag
+    7;      % heb_aa
+    7;      % heb_ls
+    7;      % heb_toba
+    7;      % heb_maya
+    7;      % heb_yama
+    7;      % heb_blta
+    7;      % heb_mibe
+    7;
+    7;
+    7;
+    7;
+    7;
+    7;
+    7;
+    7;
+    7;
+    7;
+    7;
+    7;
+    7;
+    7;
+    ];
 % a scan number in vista where the Knk scan was run (300 sec).
 % IMPORTANT: this corresponds to list_sessionPath
 bk.list_scanNum_Knk = [
@@ -1119,6 +1601,7 @@ bk.list_scanNum_Knk_sessionRet = [
     5;      % heb_taay
     5;      % heb_maaf
     5;      % heb_brne
+    5;      % heb_nagr
     5;      % heb_avhi
     5;      % heb_avar
     5;      % heb_nihe
@@ -1145,11 +1628,11 @@ bk.list_scanNum_Checkers_sessionRet = [
     1;      % gt
     1;      % ws
     1;      % ol
-    0;      % tl
+    1;      % tl
     1;      % mv
     1;      % vm
     1;      % ab
-    0;      % bw
+    1;      % bw
     1;      % dys_ab
     4;      % heb_ag
     4;      % heb_aa

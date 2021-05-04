@@ -23,7 +23,7 @@ if ~isfolder(cr.dirs.FIGSVG); mkdir(cr.dirs.FIGSVG); end
 
 % CONTINUE WITH THE NORMAL PROCESSING
 % add to path the required matlab files inside the project, with info to run the project
-addpath(genpath(fullfile(cr.dirs.ANALYSIS,'matlabfiles')));
+% addpath(genpath(fullfile(cr.dirs.ANALYSIS,'matlabfiles')));
 
 % Rosemary relied on this file that contains most of the subjects and other
 % lists. Make it work with relative paths and store it in each project repository
@@ -36,18 +36,16 @@ cr.bk = bookKeeping(cr);
 if 0
 % subjects we want to do this for
 list_subInds        = [31:36 38:44];  % Hebrew
-list_subInds        = [1:20];  % Original 20
+% list_subInds        = [1:20];  % Original 20
 % mw (13) for Words failed, continue with the next ones for now
 % list_subInds        = [18:20];
 %17 and 13 failed at beginning
 
 
 % Fix it: 
-% list_subInds        = [13,17];
+list_subInds        = [13,17];% 13
 
-for subind =list_subInds
-    
-    % subind = 13;
+for subind = list_subInds
     
     mrvCleanWorkspace;
     % subind  = list_subInds(ns);
@@ -91,6 +89,12 @@ for subind =list_subInds
         % pmLaunchDockerCommand('prfanalyze','ellipse','tr1dur300v3','afni6')
         % Convert the data back so that the rest of the scripts continue working
 end
+
+
+
+
+
+
 end
 
 %% -----------------------------------------------------------------------------
@@ -128,14 +132,18 @@ list_rmDescripts = {'Words'...  % Words (large bars)
                     ... % 'Words_Hebrew'... % Words (smalls bars)
                     'FalseFont'};
 if readExisting
-    load(fullfile(crRootPath,'DATA',...
-          'rmroicell_subInds-1to20_dtNames-cb-w-ff_fits-Rosemary.mat'),'rmroiCell');
+    % load(fullfile(crRootPath,'DATA',...
+    %       'rmroicell_subInds-1to20_dtNames-cb-w-ff_fits-Rosemary.mat'),'rmroiCell');
+      load(fullfile(crRootPath,'DATA',...
+          'rmroicell_subInds-1to20_dtNames-cb-w-ff_fits-new.mat'),'rmroiCell');    
 else
     rmroiCell=ff_rmroiCell(cr,list_subInds,list_roiNames,list_dtNames,...
                            list_rmNames,'list_path',cr.bk.list_sessionRet);
     % Save rmroicell just in case
+    % save(fullfile(crRootPath,'DATA',...
+    %       'rmroicell_subInds-1to20_dtNames-cb-w-ff_fits-Rosemary.mat'),'rmroiCell')
     save(fullfile(crRootPath,'DATA',...
-          'rmroicell_subInds-1to20_dtNames-cb-w-ff_fits-Rosemary.mat'),'rmroiCell')
+          'rmroicell_subInds-1to20_dtNames-cb-w-ff_fits-new.mat'),'rmroiCell')
 end
 
 % Read the generic params for coverage for all subjects
@@ -1673,3 +1681,4 @@ end % loop over fields
 
 
 
++
