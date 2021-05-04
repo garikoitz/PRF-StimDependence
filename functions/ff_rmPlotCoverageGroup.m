@@ -38,9 +38,19 @@ centersy0 = [];
 
 %% input parser -- flipping
 par = inputParser; 
-addOptional(par, 'flip', true); 
-parse(par, varargin{:});
-flip = par.Results.flip; 
+
+par.addRequired('M'        , @iscell);
+par.addRequired('vfc'      , @isstruct);
+
+addOptional(par, 'flip'      , true, @islogical); 
+addOptional(par, 'fname'     , ''  , @ischar); 
+addOptional(par, 'visibility', 'on', @ischar); 
+
+parse(par, M, vfc, varargin{:});
+flip       = par.Results.flip; 
+fname      = par.Results.fname; 
+visibility = par.Results.visibility; 
+
 
 %% get the rf information for each subject
 for ii = 1:numSubs
@@ -96,7 +106,7 @@ if ~isempty(RF)
     % plot the average coveraged
     % edit GLU
     % figure();
-    mrvNewGraphWin;
+    mrvNewGraphWin(fname,[],visibility);
     
     % to make the black outer circle thing
     c = makecircle(vfc.nSamples);  
