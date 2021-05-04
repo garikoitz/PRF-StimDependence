@@ -120,7 +120,7 @@ list_dtNames  = {'Checkers','Words','FalseFont'};
 list_rmNames  = {'retModel-Checkers-css-fFit.mat'
                  'retModel-Words-css-fFit.mat' 
                  'retModel-FalseFont-css-fFit.mat' };
-% {
+%{
 % Use the originals calculated by Rosemary
 list_rmNames  = {'retModel-Checkers-css.mat'
                  'retModel-Words-css.mat' 
