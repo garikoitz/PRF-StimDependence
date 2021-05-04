@@ -104,7 +104,7 @@ end
 % This will read the results obtained by Rosemary or the re-run in 2021
 
 readExisting = true;
-
+whatFit = 'new';  % 'new' | 'Rosemary'
 
 % 
 list_subInds  = [1:20];
@@ -131,19 +131,14 @@ list_rmDescripts = {'Words'...  % Words (large bars)
                     ... % 'Words_English'...
                     ... % 'Words_Hebrew'... % Words (smalls bars)
                     'FalseFont'};
+rmroiFname = ['rmroicell_subInds-1to20_dtNames-cb-w-ff_fits-' whatFit '.mat'];
 if readExisting
-    % load(fullfile(crRootPath,'DATA',...
-    %       'rmroicell_subInds-1to20_dtNames-cb-w-ff_fits-Rosemary.mat'),'rmroiCell');
-      load(fullfile(crRootPath,'DATA',...
-          'rmroicell_subInds-1to20_dtNames-cb-w-ff_fits-new.mat'),'rmroiCell');    
+    load(fullfile(crRootPath,'DATA',rmroiFname),'rmroiCell');    
 else
     rmroiCell=ff_rmroiCell(cr,list_subInds,list_roiNames,list_dtNames,...
                            list_rmNames,'list_path',cr.bk.list_sessionRet);
-    % Save rmroicell just in case
-    % save(fullfile(crRootPath,'DATA',...
-    %       'rmroicell_subInds-1to20_dtNames-cb-w-ff_fits-Rosemary.mat'),'rmroiCell')
-    save(fullfile(crRootPath,'DATA',...
-          'rmroicell_subInds-1to20_dtNames-cb-w-ff_fits-new.mat'),'rmroiCell')
+    % Save rmroicell
+    save(fullfile(crRootPath,'DATA',rmroiFname),'rmroiCell')
 end
 
 % Read the generic params for coverage for all subjects
@@ -178,10 +173,10 @@ cr.defaults.covfig.vfc.list_rmNames = list_rmNames;
 
 
 % Launch the function
-fname = 'Fig1_'; % '' for not saving
+fname = '';%'Fig1_'; % '' for not saving
 figFunction_coverage_maxProfile_group(cr,list_subInds, 'flip',false, ...
                                       'rmroiCell',rmroiCell,...
-                                      'fname', fname, 'vers','v01_oldfit');
+                                      'fname', fname, 'vers',['v01_' whatFit 'fit']);
                                
 %% FIGURE 2: (C) Eccentricity: Scatterplots: word-checkerboard
 % Order is CB, W, FF, invert it so that it is W then CB
@@ -1681,4 +1676,3 @@ end % loop over fields
 
 
 
-+
