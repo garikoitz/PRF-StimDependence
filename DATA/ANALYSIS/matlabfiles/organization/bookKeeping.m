@@ -22,7 +22,6 @@ oldanatomy    = '/biac4/wandell/data/reading_prf/anatomy';
 % chdir(fullfile(crRootPath, 'organization'));
 
 %% name of sessions, abbreviations, and their paths
-
 % subject initials
 bk.list_sub = {
     'jg'        % 1
@@ -184,7 +183,7 @@ bk.list_sessionRet = {
     fullfile(dataDir,'gt','tiledLoc_sizeRet');    % gt
     fullfile(dataDir,'ws','tiledLoc_sizeRet');    % ws
     fullfile(dataDir,'ol','tiledLoc_sizeRet');    % ol
-    fullfile(dataDir,'tl','Localizer_sizeRet');   % tl
+    fullfile(dataDir,'tl','Localizer_sizeRet');   % tl% the stim file is wrong, check it
     fullfile(dataDir,'mv','tiledLoc_sizeRet');    % mv
     fullfile(dataDir,'vm','tiledLoc_sizeRet');    % vm
     fullfile(dataDir,'ab','tiledLoc_sizeRet');    % ab
@@ -198,7 +197,7 @@ bk.list_sessionRet = {
     fullfile(dataDir,'heb_pilot06','Ret_OTSPrescription_152Vol'); % heb_yama
     fullfile(dataDir,'heb_pilot07','RetAndHebrewLoc');            % heb_blta
     fullfile(dataDir,'heb_pilot08','RetAndHebrewLoc');            % heb_mibe
-    fullfile(dataDir,'heb_pilot09','RetAndHebrewLoc');
+    fullfile(dataDir,'heb_pilot09','RetAndHebrewLoc'); % 31
     fullfile(dataDir,'heb_pilot10','RetAndHebrewLoc');
     fullfile(dataDir,'heb_pilot11','RetAndHebrewLoc');
     fullfile(dataDir,'heb_pilot12','RetAndHebrewLoc');
