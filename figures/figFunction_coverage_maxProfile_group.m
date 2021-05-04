@@ -22,6 +22,7 @@ p.addOptional('flip'      , true,  @islogical);
 p.addOptional('rmroicell' , {}, @iscell);
 p.addOptional('vers','v01', @ischar);
 p.addOptional('fname',''  , @ischar);
+p.addOptional('invisible',false  , @islogical);
 
 
 % Parse. Assign result inside each case
@@ -31,8 +32,19 @@ flip      = p.Results.flip;
 rmroiCell = p.Results.rmroicell;
 vers      = p.Results.vers;
 fname     = p.Results.fname;
+invisible = p.Results.invisible;
 
 if isempty(fname);savefig=false;else;savefig=true;end
+
+
+%%
+if invisible
+    visibility = 'off';
+else
+    visibility = 'on';
+end
+
+
 
 %%
 vfc = cr.defaults.covfig.vfc;
@@ -100,9 +112,12 @@ for jj = 1:numRois
         % dtName = list_dtNames{kk};
         % R = rmroi(kk,:);
         % figure; 
-        mrvNewGraphWin([roiName '- ' rmName]);
+        mrvNewGraphWin([roiName '- ' rmName],[],visibility);
         
-        RF_mean = ff_rmPlotCoverageGroup(rmroiCell(:,jj,kk), vfc, 'flip',flip);
+        RF_mean = ff_rmPlotCoverageGroup(rmroiCell(:,jj,kk), vfc, ...
+                     'flip',flip, ...
+                     'visibility',visibility, ...
+                     'fname', [roiName '- ' rmName]);
         
         % set user data to have RF_mean
         set(gcf, 'UserData', RF_mean);
@@ -141,9 +156,6 @@ for jj = 1:numRois
     end
     
 end
-
-
-
 
 
 end

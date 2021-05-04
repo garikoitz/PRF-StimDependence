@@ -23,7 +23,7 @@ if ~isfolder(cr.dirs.FIGSVG); mkdir(cr.dirs.FIGSVG); end
 
 % CONTINUE WITH THE NORMAL PROCESSING
 % add to path the required matlab files inside the project, with info to run the project
-addpath(genpath(fullfile(cr.dirs.ANALYSIS,'matlabfiles')));
+% addpath(genpath(fullfile(cr.dirs.ANALYSIS,'matlabfiles')));
 
 % Rosemary relied on this file that contains most of the subjects and other
 % lists. Make it work with relative paths and store it in each project repository
@@ -36,18 +36,16 @@ cr.bk = bookKeeping(cr);
 if 0
 % subjects we want to do this for
 list_subInds        = [31:36 38:44];  % Hebrew
-list_subInds        = [1:20];  % Original 20
+% list_subInds        = [1:20];  % Original 20
 % mw (13) for Words failed, continue with the next ones for now
 % list_subInds        = [18:20];
 %17 and 13 failed at beginning
 
 
 % Fix it: 
-% list_subInds        = [13,17];
+list_subInds        = [13,17];% 13
 
-for subind =list_subInds
-    
-    % subind = 13;
+for subind = list_subInds
     
     mrvCleanWorkspace;
     % subind  = list_subInds(ns);
@@ -91,6 +89,12 @@ for subind =list_subInds
         % pmLaunchDockerCommand('prfanalyze','ellipse','tr1dur300v3','afni6')
         % Convert the data back so that the rest of the scripts continue working
 end
+
+
+
+
+
+
 end
 
 %% -----------------------------------------------------------------------------
@@ -100,7 +104,7 @@ end
 % This will read the results obtained by Rosemary or the re-run in 2021
 
 readExisting = true;
-
+whatFit = 'new';  % 'new' | 'Rosemary'
 
 % 
 list_subInds  = [1:20];
@@ -116,7 +120,7 @@ list_dtNames  = {'Checkers','Words','FalseFont'};
 list_rmNames  = {'retModel-Checkers-css-fFit.mat'
                  'retModel-Words-css-fFit.mat' 
                  'retModel-FalseFont-css-fFit.mat' };
-% {
+%{
 % Use the originals calculated by Rosemary
 list_rmNames  = {'retModel-Checkers-css.mat'
                  'retModel-Words-css.mat' 
@@ -127,15 +131,14 @@ list_rmDescripts = {'Words'...  % Words (large bars)
                     ... % 'Words_English'...
                     ... % 'Words_Hebrew'... % Words (smalls bars)
                     'FalseFont'};
+rmroiFname = ['rmroicell_subInds-1to20_dtNames-cb-w-ff_fits-' whatFit '.mat'];
 if readExisting
-    load(fullfile(crRootPath,'DATA',...
-          'rmroicell_subInds-1to20_dtNames-cb-w-ff_fits-Rosemary.mat'),'rmroiCell');
+    load(fullfile(crRootPath,'DATA',rmroiFname),'rmroiCell');    
 else
     rmroiCell=ff_rmroiCell(cr,list_subInds,list_roiNames,list_dtNames,...
                            list_rmNames,'list_path',cr.bk.list_sessionRet);
-    % Save rmroicell just in case
-    save(fullfile(crRootPath,'DATA',...
-          'rmroicell_subInds-1to20_dtNames-cb-w-ff_fits-Rosemary.mat'),'rmroiCell')
+    % Save rmroicell
+    save(fullfile(crRootPath,'DATA',rmroiFname),'rmroiCell')
 end
 
 % Read the generic params for coverage for all subjects
@@ -170,10 +173,12 @@ cr.defaults.covfig.vfc.list_rmNames = list_rmNames;
 
 
 % Launch the function
-fname = 'Fig1_'; % '' for not saving
+fname = 'Coverage_';%'Fig1_'; % '' for not saving
 figFunction_coverage_maxProfile_group(cr,list_subInds, 'flip',false, ...
                                       'rmroiCell',rmroiCell,...
-                                      'fname', fname, 'vers','v01_oldfit');
+                                      'fname', fname, ...
+                                      'vers',['v01_' whatFit 'fit'],...
+                                      'invisible',true);
                                
 %% FIGURE 2: (C) Eccentricity: Scatterplots: word-checkerboard
 % Order is CB, W, FF, invert it so that it is W then CB
@@ -192,7 +197,7 @@ list_rmDescripts = {'Words','Checkers'};%    {'FalseFont'}
                                    'fieldrange', 15);
 
 % Plot it
-fname = 'scatterplot_eccentricity_WordVsCheck_6ROIs_20subs_RosemaryFit_v01';
+fname = ['scatterplot_eccentricity_WordVsCheck_6ROIs_20subs_' whatFit 'Fit_v01'];
 crCreateScatterplot(R,C_data,cr,...
                     list_subInds,...
                     list_roiNames16,...
@@ -205,7 +210,7 @@ crCreateScatterplot(R,C_data,cr,...
 % If doubt or this is moved, calculate it again here
 
 % Plot it
-fname = 'lineplot_WordVsCheck_6ROIs_20subs_RosemaryFit_v01';
+fname = ['lineplot_WordVsCheck_6ROIs_20subs_' whatFit 'Fit_v01'];
 crCreateLinePlot(R,C_data,cr,...
                  list_subInds,...
                  list_roiNames16,...
@@ -218,7 +223,7 @@ crCreateLinePlot(R,C_data,cr,...
 % If doubt or this is moved, calculate it again here
 
 % Plot it
-fname = 'scatterplot_varianceExplained_WordVsCheck_6ROIs_20subs_RosemaryFit_v01';
+fname=['scatterplot_varianceExplained_WordVsCheck_6ROIs_20subs_' whatFit 'Fit_v01'];
 crCreateScatterplot(R,C_data,cr,...
                     list_subInds,...
                     list_roiNames16,...
@@ -240,7 +245,7 @@ list_rmDescripts = {'Words','FalseFont'};
                                    'cothres', 0.2,...
                                    'fieldrange', 15);
 
-fname = 'scatterplot_eccentricity_WordVsFF_6ROIs_20subs_RosemaryFit_v01';
+fname = ['scatterplot_eccentricity_WordVsFF_6ROIs_20subs_' whatFit 'Fit_v01'];
 crCreateScatterplot(R,C_data,cr,...
                     list_subInds,...
                     list_roiNames16,...
@@ -254,7 +259,7 @@ crCreateScatterplot(R,C_data,cr,...
 % If doubt or this is moved, calculate it again here
 
 % Plot it
-fname = 'scatterplot_varianceExplained_WordVsFF_6ROIs_20subs_RosemaryFit_v01';
+fname = ['scatterplot_varianceExplained_WordVsFF_6ROIs_20subs_' whatFit 'Fit_v01'];
 crCreateScatterplot(R,C_data,cr,...
                     list_subInds,...
                     list_roiNames16,...
@@ -277,7 +282,7 @@ list_rmDescripts = {'FalseFont','Checkers'};
                                    'cothres', 0.2,...
                                    'fieldrange', 15);
 
-fname = 'scatterplot_eccentricity_FFVsCB_6ROIs_20subs_RosemaryFit_v01';
+fname = ['scatterplot_eccentricity_FFVsCB_6ROIs_20subs_' whatFit 'Fit_v01'];
 crCreateScatterplot(R,C_data,cr,...
                     list_subInds,...
                     list_roiNames16,...
@@ -302,14 +307,14 @@ list_rmDescripts = {'Words','Checkers'};
                                    'fieldrange', 15);
 
 % Plot it
-fname = 'scatterplot_eccentricity_WordVsCheck_IPS01_20subs_RosemaryFit_v01';
+fname = ['scatterplot_eccentricity_WordVsCheck_IPS01_20subs_' whatFit 'Fit_v01'];
 crCreateScatterplot(R,C_data,cr,...
                     list_subInds,...
                     list_roiNames78,...
                     list_rmDescripts,...
                     'ecc', ...
                     '');
-fname = 'scatterplot_varianceExplained_WordVsCheck_IPS01_20subs_RosemaryFit_v01';
+fname = ['scatterplot_varianceExplained_WordVsCheck_IPS01_20subs_' whatFit 'Fit_v01'];
 crCreateScatterplot(R,C_data,cr,...
                     list_subInds,...
                     list_roiNames78,...
@@ -478,7 +483,7 @@ crCreateScatterplot(R,C_data,cr,...
                 
                 
 %% COVERAGE: individual plots 
-for subind = 1 [1:12,14:16,18:20] % list_subInds
+for subind = 13 [1:12,14:16,18:20] % list_subInds
     subname = cr.bk.list_sub{subind}
     %% Plot the coverage figures
     % Read the coverage figure params
