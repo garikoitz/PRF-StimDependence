@@ -1,9 +1,9 @@
-function  crCreateScatterplot(  R, C_data, cr, ...
-                                list_subInds,...
-                                list_roiNames,...
-                                list_rmDescripts,...
-                                fieldName, ...
-                                fname)
+function  [percentAboveSubs,perROI] = crCreateScatterplot(R, C_data, cr, ...
+                                                          list_subInds,...
+                                                          list_roiNames,...
+                                                          list_rmDescripts,...
+                                                          fieldName, ...
+                                                          fname)
 %%
 % colormap for histogram
 % cmapValuesHist = colormap('pink');
@@ -80,6 +80,7 @@ subjectLines = cell(numSubs, numRois); % because pairwise
 percentAbovePooled = zeros(numRois);
 % percentAboveSubs   = zeros(numSubs, numRois, numFields);
 percentAboveSubs   = zeros(numSubs, numRois);
+diffAboveSubs      = zeros(numSubs, numRois);
 % A = cell(numFields*numRois, 5);
 A = cell(numRois, 5);
 
@@ -156,7 +157,9 @@ A = cell(numRois, 5);
         axisLims = [0 maxValue]; 
         BarData1 = [];
         BarData2 = [];
-
+        
+        poolallsubs1=[];
+        poolallsubs2=[];
         for ii = 1:numSubs
 
             subInd = list_subInds(ii);
@@ -191,10 +194,18 @@ A = cell(numRois, 5);
                 
                 % subjectLines{ii,jj,ff} = b; 
                 
+                
+                poolallsubs1=[poolallsubs1, x1];
+                poolallsubs2=[poolallsubs2, x2];
+                
+                
                 %% the percentage of voxels above the identityLine
                 perAbove = sum(x2 > x1) / length(x2);
                 % percentAboveSubs(ii,jj,ff) = perAbove; 
                 percentAboveSubs(ii,jj) = perAbove; 
+                
+                % Just store the data and put it outside
+                diffAboveSubs(ii,jj) = x2-x1; 
                 
                 %% concatenate
                 BarData1 = [BarData1, x1];
