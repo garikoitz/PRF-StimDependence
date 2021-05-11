@@ -6,7 +6,7 @@
 close all; clear all;
 mrvCleanWorkspace;
 cr         = struct();
-cr.codeDir = crRootPath;
+cr.codeDir = crRP;
 
 % WHERE THE NEW DATA IS
 cr.dirs.BASE     = '/black/localhome/glerma/TESTDATA/PRF-StimDependence';
@@ -133,12 +133,12 @@ list_rmDescripts = {'Words'...  % Words (large bars)
                     'FalseFont'};
 rmroiFname = ['rmroicell_subInds-1to20_dtNames-cb-w-ff_fits-' whatFit '.mat'];
 if readExisting
-    load(fullfile(crRootPath,'DATA',rmroiFname),'rmroiCell');    
+    load(fullfile(crRP,'DATA',rmroiFname),'rmroiCell');    
 else
     rmroiCell=ff_rmroiCell(cr,list_subInds,list_roiNames,list_dtNames,...
                            list_rmNames,'list_path',cr.bk.list_sessionRet);
     % Save rmroicell
-    save(fullfile(crRootPath,'DATA',rmroiFname),'rmroiCell')
+    save(fullfile(crRP,'DATA',rmroiFname),'rmroiCell')
 end
 
 % Read the generic params for coverage for all subjects
@@ -345,13 +345,13 @@ list_rmNames     = {'retModel-WordSmall-css.mat'
 list_rmDescripts = {'WordSmall'... 
                     'WordLarge'};           
 if readExisting
-    load(fullfile(crRootPath,'DATA',...
+    load(fullfile(crRP,'DATA',...
       'rmroicell_subInds-1-3-4-13to20_dtNames-Wsmall-Wlarge_fits-Rosemary.mat'),'rmroiCell');
 else
     rmroiCell=ff_rmroiCell(cr,list_subInds,list_roiNames,list_dtNames,...
                            list_rmNames,'list_path',cr.bk.list_sessionSizeRet);
     % Save rmroicell just in case
-    save(fullfile(crRootPath,'DATA',...
+    save(fullfile(crRP,'DATA',...
       'rmroicell_subInds-1-3-4-13to20_dtNames-Wsmall-Wlarge_fits-Rosemary.mat'),'rmroiCell')
 end
 
@@ -431,12 +431,12 @@ end
      
 matname = ['rmroicell_subInds-31to36-38to44_dtNames-WE-WH_fits-' whatFit '.mat'];
 if readExisting
-    load(fullfile(crRootPath,'DATA',matname),'rmroiCell');
+    load(fullfile(crRP,'DATA',matname),'rmroiCell');
 else
     rmroiCell=ff_rmroiCell(cr,list_subInds,list_roiNames,list_dtNames,...
                            list_rmNames,'list_path',cr.bk.list_sessionRet);
     % Save rmroicell just in case
-    save(fullfile(crRootPath,'DATA',matname),'rmroiCell')
+    save(fullfile(crRP,'DATA',matname),'rmroiCell')
 end
 
 % Read the generic params for coverage for all subjects
@@ -890,15 +890,15 @@ if 0
     rmroiCell = ff_rmroiCell(cr,list_subInds, list_roiNames, list_dtNames, ...
             list_rmNames, 'list_path', list_path);
     % SAVE THIS TO WORK LOCALLY
-    mkdir(fullfile(crRootPath,'DATA'))
+    mkdir(fullfile(crRP,'DATA'))
     % 20 subs, words and CBs
-    % save(fullfile(crRootPath,'DATA','rmroicell_1to20.mat'),'rmroiCell');
+    % save(fullfile(crRP,'DATA','rmroicell_1to20.mat'),'rmroiCell');
     % ALL subs, words and CBs and FF and Heb
-    save(fullfile(crRootPath,'local','rmroicell_allandall.mat'),'rmroiCell');
+    save(fullfile(crRP,'local','rmroicell_allandall.mat'),'rmroiCell');
 end
 if 0
-    % load(fullfile(crRootPath,'DATA','rmroicell_1to20.mat'));
-    load(fullfile(crRootPath,'local','rmroicell_allandall.mat'));
+    % load(fullfile(crRP,'DATA','rmroicell_1to20.mat'));
+    load(fullfile(crRP,'local','rmroicell_allandall.mat'));
     % Only the 20
     list_subInds  = [1:20]; 
     rmroiCell = rmroiCell(list_subInds,(1:6),[1,2]);
@@ -1343,7 +1343,7 @@ for jj = 1:numRois
 %         end
         xlim([-15, 18])
         % titlefile = strrep(titleName{1},' ','_');
-        % saveas(gcf, fullfile(crRootPath,'local','png',[titlefile '.png']), 'png') 
+        % saveas(gcf, fullfile(crRP,'local','png',[titlefile '.png']), 'png') 
 %         subplot(2,numRois,numRois+jj); 
 %         polarhistogram(deg2rad([maxang5 minang5]),100, 'Normalization','probability',...
 %             'EdgeAlpha',1, 'EdgeColor','k','FaceAlpha',1, 'FaceColor','k'); 
@@ -1355,8 +1355,8 @@ for jj = 1:numRois
 
    end
 end
-saveas(gcf, fullfile(crRootPath,'local','png',['Radiality_Plots_2x' num2str(fov) '.png']), 'png')    
-saveas(gcf, fullfile(crRootPath,'local','svg',['Radiality_Plots_2x' num2str(fov) '.svg']), 'svg')    
+saveas(gcf, fullfile(crRP,'local','png',['Radiality_Plots_2x' num2str(fov) '.png']), 'png')    
+saveas(gcf, fullfile(crRP,'local','svg',['Radiality_Plots_2x' num2str(fov) '.svg']), 'svg')    
 close all
 end
 
@@ -1631,8 +1631,8 @@ for ff = 1:numFields
     % [num2str(numVoxels) ' voxels']
     %      };
     % title(titleName, 'FontWeight', 'Bold');
-    saveas(gcf, fullfile(crRootPath,'local','png',[titleName{1} '_' fieldName '_band-2x' num2str(fov) '.png']), 'png')
-    saveas(gcf, fullfile(crRootPath,'local','svg',[titleName{1} '_' fieldName '_band-2x' num2str(fov) '.svg']), 'svg')
+    saveas(gcf, fullfile(crRP,'local','png',[titleName{1} '_' fieldName '_band-2x' num2str(fov) '.png']), 'png')
+    saveas(gcf, fullfile(crRP,'local','svg',[titleName{1} '_' fieldName '_band-2x' num2str(fov) '.svg']), 'svg')
 end % loop over fields
 
 % percent above identityLine, pooled over subjects ... print out the 
