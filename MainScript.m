@@ -203,20 +203,108 @@ fname = ['scatterplot_eccentricity_WordVsCheck_6ROIs_20subs_' whatFit 'Fit_v01']
                                     list_roiNames16,...
                                     list_rmDescripts,...
                                     'ecc', ...  % 'co'
-                                    fname);
+                                    '');
    
 %% FIGURE 3: (B) Line plots: word-checkerboard 
 % Uses the same voxel calculations from the previous plot
 % If doubt or this is moved, calculate it again here
 
 % Plot it
-fname = ['lineplot_WordVsCheck_6ROIs_20subs_' whatFit 'Fit_v01'];
-crCreateLinePlot(R,C_data,cr,...
-                 list_subInds,...
-                 list_roiNames16,...
-                 list_rmNames,...
-                 list_rmDescripts,...
-                 fname);
+A = colormap(jet);close all;
+fname = ['lineplot_WordVsCheck_6ROIs_20subs_' whatFit 'Fit_v02'];
+[diffs15,diffs5,posangles15,negangles15,posangles5,negangles5] = ...
+                         crCreateLinePlot(R,cr,list_roiNames16,fname);
+
+
+             
+A = A(1:round(length(A)/length(list_roiNames16)):end,:);
+Y = cell(2,2);
+Y(1,:) = {posangles5,negangles5};
+Y(2,:) = {posangles15,negangles15};
+
+xx = mrvNewGraphWin('posangles15','wide');
+set(xx,'Position',[0.005 0.062 .95 .55 ]);
+for nx=1:2
+    subplot(1,2,nx)
+    Hs = [];
+    legs = {};
+    for ii=1:length(list_roiNames16)
+        % subplot(2,3,ii)
+        X = [Y{nx,1}{ii},Y{nx,2}{ii}];
+        % histogram(diffs{ii}); hold on
+        if ii==6
+            H = histfit(X,20,'kernel'); hold on
+        else
+            H = histfit(X,100,'kernel'); hold on
+        end
+        H(1).FaceColor=A(ii,:);%[1,1,1];
+        H(1).EdgeColor=A(ii,:);%[1,1,1];
+        H(1).FaceAlpha=0;
+        H(1).EdgeAlpha=0;
+        H(2).Color=A(ii,:);
+        H(2).Visible='on';
+        H(1).YData=H(1).YData/(sum(H(1).YData) * (H(1).XData(2) - H(1).XData(1)) );
+        H(2).YData=H(2).YData/trapz(H(2).XData, H(2).YData);
+        Hs = [Hs, H(2)];
+        % plot([0,0],[0,0.1],'k-.')
+        % ylim([0,0.1])
+        % xlim([-90,90])
+        % disp(trapz(H(2).XData, H(2).YData))
+        leg  = strrep(strrep(list_roiNames16{ii},'WangAtlas_',''),'_','\_');
+        leg  = [leg ' (N:' num2str(length(X)) ')'];
+        legs = [legs {leg}];
+    end
+    ylim([0,0.022])
+    xlim([-90,90])
+    plot([0,0],[0,0.1],'k-.')
+    legend(Hs,legs)
+    if nx==1; title('Angle  when EccCB <= 5 deg');end
+    if nx==2; title('Angle  when EccCB > 5 deg');end
+    xlabel('Angle [deg]')
+    ylabel('Relative count')         
+end           
+       
+% Plot distances
+Y = cell(2,1);
+Y(1,1) = {diffs5};
+Y(2,1) = {diffs15};
+
+xx = mrvNewGraphWin('Differences','wide');
+set(xx,'Position',[0.005 0.062 .95 .55 ]);
+for nx=1:2
+    subplot(1,2,nx)
+    Hs = [];
+    legs = {};
+    for ii=1:length(list_roiNames16)
+        % subplot(2,3,ii)
+        X = [Y{nx,1}{ii}];
+        H = histfit(X,100,'kernel'); hold on
+        H(1).FaceColor=A(ii,:);
+        H(1).EdgeColor=A(ii,:);
+        H(1).FaceAlpha=0;
+        H(1).EdgeAlpha=0;
+        H(2).Color=A(ii,:);
+        H(2).Visible='on';
+        H(1).YData=H(1).YData/(sum(H(1).YData) * (H(1).XData(2) - H(1).XData(1)) );
+        H(2).YData=H(2).YData/trapz(H(2).XData, H(2).YData);
+        Hs = [Hs, H(2)];
+        % plot([0,0],[0,0.5],'k-.')
+        % ylim([0,0.1])
+        % xlim([-5,10])
+        leg  = strrep(strrep(list_roiNames16{ii},'WangAtlas_',''),'_','\_');
+        leg  = [leg ' (N:' num2str(length(X)) ')'];
+        legs = [legs {leg}];
+    end
+    ylim([0,0.6])
+    if nx==1;xlim([-4,4]);end
+    if nx==2;xlim([-5,10]);end
+    plot([0,0],[0,0.6],'k-.')
+    legend(Hs,legs)
+    if nx==1; title('Diffs in eccentricity  when EccCB <= 5 deg');end
+    if nx==2; title('Diffs in eccentricity  when EccCB > 5 deg');end
+    xlabel('Delta Eccentricity Checkers - Words [deg]')
+    ylabel('Relative count')
+end
              
 %% FIGURE 4: (A) Variance Explained: Scatterplot: word-checkerboard
 % Uses the same voxel calculations from the previous plot
@@ -230,6 +318,10 @@ crCreateScatterplot(R,C_data,cr,...
                     list_rmDescripts,...
                     'co', ...  % 'co'
                     fname);
+                
+                
+                
+                
 
 %% FIGURE 5: (A) Eccentricity and (B) Variance Explained: Scatterplot: word-falsefont
 % Order is CB, W, FF, invert it so that it is W then CB
