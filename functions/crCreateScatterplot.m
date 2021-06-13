@@ -1,4 +1,4 @@
-function  [percentAboveSubs,perROI] = crCreateScatterplot(R, C_data, cr, ...
+function  crCreateScatterplot(R, C_data, cr, ...
                                                           list_subInds,...
                                                           list_roiNames,...
                                                           list_rmDescripts,...
@@ -139,6 +139,10 @@ A = cell(numRois, 5);
         maxValue = 5; 
     elseif strcmp(fieldName, 'x0') || strcmp(fieldName, 'y0')
         maxValue = cr.defaults.covfig.vfc.fieldRange;
+        fov = 1.5; % width of the band
+        nrows = 2; ncols = 3;
+        position = [0.005 0.062 .95 .7 ];
+        radius = 2;
     elseif strcmp(fieldName, 'ph')
         maxValue = 2*pi; 
     else
@@ -263,7 +267,7 @@ A = cell(numRois, 5);
         npoints = 100; 
         
         % 3d histogram heat map -- absolute number of voxels
-        ff_histogramHeat(BarData1, BarData2, maxValue, maxValue,radius,cmapValuesHist,fov,roiName);
+        ff_histogramHeat(BarData1, BarData2, maxValue, maxValue,radius,cmapValuesHist,fov,roiName,fieldName);
         numVoxels = length(BarData1); 
         % axes and title
         switch fieldName
@@ -289,6 +293,10 @@ A = cell(numRois, 5);
                     xlabel(['' rm1Descript ''])
                 end
         end
+        
+        
+        
+        
         
     end % loop over rois
 

@@ -1,4 +1,4 @@
-function [RF_mean, RF_individuals] = ff_rmPlotCoverageGroup(M, vfc, varargin)
+function [RF_mean, RF_individuals,thisEmpties] = ff_rmPlotCoverageGroup(M, vfc, varargin)
 %% function to plot the group average visual field coverage
 % [RF_mean, RF_individuals] = ff_rmPlotCoverageGroup(M, vfc)
 % [RF_mean, RF_individuals] = ff_rmPlotCoverageGroup(M, vfc, 'flip', false)
@@ -53,6 +53,7 @@ visibility = par.Results.visibility;
 
 
 %% get the rf information for each subject
+thisEmpties = [];
 for ii = 1:numSubs
    if ~isempty(M{ii})
         [rf, figHandle, all_models, weight, data]  = rmPlotCoveragefromROImatfile(M{ii}, vfc);
@@ -73,15 +74,25 @@ for ii = 1:numSubs
         
         % also check that there voxels pass the threshold!!! (otherwise the coverage will be all 0s)
         % if no voxels pass threshold, <data> from rmPlotCoveragefromROImatfile is empty
-        % noVoxelsPassThreshold = isempty(data);               
-        % if ~coverageHasNans && ~noVoxelsPassThreshold 
         
-        if ~coverageHasNans
+        % Brian and I decided that if no voxel passes, then it should not
+        % average, it is going to change the N, that's it. 
+        
+        noVoxelsPassThreshold = isempty(data);               
+        
+        if ~coverageHasNans && ~noVoxelsPassThreshold 
+        % if ~coverageHasNans
+            
             counter = counter + 1;
             
             % store it in RF
             RF(:,:,counter) = rf; 
-            close
+            if ~noVoxelsPassThreshold
+                close
+            end
+        else
+            ii
+            thisEmpties = [thisEmpties, ii];
         end
         
         % grab location of rf centers
@@ -119,7 +130,7 @@ if ~isempty(RF)
 
     % add polar grid on top
     p.ringTicks = (1:3)/3*vfc.fieldRange;
-    p.color = 'w';
+    p.color = 'k';
     
     % tick labels
     if ~isfield(vfc, 'tickLabel')

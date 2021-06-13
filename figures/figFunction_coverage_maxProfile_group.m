@@ -1,4 +1,4 @@
-function figFunction_coverage_maxProfile_group(cr, subinds, varargin)
+function [RF_Mean_Cells, RF_Indiv_Cells, empties] = figFunction_coverage_maxProfile_group(cr, subinds, varargin)
 
 % GLU created this function from the script figScript_coverage...
 
@@ -18,21 +18,35 @@ p = inputParser;
 p.addRequired('cr'        , @isstruct);
 p.addRequired('subinds'   , @isnumeric);
 
-p.addOptional('flip'      , true,  @islogical);
+p.addOptional('flip'       , true,  @islogical);
+p.addOptional('bootcontour', false,  @islogical);
 p.addOptional('rmroicell' , {}, @iscell);
+p.addOptional('list_roiNames' , {}, @iscell);
+p.addOptional('list_dtNames' , {}, @iscell);
+p.addOptional('list_rmNames' , {}, @iscell);
+p.addOptional('sizedegs' , 0, @isnumeric);
+p.addOptional('numboots' , 3, @isnumeric);
 p.addOptional('vers','v01', @ischar);
 p.addOptional('fname',''  , @ischar);
 p.addOptional('invisible',false  , @islogical);
+p.addOptional('minvarexp' , 0, @isnumeric);
 
 
 % Parse. Assign result inside each case
 p.parse(cr, subinds, varargin{:});
 % Read here only the generic ones
-flip      = p.Results.flip;
-rmroiCell = p.Results.rmroicell;
-vers      = p.Results.vers;
-fname     = p.Results.fname;
-invisible = p.Results.invisible;
+flip          = p.Results.flip;
+bootcontour   = p.Results.bootcontour;
+rmroiCell     = p.Results.rmroicell;
+vers          = p.Results.vers;
+fname         = p.Results.fname;
+invisible     = p.Results.invisible;
+list_roiNames = p.Results.list_roiNames;
+list_dtNames  = p.Results.list_dtNames;
+list_rmNames  = p.Results.list_rmNames;
+sizedegs      = p.Results.sizedegs;
+minvarexp     = p.Results.minvarexp;
+numboots      = p.Results.numboots;
 
 if isempty(fname);savefig=false;else;savefig=true;end
 
@@ -50,7 +64,13 @@ end
 vfc = cr.defaults.covfig.vfc;
 % visual field plotting thresholds
 % vfc = ff_vfcDefault; 
-% vfc.cothresh = 0.2; 
+
+if minvarexp==0
+    minvarexp = vfc.cothresh; 
+end
+vfc.cothresh = minvarexp; 
+
+
 % vfc.method = 'max'; % avg | 'max'
 
 % session list, see bookKeeping
@@ -65,17 +85,32 @@ plotContour   = vfc.contourPlot;
 contourLevel  = vfc.contourLevel; 
 
 % rois we want to look at
-list_roiNames = vfc.list_roiNames;
+if isempty(list_roiNames) 
+    list_roiNames = vfc.list_roiNames;
+end
 
 % data types we want to look at
-list_dtNames  = vfc.list_dtNames;
+if isempty(list_dtNames)
+    list_dtNames  = vfc.list_dtNames;
+end
 
 % names of the rm in each dt
-list_rmNames  = vfc.list_rmNames;
+if isempty(list_rmNames)
+    list_rmNames  = vfc.list_rmNames;
+end
+
+% sizedegs if not passed
+if sizedegs==0
+    sizedegs = vfc.fieldRange;
+else
+    vfc.fieldRange = sizedegs;
+end
+
+
 
 %% define things
 numRois = length(list_roiNames);
-numRms = length(list_dtNames);
+numRms  = length(list_dtNames);
 numSubs = length(list_subInds);
 
 %% get the rmroi cell
@@ -91,6 +126,9 @@ end
 
 %% make averaged coverage plot for each roi and rm model
 %% loop over rois
+RF_Mean_Cells  = cell(numRois, numRms);
+RF_Indiv_Cells = cell(numRois, numRms);
+empties        = cell(numRois, numRms);
 for jj = 1:numRois
     
     
@@ -101,10 +139,12 @@ for jj = 1:numRois
     % GLU edit 
     for kk = 1:numRms
         % figure; 
-        
+
         % name of this dt and rm
         dtName = list_dtNames{kk};
         rmName = list_rmNames{kk};    
+        
+        fprintf('\n\n%s >> %s >> %s\n',roiName,dtName, rmName)
         
         % counter for subjects with valid roi definitions
         counter = 0;
@@ -114,12 +154,29 @@ for jj = 1:numRois
         % figure; 
         mrvNewGraphWin([roiName '- ' rmName],[],visibility);
         
-        RF_mean = ff_rmPlotCoverageGroup(rmroiCell(:,jj,kk), ...
-                     vfc, ...
-                     'flip',flip, ...
-                     'visibility',visibility, ...
-                     'fname', [roiName '- ' rmName]);
         
+        if bootcontour && kk==1
+            numsubs    = size(rmroiCell,1);
+            RFMEAN     = nan(128,128,numboots);
+            for bb=1:numboots
+                randReplacement = datasample(1:numsubs,numsubs);
+                [RF_mean, RF_individuals, thisEmpties] = ff_rmPlotCoverageGroup(rmroiCell(:,jj,kk), ...
+                    vfc, ...
+                    'flip',flip, ...
+                    'visibility',visibility, ...
+                    'fname', [roiName '- ' rmName]);
+                RFMEAN(:,:,bb) = RF_mean;
+            end
+        else
+            [RF_mean, RF_individuals, thisEmpties] = ff_rmPlotCoverageGroup(rmroiCell(:,jj,kk), ...
+                vfc, ...
+                'flip',flip, ...
+                'visibility',visibility, ...
+                'fname', [roiName '- ' rmName]);
+        end
+        RF_Mean_Cells{jj,kk}  = RF_mean;
+        RF_Indiv_Cells{jj,kk} = RF_individuals;
+        empties{jj,kk}        = thisEmpties;
         % set user data to have RF_mean
         set(gcf, 'UserData', RF_mean);
         
@@ -135,6 +192,22 @@ for jj = 1:numRois
             
             % plotting
             plot(contourX, contourY, ':', 'LineWidth',2, 'Color', [0 0 0])
+            if kk==1
+                prevContX = contourX;
+                prevContY = contourY;
+            else
+                if bootcontour
+                    for bb=1:numboots
+                        [~, contourCoordsX, contourCoordsY] = ...
+                            ff_contourMatrix_makeFromMatrix(RFMEAN(:,:,bb),vfc,contourLevel);
+                        contX = contourCoordsX/vfc.nSamples*(2*vfc.fieldRange) - vfc.fieldRange;
+                        contY = contourCoordsY/vfc.nSamples*(2*vfc.fieldRange) - vfc.fieldRange;
+                        plot(contX, contY, '--', 'LineWidth',2, 'Color', [0.5  0.5  0.5 ]); hold on
+                    end
+                else
+                    plot(prevContX, prevContY, '--', 'LineWidth',2, 'Color', [0.5  0.5  0.5 ])
+                end
+            end
         end
         
         axis([-vfc.fieldRange vfc.fieldRange -vfc.fieldRange vfc.fieldRange])
@@ -153,7 +226,8 @@ for jj = 1:numRois
             saveas(gcf,fullfile(cr.dirs.FIGSVG, ...
                 strcat([fname strrep(strjoin(titleName),' ','_') '_' vers],'.svg')),'svg');
         end
-                
+       
+       
     end
     
 end
