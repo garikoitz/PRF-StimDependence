@@ -40,10 +40,9 @@ list_subInds        = [31:36 38:44];  % Hebrew
 % mw (13) for Words failed, continue with the next ones for now
 % list_subInds        = [18:20];
 %17 and 13 failed at beginning
+list_subInds     = [1,3,4,13:20];
+list_dtNames     = {'WordSmall','WordLarge'};
 
-
-% Fix it: 
-list_subInds        = [13,17];% 13
 
 for subind = list_subInds
     
@@ -54,9 +53,15 @@ for subind = list_subInds
     fprintf('\nSubDetails:\nInd:%i, StrInd:%s, subname:%s, Name:%s, anatName:%s\n',...
         subind,cr.bk.list_subNumberString{subind},subname,...
         cr.bk.list_names{subind},anatName)
-    % Change dir, we need to run analysis where mrSession is
-    chdir(cr.bk.list_sessionRet{subind})
     
+    % Change dir, we need to run analysis where mrSession is
+    % FOR ALL
+    % chdir(cr.bk.list_sessionRet{subind})
+    % prf.dirVistacc = cr.bk.list_sessionRet{subind};
+    % FOR WORD LARGE SMALL
+    chdir(cr.bk.list_sessionSizeRet{subind})
+    prf.dirVistacc = cr.bk.list_sessionSizeRet{subind};
+        
     %% PRF analysis
     % Read the generic params for all subjects
     run(fullfile(cr.dirs.DEF,'prfrun_defaults.m'));
@@ -65,7 +70,7 @@ for subind = list_subInds
     clear('params'); clear('p');
     % Read prfRun_params specific to this subject
     % run(cr.bk.list_prfParams{subind}); NOT NECESSARY
-    prf.dirVistacc = cr.bk.list_sessionRet{subind};
+    
     prf.dirAnatomy = cr.bk.list_anatomy{subind};
     prf.list_rmName= cr.bk.list_rmName{subind};
     prf.p.stimSize = cr.bk.list_stimSize(subind);
