@@ -1,9 +1,9 @@
-function  crCreateScatterplot(  R, C_data, cr, ...
-                                list_subInds,...
-                                list_roiNames,...
-                                list_rmDescripts,...
-                                fieldName, ...
-                                fname)
+function  crCreateScatterplot(R, C_data, cr, ...
+                                                          list_subInds,...
+                                                          list_roiNames,...
+                                                          list_rmDescripts,...
+                                                          fieldName, ...
+                                                          fname)
 %%
 % colormap for histogram
 % cmapValuesHist = colormap('pink');
@@ -80,6 +80,7 @@ subjectLines = cell(numSubs, numRois); % because pairwise
 percentAbovePooled = zeros(numRois);
 % percentAboveSubs   = zeros(numSubs, numRois, numFields);
 percentAboveSubs   = zeros(numSubs, numRois);
+diffAboveSubs      = zeros(numSubs, numRois);
 % A = cell(numFields*numRois, 5);
 A = cell(numRois, 5);
 
@@ -138,6 +139,10 @@ A = cell(numRois, 5);
         maxValue = 5; 
     elseif strcmp(fieldName, 'x0') || strcmp(fieldName, 'y0')
         maxValue = cr.defaults.covfig.vfc.fieldRange;
+        fov = 1.5; % width of the band
+        nrows = 2; ncols = 3;
+        position = [0.005 0.062 .95 .7 ];
+        radius = 2;
     elseif strcmp(fieldName, 'ph')
         maxValue = 2*pi; 
     else
@@ -156,7 +161,9 @@ A = cell(numRois, 5);
         axisLims = [0 maxValue]; 
         BarData1 = [];
         BarData2 = [];
-
+        
+        poolallsubs1=[];
+        poolallsubs2=[];
         for ii = 1:numSubs
 
             subInd = list_subInds(ii);
@@ -191,10 +198,18 @@ A = cell(numRois, 5);
                 
                 % subjectLines{ii,jj,ff} = b; 
                 
+                
+                poolallsubs1=[poolallsubs1, x1];
+                poolallsubs2=[poolallsubs2, x2];
+                
+                
                 %% the percentage of voxels above the identityLine
                 perAbove = sum(x2 > x1) / length(x2);
                 % percentAboveSubs(ii,jj,ff) = perAbove; 
                 percentAboveSubs(ii,jj) = perAbove; 
+                
+                % Just store the data and put it outside
+%                 diffAboveSubs(ii,jj) = x2-x1; 
                 
                 %% concatenate
                 BarData1 = [BarData1, x1];
@@ -252,7 +267,7 @@ A = cell(numRois, 5);
         npoints = 100; 
         
         % 3d histogram heat map -- absolute number of voxels
-        ff_histogramHeat(BarData1, BarData2, maxValue, maxValue,radius,cmapValuesHist,fov,roiName);
+        ff_histogramHeat(BarData1, BarData2, maxValue, maxValue,radius,cmapValuesHist,fov,roiName,fieldName);
         numVoxels = length(BarData1); 
         % axes and title
         switch fieldName
@@ -278,6 +293,10 @@ A = cell(numRois, 5);
                     xlabel(['' rm1Descript ''])
                 end
         end
+        
+        
+        
+        
         
     end % loop over rois
 

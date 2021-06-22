@@ -48,8 +48,7 @@ else
 end
 
 
-%% make an image matrix that is 0 everywhere except for this at this
-% contour 
+%% make an image matrix that is 0 everywhere except for this at this contour 
 contourMatrix = zeros(vfc.nSamples, vfc.nSamples); 
 for cc = 1:length(contourCoords)
     xpos = round(contourCoords(2,cc)); 

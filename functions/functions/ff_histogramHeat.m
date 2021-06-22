@@ -1,4 +1,4 @@
-function ff_histogramHeat(x, y, maxValueX, maxValueY, numHistBins,cmapValuesHist,fov,roiName)
+function ff_histogramHeat(x, y, maxValueX, maxValueY, numHistBins,cmapValuesHist,fov,roiName,fieldName)
 % ff_histogramHeat(x, y, maxValueX, maxValueY, numHistBins) 
 %
 % Makes a heat map!
@@ -11,9 +11,14 @@ function ff_histogramHeat(x, y, maxValueX, maxValueY, numHistBins,cmapValuesHist
 % GLU: used numHistBins as the radius of scatplot now, it was unused
 
 %% 
-minValueX = 0; %-2.3; % 0
-minValueY = 0; %-2.3; % 0
-
+switch fieldName
+    case {'ecc','co'}
+        minValueX = 0; %-2.3; % 0
+        minValueY = 0; %-2.3; % 0
+    case {'x0'}
+        minValueX = -7; %-2.3; % 0
+        minValueY = -7; %-2.3; % 0
+end
 axisLimsX = [minValueX maxValueX]; 
 axisLimsY = [minValueY maxValueY]; 
 % Ctrs{1} = linspace(minValueX, maxValueX, numHistBins);
@@ -62,17 +67,51 @@ jbfill([minValueX,minValueX+fov, maxValueX-fov, maxValueX], ...
        [minValueY+fov,minValueY+fov+fov,maxValueY,maxValueY],...
        [minValueY,minValueY,maxValueY-fov-fov,maxValueY-fov], ...
        iColor,iColor,0,0.4);
-line([minValueX, maxValueX], [5,5], ...
-      'LineStyle','-', 'Color', 'r', 'LineWidth',1)
-roiName = [strrep(ff_stringRemove(roiName, 'WangAtlas_'),'_','\_')];
-text(maxValueX-(maxValueX-minValueX)*(1/4), minValueY+fov,roiName,...
-     'Color','w','FontWeight','Bold','FontSize',14)
+roiName = strrep(ff_stringRemove(roiName, 'WangAtlas_'),'_left','');
+roiName = strrep(roiName,'l','');
+text(maxValueX-(maxValueX-minValueX)*(1/4), minValueY+fov/2,roiName,...
+     'Color','w','FontWeight','Bold','FontSize',18)
 colormap(cmapValuesHist); 
 c = colorbar;
 set(c, 'location', 'eastoutside')
 
 
 
+switch fieldName
+    case {'ecc'}
+        line([minValueX, maxValueX], [5,5], 'LineStyle','-', 'Color', 'r', 'LineWidth',1)
+        % Here we can do the ecc tests in BarData1 and BarData2
+        % Cohens d
+        fovealInd = (y <= 5);
+        dfoveal = computeCohen_d(y(fovealInd), x(fovealInd));
+        dperiph = computeCohen_d(y(~fovealInd), x(~fovealInd));
+        text(maxValueX-(maxValueX-minValueX)*(1/4), 5.5,sprintf('d\'': %.2g',dperiph),...
+            'Color','w','FontWeight','Bold','FontSize',14)
+        text(maxValueX-(maxValueX-minValueX)*(1/4), 4.5 ,sprintf('d\'': %.2g',dfoveal),...
+            'Color','w','FontWeight','Bold','FontSize',14)
+    case {'x0'}
+        line([minValueX, maxValueX], [5,5], 'LineStyle','-', 'Color', 'r', 'LineWidth',1)
+        % Here we can do the ecc tests in BarData1 and BarData2
+        % Cohens d
+        fovealInd = (y <= 5);
+        dfoveal = computeCohen_d(y(fovealInd), x(fovealInd));
+        dperiph = computeCohen_d(y(~fovealInd), x(~fovealInd));
+        text(maxValueX-(maxValueX-minValueX)*(1/4), 5.5,sprintf('d\'': %.2g',dperiph),...
+            'Color','w','FontWeight','Bold','FontSize',14)
+        text(maxValueX-(maxValueX-minValueX)*(1/4), 4.5 ,sprintf('d\'': %.2g',dfoveal),...
+            'Color','w','FontWeight','Bold','FontSize',14)
+        xlim([-7,7])
+        ylim([-7,7])
+    case {'co'}
+        % Here we can do the ecc tests in BarData1 and BarData2
+        % Cohens d
+        d = computeCohen_d(y, x);
+        text(maxValueX-(maxValueX-minValueX)*(1/4), minValueY+fov ,sprintf('d\'': %.2g',d),...
+            'Color','w','FontWeight','Bold','FontSize',14)
+    otherwise
+        error('fieldName not known, only ecc and co implemented ')
+        
+end
 
 
 
