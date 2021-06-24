@@ -197,7 +197,7 @@ bk.list_sessionRet = {
     fullfile(dataDir,'heb_pilot06','Ret_OTSPrescription_152Vol'); % heb_yama
     fullfile(dataDir,'heb_pilot07','RetAndHebrewLoc');            % heb_blta
     fullfile(dataDir,'heb_pilot08','RetAndHebrewLoc');            % heb_mibe
-    fullfile(dataDir,'heb_pilot09','RetAndHebrewLoc'); % 31
+    fullfile(dataDir,'heb_pilot09','RetAndHebrewLoc');             % 31
     fullfile(dataDir,'heb_pilot10','RetAndHebrewLoc');
     fullfile(dataDir,'heb_pilot11','RetAndHebrewLoc');
     fullfile(dataDir,'heb_pilot12','RetAndHebrewLoc');
@@ -1107,29 +1107,56 @@ bk.list_rmName = [
     {{'Checkers';'Words'}}      % ab
     {{'Checkers';'Words'}}      % bw
     {{'Checkers';'Words'}}      % dys_ab
-    {{'Words_English';'Words_Hebrew'}}      % heb_ag
-    {{'Words_English';'Words_Hebrew'}}      % heb_aa
-    {{'Words_English';'Words_Hebrew'}}      % heb_ls
-    {{'Words_English';'Words_Hebrew'}}      % heb_toba
-    {{'Words_English';'Words_Hebrew'}}      % heb_maya
-    {{'Words_English';'Words_Hebrew'}}      % heb_yama
-    {{'Words_English';'Words_Hebrew'}}      % heb_blta
-    {{'Words_English';'Words_Hebrew'}}      % heb_mibe
-    {{'Words_English';'Words_Hebrew'}}
-    {{'Words_English';'Words_Hebrew'}}
-    {{'Words_English';'Words_Hebrew'}}
-    {{'Words_English';'Words_Hebrew'}}
-    {{'Words_English';'Words_Hebrew'}}
-    {{'Words_English';'Words_Hebrew'}}
-    {{'Words_English';'Words_Hebrew'}}
-    {{'Words_English';'Words_Hebrew'}}
-    {{'Words_English';'Words_Hebrew'}}
-    {{'Words_English';'Words_Hebrew'}}
-    {{'Words_English';'Words_Hebrew'}}
-    {{'Words_English';'Words_Hebrew'}}
-    {{'Words_English';'Words_Hebrew'}}
-    {{'Words_English';'Words_Hebrew'}}
+    {{'Checkers'}}      % heb_ag
+    {{'Checkers'}}      % heb_aa
+    {{'Checkers'}}     % heb_ls
+    {{'Checkers'}}      % heb_toba
+    {{'Checkers'}}      % heb_maya
+    {{'Checkers'}}      % heb_yama
+    {{'Checkers'}}      % heb_blta
+    {{'Checkers'}}      % heb_mibe
+    {{'Checkers'}}
+    {{'Checkers'}}
+    {{'Checkers'}}
+    {{'Checkers'}}
+    {{'Checkers'}}
+    {{'Checkers'}}
+    {{'Checkers'}}
+    {{'Checkers'}}
+    {{'Checkers'}}
+    {{'Checkers'}}
+    {{'Checkers'}}
+    {{'Checkers'}}
+    {{'Checkers'}}
+    {{'Checkers'}}
     ];
+    
+    
+    
+    
+%     {{'Words_English';'Words_Hebrew'}}      % heb_ag
+%     {{'Words_English';'Words_Hebrew'}}      % heb_aa
+%     {{'Words_English';'Words_Hebrew'}}      % heb_ls
+%     {{'Words_English';'Words_Hebrew'}}      % heb_toba
+%     {{'Words_English';'Words_Hebrew'}}      % heb_maya
+%     {{'Words_English';'Words_Hebrew'}}      % heb_yama
+%     {{'Words_English';'Words_Hebrew'}}      % heb_blta
+%     {{'Words_English';'Words_Hebrew'}}      % heb_mibe
+%     {{'Words_English';'Words_Hebrew'}}
+%     {{'Words_English';'Words_Hebrew'}}
+%     {{'Words_English';'Words_Hebrew'}}
+%     {{'Words_English';'Words_Hebrew'}}
+%     {{'Words_English';'Words_Hebrew'}}
+%     {{'Words_English';'Words_Hebrew'}}
+%     {{'Words_English';'Words_Hebrew'}}
+%     {{'Words_English';'Words_Hebrew'}}
+%     {{'Words_English';'Words_Hebrew'}}
+%     {{'Words_English';'Words_Hebrew'}}
+%     {{'Words_English';'Words_Hebrew'}}
+%     {{'Words_English';'Words_Hebrew'}}
+%     {{'Words_English';'Words_Hebrew'}}
+%     {{'Words_English';'Words_Hebrew'}}
+%     ];
 
 bk.list_imFile_Checkers = {
     'Stimuli/images_8barswithblank_fliplr.mat';      % jg

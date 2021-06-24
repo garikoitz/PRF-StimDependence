@@ -40,9 +40,9 @@ list_subInds        = [31:36 38:44];  % Hebrew
 % mw (13) for Words failed, continue with the next ones for now
 % list_subInds        = [18:20];
 %17 and 13 failed at beginning
-list_subInds     = [1,3,4,13:20];
-list_dtNames     = {'WordSmall','WordLarge'};
-
+% list_subInds     = [1,3,4,13:20];
+% list_dtNames     = {'WordSmall','WordLarge'};
+list_dtNames     = {'Checkers'};
 
 for subind = list_subInds
     
@@ -56,11 +56,11 @@ for subind = list_subInds
     
     % Change dir, we need to run analysis where mrSession is
     % FOR ALL
-    % chdir(cr.bk.list_sessionRet{subind})
-    % prf.dirVistacc = cr.bk.list_sessionRet{subind};
+    chdir(cr.bk.list_sessionRet{subind})
+    prf.dirVistacc = cr.bk.list_sessionRet{subind};
     % FOR WORD LARGE SMALL
-    chdir(cr.bk.list_sessionSizeRet{subind})
-    prf.dirVistacc = cr.bk.list_sessionSizeRet{subind};
+    % chdir(cr.bk.list_sessionSizeRet{subind})
+    % prf.dirVistacc = cr.bk.list_sessionSizeRet{subind};
         
     %% PRF analysis
     % Read the generic params for all subjects
@@ -102,8 +102,12 @@ end
 
 end
 
-%% -----------------------------------------------------------------------------
 
+%% -----------------------------------------------------------------------------
+vw = initHiddenGray;
+vw = rmLoadDefault(vw);
+save('cc_vw.mat','vw')
+%% -----------------------------------------------------------------------------
 %% PREPARE DATA: WORDS, CHECKERS AND FALSEFONTS
 % Generate the rmroicell that we will use in all plots in this script
 % This will read the results obtained by Rosemary or the re-run in 2021
@@ -536,12 +540,13 @@ crCreateScatterplot(R,C_data,cr,...
 %% PREPARE DATA: ENGLISH AND HEBREW WORDS 
 % Generate the rmroicell that we will use in all plots in this script
 % This will read the results obtained by Rosemary or the re-run in 2021
-whatFit = 'new';  % 'new' | 'Rosemary'
+whatFit = 'Rosemary';  % 'new' | 'Rosemary'
 
 readExisting = true;
 % Do the same with the small and large words
 list_subInds     = [31:36 38:44];
-list_dtNames     = {'Words_English','Words_Hebrew'};
+% list_dtNames     = {'Words_English','Words_Hebrew'};
+list_dtNames     = {'Checkers'};
 list_roiNames = {'WangAtlas_V1v_left'
                  'WangAtlas_V2v_left'
                  'WangAtlas_V3v_left'
@@ -550,17 +555,20 @@ list_roiNames = {'WangAtlas_V1v_left'
                  'lVOTRC' };
                  % 'WangAtlas_IPS0'
                  % 'WangAtlas_IPS1'
-list_rmDescripts = {'Words_English'... 
-                    'Words_Hebrew'};  
+% list_rmDescripts = {'Words_English'... 
+%                     'Words_Hebrew'};  
+list_rmDescripts = {'Checkers'};  
 if strcmp(whatFit,'Rosemary')
-    list_rmNames     = {'retModel-Words_English-css.mat'
-                        'retModel-Words_Hebrew-css.mat' };
+    % list_rmNames     = {'retModel-Words_English-css.mat'
+    %                     'retModel-Words_Hebrew-css.mat' };
+    list_rmNames     = {'retModel-Checkers-css.mat' };
 else
-     list_rmNames     = {'retModel-Words_English-css-fFit.mat'
-                        'retModel-Words_Hebrew-css-fFit.mat' };
+     % list_rmNames     = {'retModel-Words_English-css-fFit.mat'
+     %                    'retModel-Words_Hebrew-css-fFit.mat' };
+     list_rmNames     = {'retModel-Checkers-css-fFit.mat' };
 end
      
-matname = ['rmroicell_subInds-31to36-38to44_dtNames-WE-WH_fits-' whatFit '.mat'];
+matname = ['rmroicell_subInds-31to36-38to44_dtNames-Checkers_fits-' whatFit '.mat'];
 if readExisting
     load(fullfile(crRP,'DATA',matname),'rmroiCell');
 else

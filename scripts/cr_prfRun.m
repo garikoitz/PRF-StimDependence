@@ -47,8 +47,8 @@ opt.params      = cr.defaults.prfrun.params;
 % session list. see bookKeeping
 
 
-%opt.list_path   = cr.bk.list_sessionRet; 
-opt.list_path   = cr.bk.list_sessionSizeRet; 
+opt.list_path   = cr.bk.list_sessionRet; 
+% opt.list_path   = cr.bk.list_sessionSizeRet; 
 
 
 opt.list_rois   = opt.rois;
