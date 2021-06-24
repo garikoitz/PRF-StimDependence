@@ -45,7 +45,12 @@ opt.params      = cr.defaults.prfrun.params;
 
 % The following parameters have been set in bk = bookKeeping():
 % session list. see bookKeeping
+
+
 opt.list_path   = cr.bk.list_sessionRet; 
+% opt.list_path   = cr.bk.list_sessionSizeRet; 
+
+
 opt.list_rois   = opt.rois;
 
 
