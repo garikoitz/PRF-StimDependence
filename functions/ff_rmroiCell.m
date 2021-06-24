@@ -41,7 +41,7 @@ bookKeepingOption = p.Results.bookKeeping;
 %% Define things
 numSubs = length(list_subInds);
 numRois = length(list_roiNames);
-numRms = length(list_rmNames);
+numRms  = length(list_rmNames);
 
 rmroiCell = cell(numSubs, numRois, numRms);
 

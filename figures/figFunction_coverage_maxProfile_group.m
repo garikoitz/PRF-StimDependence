@@ -191,21 +191,23 @@ for jj = 1:numRois
             contourY = contourCoordsY/vfc.nSamples*(2*vfc.fieldRange) - vfc.fieldRange; 
             
             % plotting
-            plot(contourX, contourY, ':', 'LineWidth',2, 'Color', [0 0 0])
+            
             if kk==1
+                plot(contourX, contourY, ':', 'LineWidth',2, 'Color', [0 0 0])
                 prevContX = contourX;
                 prevContY = contourY;
             else
+                plot(contourX, contourY, '--', 'LineWidth',2, 'Color', [0.5 0.5 0.5])
                 if bootcontour
                     for bb=1:numboots
                         [~, contourCoordsX, contourCoordsY] = ...
                             ff_contourMatrix_makeFromMatrix(RFMEAN(:,:,bb),vfc,contourLevel);
                         contX = contourCoordsX/vfc.nSamples*(2*vfc.fieldRange) - vfc.fieldRange;
                         contY = contourCoordsY/vfc.nSamples*(2*vfc.fieldRange) - vfc.fieldRange;
-                        plot(contX, contY, '--', 'LineWidth',2, 'Color', [0.5  0.5  0.5 ]); hold on
+                        plot(contX, contY, ':', 'LineWidth',2, 'Color', [0 0 0]); hold on
                     end
                 else
-                    plot(prevContX, prevContY, '--', 'LineWidth',2, 'Color', [0.5  0.5  0.5 ])
+                    plot(prevContX, prevContY, ':', 'LineWidth',2, 'Color', [0 0 0])
                 end
             end
         end

@@ -83,8 +83,8 @@ switch fieldName
         % Here we can do the ecc tests in BarData1 and BarData2
         % Cohens d
         fovealInd = (y <= 5);
-        dfoveal = computeCohen_d(y(fovealInd), x(fovealInd));
-        dperiph = computeCohen_d(y(~fovealInd), x(~fovealInd));
+        dfoveal = computeCohen_d(y(fovealInd), x(fovealInd),'paired');
+        dperiph = computeCohen_d(y(~fovealInd), x(~fovealInd),'paired');
         text(maxValueX-(maxValueX-minValueX)*(1/4), 5.5,sprintf('d\'': %.2g',dperiph),...
             'Color','w','FontWeight','Bold','FontSize',14)
         text(maxValueX-(maxValueX-minValueX)*(1/4), 4.5 ,sprintf('d\'': %.2g',dfoveal),...
@@ -94,8 +94,8 @@ switch fieldName
         % Here we can do the ecc tests in BarData1 and BarData2
         % Cohens d
         fovealInd = (y <= 5);
-        dfoveal = computeCohen_d(y(fovealInd), x(fovealInd));
-        dperiph = computeCohen_d(y(~fovealInd), x(~fovealInd));
+        dfoveal = computeCohen_d(y(fovealInd), x(fovealInd),'paired');
+        dperiph = computeCohen_d(y(~fovealInd), x(~fovealInd),'paired');
         text(maxValueX-(maxValueX-minValueX)*(1/4), 5.5,sprintf('d\'': %.2g',dperiph),...
             'Color','w','FontWeight','Bold','FontSize',14)
         text(maxValueX-(maxValueX-minValueX)*(1/4), 4.5 ,sprintf('d\'': %.2g',dfoveal),...
@@ -105,7 +105,7 @@ switch fieldName
     case {'co'}
         % Here we can do the ecc tests in BarData1 and BarData2
         % Cohens d
-        d = computeCohen_d(y, x);
+        d = computeCohen_d(y, x,'paired');
         text(maxValueX-(maxValueX-minValueX)*(1/4), minValueY+fov ,sprintf('d\'': %.2g',d),...
             'Color','w','FontWeight','Bold','FontSize',14)
     otherwise
