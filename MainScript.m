@@ -105,103 +105,102 @@ end
 %% -----------------------------------------------------------------------------
 %% -----------------------------------------------------------------------------
 %% VAR EXPLAINED
+inTheServer = false;
 if inTheServer
- vw = initHiddenGray;
- vw = rmLoadDefault(vw);
- save('cc_vw.mat','vw')
+    vw = initHiddenGray;
+    vw = rmLoadDefault(vw);
+    save('cc_vw.mat','vw')
 else
- % Calculate variance explained between 
-
-cd(fullfile(crRP,'local'));
-% Load ROIs
-roiPath = fullfile(crRP,'local','WangAtlas_V2v_left.mat');
-% roiPath = fullfile(crRP,'local','lVOTRC.mat');
-AA      = load(roiPath);
-% vw   = initHiddenGray;
-% vw   = rmLoadDefault(vw);
-load(fullfile(crRP,'local','cc_vw.mat'))
-vw    = loadROI(vw, roiPath, [],[],1,0);
-assert(isequal(AA.ROI.coords, vw.ROIs(1).coords));
-vw    = viewSet(vw, 'curdt', 'Checkers'); 
-V1indices   = viewGet(vw, 'roiIndices');
-% V1indices   = V1indices(1:1300);
-
-
-% Read checkers 1 and the average of 23
-C1  = load(fullfile(crRP,'local','cc_checkers1_tSeries1.mat'));
-C23 = load(fullfile(crRP,'local','cc_checkers23_tSeries1.mat'));
-C1  = C1.tSeries;
-C23 = C23.tSeries;
-
-% Filter to the ROI, left ventral V1
-C1V1      = C1(:,V1indices);
-C23V1     = C23(:,V1indices);
-subplot(3,3,1)
-meanC1V1  = mean(C1V1,2); plot(meanC1V1);hold on
-meanC23V1 = mean(C23V1,2); plot(meanC23V1,'r'); 
-title('Mean V1 activation');legend({'Checkers1','Checkers23'});
-% We need to demean it
-subplot(3,3,2)
-dmC1V1   = C1V1 - mean(C1V1);
-mdmC1V1  = mean(dmC1V1,2); plot(mdmC1V1);hold on
-dmC23V1  = C23V1 - mean(C23V1);
-mdmC23V1 = mean(dmC23V1,2); plot(mdmC23V1,'r');
-title('Demeaned mean V1 activation');legend({'Checkers1','Checkers23'});
-
-
-
-
-% Read the latest model fit
-C   = load(fullfile(crRP,'local','retModel-Checkers-css-fFit-fFit.mat'));
-% Filter for V1
-rss    = C.model{1}.rss(V1indices);
-rawrss = C.model{1}.rawrss(V1indices);
-% Calculate var explained of model fit
-varexp         = 100*(1 - rss ./rawrss);
-subplot(3,3,4)
-plot(varexp,'.')
-ylim([0,100])
-title('var exp by index, new fit')
-subplot(3,3,5)
-histogram(varexp,100)
-xlim([0,100]);
-title('var exp by histogram, new fit')
-
-subplot(3,3,3)
-plot(dmC1V1,dmC23V1,'.');
-xlabel('dmC1V1')
-ylabel('dmC23V1')
-identityLine(gca)
-title('scatterplot of tSeries')
-
-subplot(3,3,6)
-histogram((diag(corr(dmC1V1,dmC23V1)).^2),200);
-xlabel('var explained')
-title('Corr of tSeries')
-
-
-
-% Calcualte var explained of the two time series
-F   = 100*(1 - sum((dmC1V1-dmC23V1).^2) ./ sum(dmC23V1.^2));
-F(F<0)=nan;
-subplot(3,3,7)
-plot(F,'.')
-ylim([0,100])
-title('var exp by index, 2 runs')
-subplot(3,3,8)
-histogram(F,100)
-xlim([0,100]);
-title('var exp by histogram, 2 runs')
-
-
-subplot(3,3,9)
-plot(varexp,F,'.'); xlim([0,100]); ylim([0,100]);identityLine(gca);
-xlabel('varexp fits')
-ylabel('varexp tSeries')
-title(sprintf('Medians: fit= %2.1f, tSeries= %2.1f', median(varexp,'omitnan'),median(F,'omitnan')))
+    % Calculate variance explained between
+    
+    cd(fullfile(crRP,'local'));
+    % Load ROIs
+    roiPath = fullfile(crRP,'local','WangAtlas_V2v_left.mat');
+    % roiPath = fullfile(crRP,'local','lVOTRC.mat');
+    AA      = load(roiPath);
+    % vw   = initHiddenGray;
+    % vw   = rmLoadDefault(vw);
+    load(fullfile(crRP,'local','cc_vw.mat'))
+    vw    = loadROI(vw, roiPath, [],[],1,0);
+    assert(isequal(AA.ROI.coords, vw.ROIs(1).coords));
+    vw    = viewSet(vw, 'curdt', 'Checkers');
+    V1indices   = viewGet(vw, 'roiIndices');
+    % V1indices   = V1indices(1:1300);
+    
+    
+    % Read checkers 1 and the average of 23
+    C1  = load(fullfile(crRP,'local','cc_checkers1_tSeries1.mat'));
+    C23 = load(fullfile(crRP,'local','cc_checkers23_tSeries1.mat'));
+    C1  = C1.tSeries;
+    C23 = C23.tSeries;
+    
+    % Filter to the ROI, left ventral V1
+    C1V1      = C1(:,V1indices);
+    C23V1     = C23(:,V1indices);
+    subplot(3,3,1)
+    meanC1V1  = mean(C1V1,2); plot(meanC1V1);hold on
+    meanC23V1 = mean(C23V1,2); plot(meanC23V1,'r');
+    title('Mean V1 activation');legend({'Checkers1','Checkers23'});
+    % We need to demean it
+    subplot(3,3,2)
+    dmC1V1   = C1V1 - mean(C1V1);
+    mdmC1V1  = mean(dmC1V1,2); plot(mdmC1V1);hold on
+    dmC23V1  = C23V1 - mean(C23V1);
+    mdmC23V1 = mean(dmC23V1,2); plot(mdmC23V1,'r');
+    title('Demeaned mean V1 activation');legend({'Checkers1','Checkers23'});
+    
+    
+    
+    
+    % Read the latest model fit
+    C   = load(fullfile(crRP,'local','retModel-Checkers-css-fFit-fFit.mat'));
+    % Filter for V1
+    rss    = C.model{1}.rss(V1indices);
+    rawrss = C.model{1}.rawrss(V1indices);
+    % Calculate var explained of model fit
+    varexp         = 100*(1 - rss ./rawrss);
+    subplot(3,3,4)
+    plot(varexp,'.')
+    ylim([0,100])
+    title('var exp by index, new fit')
+    subplot(3,3,5)
+    histogram(varexp,100)
+    xlim([0,100]);
+    title('var exp by histogram, new fit')
+    
+    subplot(3,3,3)
+    plot(dmC1V1,dmC23V1,'.');
+    xlabel('dmC1V1')
+    ylabel('dmC23V1')
+    identityLine(gca)
+    title('scatterplot of tSeries')
+    
+    subplot(3,3,6)
+    histogram((diag(corr(dmC1V1,dmC23V1)).^2),200);
+    xlabel('var explained')
+    title('Corr of tSeries')
+    
+    
+    
+    % Calcualte var explained of the two time series
+    F   = 100*(1 - sum((dmC1V1-dmC23V1).^2) ./ sum(dmC23V1.^2));
+    F(F<0)=nan;
+    subplot(3,3,7)
+    plot(F,'.')
+    ylim([0,100])
+    title('var exp by index, 2 runs')
+    subplot(3,3,8)
+    histogram(F,100)
+    xlim([0,100]);
+    title('var exp by histogram, 2 runs')
+    
+    
+    subplot(3,3,9)
+    plot(varexp,F,'.'); xlim([0,100]); ylim([0,100]);identityLine(gca);
+    xlabel('varexp fits')
+    ylabel('varexp tSeries')
+    title(sprintf('Medians: fit= %2.1f, tSeries= %2.1f', median(varexp,'omitnan'),median(F,'omitnan')))
 end
-
-
 %% -----------------------------------------------------------------------------
 
 %% PREPARE DATA: WORDS, CHECKERS AND FALSEFONTS
@@ -255,6 +254,46 @@ cr.defaults.covfig.vfc.list_rmNames = list_rmNames;
 % subinds = [31:36 38:44]; % Hebrew
 % cr.defaults.covfig.vfc = ff_vfcDefault_Hebrew();
 
+%% Check median variance explained ver subject and ROI
+list_subInds  = [1:20];
+subnames      = cr.bk.list_sub(list_subInds);
+list_dtNames  = {'Checkers','Words'};
+list_roiNames = {'WangAtlas_V1v_left'
+                 'WangAtlas_V2v_left'
+                 'WangAtlas_V3v_left'
+                 'WangAtlas_hV4_left'
+                 'WangAtlas_VO1_left'
+                 'lVOTRC'}; 
+rmroiCellMED  = rmroiCell(:,1:6,1:2);
+
+% Create the table to store the results
+howManyRows = 2 * length(list_subInds);
+cols = {'sub','stim',list_roiNames{:},'nVoxVotrc'};
+howManyCols = length(cols);
+RES = array2table(nan(howManyRows,howManyCols));
+% Change col names
+RES.Properties.VariableNames = cols;
+RES.sub  = categorical([subnames;subnames]);
+RES.stim = categorical([repmat(list_dtNames(1),[length(list_subInds),1]);repmat(list_dtNames(2),[length(list_subInds),1])]);
+
+for ii=1:length(list_subInds)
+    nam = subnames{ii};
+    for jj = 1:length(list_roiNames)
+        roi  = list_roiNames{jj};
+        for kk = 1:length(list_dtNames)
+            dtName = list_dtNames{kk};
+            % fprintf('\n\n%s >> %s >> %s\n',nam,roi,dtName)
+            tmprss    = rmroiCell{ii,jj,kk}.rss;
+            tmprawrss = rmroiCell{ii,jj,kk}.rawrss;
+            R2        = 100*(1 - tmprss ./ tmprawrss);
+            RES{RES.sub==nam & RES.stim==dtName,roi} = median(R2,'omitnan');
+            if jj==6
+                RES{RES.sub==nam & RES.stim==dtName,'nVoxVotrc'} = length(rmroiCell{ii,jj,kk}.indices);
+            end
+        end
+    end
+end
+
 %% FIGURE 1: (C) Groups coverage plots
 
 % (A) Explain how to obtain
@@ -288,10 +327,10 @@ list_rmNamesWC      = list_rmNames([2,1]);
 %}
 
 % Launch the function
-fname = 'CoverageBoot_';%'Fig1_'; % '' for not saving
+fname = ''; % 'CoverageBoot_';%'Fig1_'; % '' for not saving
 [RF_mean, RF_individuals,empties] = figFunction_coverage_maxProfile_group(cr,list_subInds, ...
                                       'flip',false, ...
-                                      'bootcontour', true, ...
+                                      'bootcontour', false, ...
                                       'rmroiCell',rmroiCell_VOTRC, ...
                                       'list_roiNames', list_roiNamesVOTRC, ...
                                       'list_dtNames', list_dtNamesWC, ...
@@ -301,7 +340,7 @@ fname = 'CoverageBoot_';%'Fig1_'; % '' for not saving
                                       'numboots',25, ...
                                       'fname', fname, ...
                                       'vers',['v01_' whatFit 'fit'],...
-                                      'invisible',true);
+                                      'invisible',false);
                                   
 % PLOT THEM FOR VOTRC, DO BOOTSTRAPPING AND AVERAGE IT
 Wind = [1:17,19:20];
@@ -395,8 +434,6 @@ set(0, 'DefaultFigureRenderer', 'painters');
 saveas(gcf, fullfile(cr.dirs.FIGPNG, [fname '.png']), 'png')
 saveas(gcf, fullfile(cr.dirs.FIGSVG,[fname '.svg']), 'svg')
 
-                                  
-                               
 %% FIGURE 2: (C) Eccentricity: Scatterplots: word-checkerboard
 % Order is CB, W, FF, invert it so that it is W then CB
 rmroiCell_WC     = rmroiCell(:,1:6,1:2);
@@ -433,7 +470,6 @@ crCreateScatterplot(R,C_data,cr,...
                     'co', ...  % 'co'
                     fname);
 
-   
 %% FIGURE 3: (B) Line plots: word-checkerboard 
 % Uses the same voxel calculations from the previous plot
 % If doubt or this is moved, calculate it again here
@@ -573,10 +609,6 @@ if ~isempty(fname)
 end
              
 %
-                
-                
-                
-                
 
 %% FIGURE 5: (A) Eccentricity and (B) Variance Explained: Scatterplot: word-falsefont
 % Order is CB, W, FF, invert it so that it is W then CB
@@ -640,7 +672,6 @@ crCreateScatterplot(R,C_data,cr,...
                     list_rmDescripts,...
                     'co', ...  % 'co'
                     fname);
-                
 
 %% FIGURE 8: IPS Eccentricity: Scatterplots: word-checkerboard
 % Order is CB, W, FF, invert it so that it is W then CB
@@ -757,13 +788,10 @@ crCreateScatterplot(R,C_data,cr,...
 %% PREPARE DATA: ENGLISH AND HEBREW WORDS 
 % Generate the rmroicell that we will use in all plots in this script
 % This will read the results obtained by Rosemary or the re-run in 2021
-whatFit = 'Rosemary';  % 'new' | 'Rosemary'
 
 readExisting = true;
 % Do the same with the small and large words
 list_subInds     = [31:36 38:44];
-% list_dtNames     = {'Words_English','Words_Hebrew'};
-list_dtNames     = {'Checkers'};
 list_roiNames = {'WangAtlas_V1v_left'
                  'WangAtlas_V2v_left'
                  'WangAtlas_V3v_left'
@@ -772,20 +800,18 @@ list_roiNames = {'WangAtlas_V1v_left'
                  'lVOTRC' };
                  % 'WangAtlas_IPS0'
                  % 'WangAtlas_IPS1'
-% list_rmDescripts = {'Words_English'... 
-%                     'Words_Hebrew'};  
-list_rmDescripts = {'Checkers'};  
+                 
+whatFit = 'new';  % 'new' | 'Rosemary'
+list_dtNames     = {'Words_English','Words_Hebrew'};
+list_rmDescripts = {'Words_English','Words_Hebrew'};  
 if strcmp(whatFit,'Rosemary')
-    % list_rmNames     = {'retModel-Words_English-css.mat'
-    %                     'retModel-Words_Hebrew-css.mat' };
-    list_rmNames     = {'retModel-Checkers-css.mat' };
+    list_rmNames     = {'retModel-Words_English-css.mat','retModel-Words_Hebrew-css.mat' };
 else
-     % list_rmNames     = {'retModel-Words_English-css-fFit.mat'
-     %                    'retModel-Words_Hebrew-css-fFit.mat' };
-     list_rmNames     = {'retModel-Checkers-css-fFit.mat' };
+     list_rmNames     = {'retModel-Words_English-css-fFit.mat','retModel-Words_Hebrew-css-fFit.mat' };
 end
-     
-matname = ['rmroicell_subInds-31to36-38to44_dtNames-Checkers_fits-' whatFit '.mat'];
+matname = ['rmroicell_subInds-31to36-38to44_dtNames-WE-WH_fits-' whatFit '.mat'];
+
+
 if readExisting
     load(fullfile(crRP,'DATA',matname),'rmroiCell');
 else
@@ -820,6 +846,7 @@ list_rmDescripts = {'Words_English','Words_Hebrew'};
                                    'fieldrange', 7);
 
 fname = ['scatterplot_eccentricity_WordEngVsWordHeb_6ROIs_13subs_' whatFit 'Fit_v02'];
+fname = '';
 crCreateScatterplot(R,C_data,cr,...
                     list_subInds,...
                     list_roiNames16,...
@@ -833,6 +860,7 @@ crCreateScatterplot(R,C_data,cr,...
 
 % Plot it
 fname = ['scatterplot_varianceExplained_WordEngVsWordHeb_6ROIs_13subs_' whatFit 'Fit_v02'];
+fname = '';
 crCreateScatterplot(R,C_data,cr,...
                     list_subInds,...
                     list_roiNames16,...
@@ -860,8 +888,10 @@ list_roiNames   = {'lVOTRC' };
 list_dtNames     = {'Words_English','Words_Hebrew'};
 list_rmNames     = {'retModel-Words_English-css-fFit.mat'
                     'retModel-Words_Hebrew-css-fFit.mat' };
+                
 % Launch the function
-fname = 'Coverage_EngHeb_';  %'Fig1_'; % '' for not saving
+fname = 'Coverage_EngCB_';  %'Fig1_'; % '' for not saving
+% fname = '';
 [RF_mean, RF_individuals,empties] = figFunction_coverage_maxProfile_group(cr,list_subInds, ...
                                       'flip',false, ...
                                       'bootcontour', true, ...
@@ -1025,7 +1055,7 @@ fname = 'Coverage_EngHeb_';  %'Fig1_'; % '' for not saving
                                       'minvarexp', 0.2, ...
                                       'fname', '', ...
                                       'vers',['v01_' whatFit 'fit'],...
-                                      'invisible',false);
+                                      'invisible',true);
 
 
 
@@ -1105,6 +1135,8 @@ set(ha(19:end),'XLabel',KK); set(ha([1,10,19]),'YLabel',KK)
                 
 % PLOT THEM FOR VOTRC, DO BOOTSTRAPPING AND AVERAGE IT
 engind = [  2,3,    6,  7,8, 9,10,11,12];
+
+
 ALLeng=RF_individuals{1}(:,:,engind);
 ALLheb=RF_individuals{2};
 
@@ -1114,7 +1146,10 @@ DVALS = zeros(128,128,50);
 
 for kk=1:50
     % Remove 1 each time and create same plots with the remaining one
-    randReplacement = datasample(1:9,9);
+    % randReplacement = datasample(1:9,9);
+    % In checkers, only survive 8
+    randReplacement = datasample(1:8,8);
+    
     alleng          = ALLeng(:,:,randReplacement);
     allheb          = ALLheb(:,:,randReplacement);
     
@@ -1137,8 +1172,6 @@ end
 mval   = mean(MVALS,3);
 stdval = mean(SVALS,3);
 Cd     = mean(DVALS,3);
-
-
 
 % PLOT
 mrvNewGraphWin('CrossValEngvsHebFOV',[],true);
@@ -1165,17 +1198,21 @@ xticks([1,64,128]); yticks([1,64,128])
 xticklabels([-7,0,7]); yticklabels([-7,0,7])
 xlabel('Degs'); ylabel('Degs')
 
-subplot(1,3,3)
-% subplot(1,2,1)
+% subplot(1,3,3)
+
+mrvNewGraphWin('CrossValEngvsHebFOV',[],true);
+subplot(1,2,1)
 imagesc(Cd);axis equal;colormap(parula);colorbar;grid
-title("Cohen's d: mean of 50 crossvals [EngFOV vs HebFOV]")
+title("Cohen's d: mean of 50 crossvals [Eng-CB]")
 xlim([1,128]);ylim([1,128])
 xticks([1,64,128]); yticks([1,64,128])
-caxis([-1.25,1.25])
+caxis([-0.7,1.7])
 xticklabels([-7,0,7]); yticklabels([-7,0,7])
 xlabel('Degs'); ylabel('Degs')
 
-% subplot(1,2,2)
+
+subplot(1,2,2)
+
 [X,Y] = meshgrid(1:128,1:128);
 XX = ((X-64)/64)*7;
 YY = ((Y-64)/64)*7;
@@ -1185,19 +1222,12 @@ xlabel('X (degs)'); ylabel('Y (degs)')
 zlabel("Cohen's d")
 xlim([-7,7])
 ylim([-7,7])
-zlim([-1.35,1.25])
+zlim([-0.5,2.1])
 xticks([-7,-5,-3,-1,1,3,5,7])
 yticks([-7,-5,-3,-1,1,3,5,7])
 xticklabels({'-7','-5','-3','-1','1','3','5','7'})
 yticklabels({''})
 set(gca,'FontSize',18)
-
-
-
-
-
-
-
 
 
 % Plot individual subject differences
@@ -1224,6 +1254,444 @@ for nn=1:size(ALLeng,3)
 end
 ha    = xlabel('Degs'); 
 ha(1) = ylabel('Degs');
+
+
+%% PREPARE DATA: ENGLISH AND CB FROM ISRAEL
+% Generate the rmroicell that we will use in all plots in this script
+% This will read the results obtained by Rosemary or the re-run in 2021
+
+readExisting = true;
+% Do the same with the small and large words
+list_subInds     = [31:36 38:44];
+list_roiNames = {'WangAtlas_V1v_left'
+                 'WangAtlas_V2v_left'
+                 'WangAtlas_V3v_left'
+                 'WangAtlas_hV4_left'
+                 'WangAtlas_VO1_left'
+                 'lVOTRC' };
+                 % 'WangAtlas_IPS0'
+                 % 'WangAtlas_IPS1'
+                 
+% A
+whatFit = 'new';  % 'new' | 'Rosemary'
+list_dtNames     = {'Words_English','Words_Hebrew'};
+list_rmDescripts = {'Words_English','Words_Hebrew'};  
+if strcmp(whatFit,'Rosemary')
+    list_rmNames     = {'retModel-Words_English-css.mat','retModel-Words_Hebrew-css.mat' };
+else
+     list_rmNames     = {'retModel-Words_English-css-fFit.mat','retModel-Words_Hebrew-css-fFit.mat' };
+end
+matname = ['rmroicell_subInds-31to36-38to44_dtNames-WE-WH_fits-' whatFit '.mat'];
+
+% B
+whatFit = 'Rosemary';  % 'new' | 'Rosemary'
+list_dtNames2     = {'Checkers'};
+list_rmDescripts2 = {'Checkers'};  
+if strcmp(whatFit,'Rosemary')
+    list_rmNames2     = {'retModel-Checkers-css.mat' };
+else
+     list_rmNames2     = {'retModel-Checkers-css-fFit.mat' };
+end
+matname2 = ['rmroicell_subInds-31to36-38to44_dtNames-Checkers_fits-' whatFit '.mat'];
+
+
+
+
+
+if readExisting
+    load(fullfile(crRP,'DATA',matname),'rmroiCell');
+    
+    % If reading checkers
+    rmroiCell = rmroiCell(:,1:6,:);
+    A = load(fullfile(crRP,'DATA',matname2),'rmroiCell');
+    rmroiCell(:,:,2) = A.rmroiCell;
+    
+else
+    rmroiCell=ff_rmroiCell(cr,list_subInds,list_roiNames,list_dtNames,...
+                           list_rmNames,'list_path',cr.bk.list_sessionRet);
+    % Save rmroicell just in case
+    save(fullfile(crRP,'DATA',matname),'rmroiCell')
+end
+
+% Read the generic params for coverage for all subjects
+cr.defaults.covfig.vfc = ff_vfcDefault();
+cr.defaults.covfig.vfc.list_roiNames    = list_roiNames;
+% data types we want to look at
+cr.defaults.covfig.vfc.list_dtNames     = list_dtNames;
+% names of the rm in each dt
+cr.defaults.covfig.vfc.list_rmNames     = list_rmNames;
+cr.defaults.covfig.vfc.list_rmDescripts = list_rmDescripts;
+% subinds = [31:36 38:44]; % Hebrew
+% cr.defaults.covfig.vfc = ff_vfcDefault_Hebrew();  
+
+
+% Order is WE_CB
+list_roiNames16 = list_roiNames(1:6);
+list_rmDescripts = {'Words_English','Checkers'};  
+
+% Obtain equally thresholded voxels to scatterplot
+[R,C_data,cr]=crThreshGetSameVoxel(cr,...
+                                   rmroiCell,...
+                                   list_subInds,...
+                                   list_roiNames16,...
+                                   'cothres', 0.2,...
+                                   'fieldrange', 7);
+
+fname = ['scatterplot_eccentricity_WordEngVsWordHeb_6ROIs_13subs_' whatFit 'Fit_v02'];
+fname = '';
+crCreateScatterplot(R,C_data,cr,...
+                    list_subInds,...
+                    list_roiNames16,...
+                    list_rmDescripts,...
+                    'ecc', ...  % 'co'
+                    fname);
+
+% FIGURE 6: (B) Variance Explained: Scatterplot: wordLarge-WordSmall
+% Uses the same voxel calculations from the previous plot
+% If doubt or this is moved, calculate it again here
+
+% Plot it
+fname = ['scatterplot_varianceExplained_WordEngVsWordHeb_6ROIs_13subs_' whatFit 'Fit_v02'];
+fname = '';
+crCreateScatterplot(R,C_data,cr,...
+                    list_subInds,...
+                    list_roiNames16,...
+                    list_rmDescripts,...
+                    'co', ...  % 'co', 'ecc'
+                    fname);
+
+% Group COVERAGE plots, take all subjects from list_subInds
+rmroiCell_VOTRC  = rmroiCell(:,6,1:2);
+list_roiNames    = {'lVOTRC' };
+list_dtNames     = {'Words_English','Checkers'};
+list_rmNames     = {'retModel-Words_English-css-fFit.mat'
+                    'retModel-Checkers-css-fFit.mat' };
+                
+% Launch the function
+fname = 'Coverage_EngCB_';  %'Fig1_'; % '' for not saving
+% fname = '';
+[RF_mean, RF_individuals,empties] = figFunction_coverage_maxProfile_group(cr,list_subInds, ...
+                                      'flip',false, ...
+                                      'bootcontour', true, ...
+                                      'rmroiCell',rmroiCell_VOTRC, ...
+                                      'list_roiNames', list_roiNames, ...
+                                      'list_dtNames', list_dtNames, ...
+                                      'list_rmNames', list_rmNames, ...
+                                      'sizedegs',7,...
+                                      'minvarexp', 0.2, ...
+                                      'numboots',25, ...
+                                      'fname', fname, ...
+                                      'vers',['v02_' whatFit 'fit'],...
+                                      'invisible',true);
+
+% PLOT the mean values per every ROI separately, 3 plots per ROI
+%{
+% Plot them
+mrvNewGraphWin('EngvsHebFOV','wide',true);
+
+ha = tight_subplot(3,6,[.01 .03],[.1 .01],[.01 .01])
+for nr=1:length(list_roiNames)
+    roiName = list_roiNames{nr};
+    ENG     = RF_individuals{nr,1};
+    HEB     = RF_individuals{nr,2};
+    EMPENG  = empties{nr,1};
+    EMPHEB  = empties{nr,2};
+    if (isempty(EMPENG) && isempty(EMPHEB))
+        alleng = ENG;
+        allheb = HEB;
+    else
+        switch nr
+            case 1
+                % Some subjects are missing, fix it
+                engind = [1,2,3,4,5,6,7,8,9,10,11,12,13];
+                hebind = [  1,2,3,  4,5,6,7, 8, 9,10,11];
+                engind = [  2,3,4,  6,7,8,9,10,11,12,13];
+                
+                % Make paired subjects
+                alleng = ENG(:,:,engind);
+                allheb = HEB;
+                assert(size(ENG,3),size(HEB,3))
+            case 2
+                % Some subjects are missing, fix it
+                engind = [1,2,3,4,5,6,7,8,9,10,11,12,13];
+                hebind = [  1,2,3,4,5,6,7,8, 9,10,11,12];
+                engind = [  2,3,4,5,6,7,8,9,10,11,12,13];
+                
+                % Make paired subjects
+                alleng = ENG(:,:,engind);
+                allheb = HEB;
+                assert(size(ENG,3),size(HEB,3))
+            case {3,4,5}
+                % Some subjects are missing, fix it
+                engind = [1,2,3,4,5,6,7,8,9,10,11,12,13];
+                hebind = [  1,2,    3,4,5,6, 7, 8, 9,10];
+                engind = [  2,3,    6,7,8,9,10,11,12,13];
+                
+                % Make paired subjects
+                alleng = ENG(:,:,engind);
+                allheb = HEB;
+                assert(size(ENG,3),size(HEB,3))
+            case 6
+                % Some subjects are missing, fix it
+                engind = [1,2,3,4,5,6,7,8,9,10,11,12,13];
+                hebind = [  1,2,    3,  4,5, 6, 7, 8, 9];
+                engind = [  2,3,    6,  7,8, 9,10,11,12];
+                
+                % Make paired subjects
+                alleng = ENG(:,:,engind);
+                allheb = HEB;
+                assert(size(ENG,3),size(HEB,3))
+            otherwise
+                error('This case does not exist')
+                
+        end
+    end
+    
+    % Calculate measures
+    mval   = mean(alleng-allheb, 3);
+    stdval = std(alleng-allheb, [],3);
+    Cd     = zeros(128,128);
+    for ii=1:128;for jj=1:128
+        Cd(ii,jj)=computeCohen_d(alleng(ii,jj,:),allheb(ii,jj,:),'paired');
+    end;end
+
+
+    
+    
+    
+    axes(ha(nr));
+    imagesc(mval);axis equal;colormap(jet);colorbar;grid
+    title(sprintf('%s >> Mean of diffs [EngFOV-HebFOV]',strrep(strrep(roiName,'WangAtlas_',''),'_','\_')))
+    xlim([1,128]);ylim([1,128])
+    xticks([1,64,128]); yticks([1,64,128])
+    xticklabels([-7,0,7]); yticklabels([-7,0,7])
+    caxis([-.2,.2])
+    xlabel('Degs'); ylabel('Degs')
+
+    axes(ha(nr+1*6));
+    imagesc(stdval);axis equal;colormap(jet);colorbar;grid
+    title(sprintf('%s >> SD of diffs [EngFOV-HebFOV]',strrep(strrep(roiName,'WangAtlas_',''),'_','\_')))
+    xlim([1,128]);ylim([1,128])
+    xticks([1,64,128]); yticks([1,64,128])
+    xticklabels([-7,0,7]); yticklabels([-7,0,7])
+    caxis([0,.45])
+    xlabel('Degs'); ylabel('Degs')
+
+    axes(ha(nr+2*6));
+    imagesc(Cd);axis equal;colormap(jet);colorbar;grid
+    title(sprintf("%s >> Cohen's d [EngFOV-HebFOV]",strrep(strrep(roiName,'WangAtlas_',''),'_','\_')))
+    xlim([1,128]);ylim([1,128])
+    xticks([1,64,128]); yticks([1,64,128])
+    xticklabels([-7,0,7]); yticklabels([-7,0,7])
+    caxis([-1,1])
+    xlabel('Degs'); ylabel('Degs')
+end
+set(ha(1:12),'XTickLabel',''); set(ha,'YTickLabel','')
+set(ha(1:12),'XTick',''); set(ha,'YTick','')
+KK=ha(1).XLabel;
+set(ha(1:12),'XLabel',KK); set(ha,'YLabel',KK)
+
+
+KK.String='Degs';
+set(ha(13:end),'XTickLabel',[-7,0,7]); set(ha([1,7,12]),'YTickLabel',[-7,0,7])
+set(ha(13:end),'XTick',[1,64,128]); set(ha([1,7,12]),'YTick',[1,64,128])
+
+%}    
+
+% TESTS JUST VOTRC
+%{
+rmroiCell_VOTRC = rmroiCell(:,6,1:2);
+list_roiNames   ={'lVOTRC' };
+list_dtNames     = {'Words_English','Words_Hebrew'};
+list_rmNames     = {'retModel-Words_English-css-fFit.mat'
+                        'retModel-Words_Hebrew-css-fFit.mat' };
+% Launch the function
+fname = 'Coverage_EngHeb_';  %'Fig1_'; % '' for not saving
+[RF_mean, RF_individuals,empties] = figFunction_coverage_maxProfile_group(cr,list_subInds, 'flip',true, ...
+                                      'rmroiCell',rmroiCell_VOTRC, ...
+                                      'list_roiNames', list_roiNames, ...
+                                      'list_dtNames', list_dtNames, ...
+                                      'list_rmNames', list_rmNames, ...
+                                      'sizedegs',7,...
+                                      'minvarexp', 0.2, ...
+                                      'fname', '', ...
+                                      'vers',['v01_' whatFit 'fit'],...
+                                      'invisible',true);
+%}
+
+% PLOT THEM FOR VOTRC, BUT LEAVING ONE SUBJECT AT A TIME
+%{
+% engind = [  2,3,    6,  7,8, 9,10,11,12];
+ALLeng=RF_individuals{1}(:,:,engind);
+ALLheb=RF_individuals{2};
+% mrvNewGraphWin('EngvsHebFOVreplacement',[],true);
+ha = tight_subplot(3,9,[.01 .03],[.1 .01],[.01 .01])
+for kk=1:9
+    % Remove 1 each time and create same plots with the remaining one
+    alleng = ALLeng(:,:,[1:kk-1,kk+1:9]);
+    allheb = ALLheb(:,:,[1:kk-1,kk+1:9]);
+    
+    % Calculate measures
+    mval   = mean(alleng - allheb, 3);
+    stdval = std(alleng  - allheb, [],3);
+    Cd     = zeros(128,128);
+    for ii=1:128;for jj=1:128
+            Cd(ii,jj)=computeCohen_d(alleng(ii,jj,:),allheb(ii,jj,:),'paired');
+    end;end
+    
+    % PLOT
+    % subplot(3,9,kk) % (kk*3)-2)
+    axes(ha(kk));
+    imagesc(mval);axis equal;colormap(jet);colorbar;grid
+    title('Mean diffs [Eng-Heb]')
+    xlim([1,128]);ylim([1,128])
+    % xticks([1,64,128]); yticks([1,64,128])
+    % xticklabels([-7,0,7]); yticklabels([-7,0,7])
+    % xlabel('Degs'); ylabel('Degs')
+    
+    % subplot(3,9,kk+9) % (kk*3)-1)
+    axes(ha(kk+9));
+    imagesc(stdval);axis equal;colormap(jet);colorbar;grid
+    title('SD diffs [Eng-Heb]')
+    xlim([1,128]);ylim([1,128])
+    % xticks([1,64,128]); yticks([1,64,128])
+    % xticklabels([-7,0,7]); yticklabels([-7,0,7])
+    % xlabel('Degs'); ylabel('Degs')
+    
+    % subplot(3,9,kk+2*9) % kk*3)
+    axes(ha(kk+2*9));
+    imagesc(Cd);axis equal;colormap(jet);colorbar;grid
+    title("Cohen's d")
+    xlim([1,128]);ylim([1,128])
+    % xticks([1,64,128]); yticks([1,64,128])
+    % xticklabels([-7,0,7]); yticklabels([-7,0,7])
+    % xlabel('Degs'); ylabel('Degs')
+end
+set(ha(1:18),'XTickLabel',''); set(ha,'YTickLabel','')
+set(ha(1:18),'XTick',''); set(ha,'YTick','')
+KK=ha(1).XLabel;
+set(ha(1:18),'XLabel',KK); set(ha,'YLabel',KK)
+
+
+KK.String='Degs';
+set(ha(19:end),'XTickLabel',[-7,0,7]); set(ha([1,10,19]),'YTickLabel',[-7,0,7])
+set(ha(19:end),'XTick',[1,64,128]); set(ha([1,10,19]),'YTick',[1,64,128])
+set(ha(19:end),'XLabel',KK); set(ha([1,10,19]),'YLabel',KK)
+
+%}
+
+
+                
+% PLOT THEM FOR VOTRC, DO BOOTSTRAPPING AND AVERAGE IT
+% engind = [  2,3,    6,  7,8, 9,10,11,12];
+% When using checkers
+allind = [1,2,3,4,5,6,7,8,9,10,11,12,13];
+chcind = [    1,  2,    3,4, 5, 6, 7, 8];
+engind = [1,2,3,4,5,6,  7,8, 9,10,11,12];
+engind = [    3  ,5,    7,8, 9,10,11,12];
+
+ALLeng=RF_individuals{1}(:,:,engind);
+ALLheb=RF_individuals{2};
+
+MVALS = zeros(128,128,50);
+SVALS = zeros(128,128,50);
+DVALS = zeros(128,128,50);
+
+for kk=1:100
+    % Remove 1 each time and create same plots with the remaining one
+    assert(isequal(size(ALLeng,3),size(ALLheb,3)))
+    randReplacement = datasample(1:size(ALLheb,3),size(ALLheb,3));
+    
+    alleng          = ALLeng(:,:,randReplacement);
+    allheb          = ALLheb(:,:,randReplacement);
+    
+    % Calculate measures
+    mval   = mean(alleng - allheb, 3);
+    stdval = std(alleng  - allheb, [],3);
+    Cd     = zeros(128,128);
+    for ii=1:128;for jj=1:128
+            Cd(ii,jj)=computeCohen_d(alleng(ii,jj,:),allheb(ii,jj,:),'paired');
+    end;end
+
+    % Accummlate it
+    MVALS(:,:,kk) = mval;
+    SVALS(:,:,kk) = stdval;
+    DVALS(:,:,kk) = Cd;
+    
+end   
+
+% obtain means again
+mval   = mean(MVALS,3);
+stdval = mean(SVALS,3);
+Cd     = mean(DVALS,3);
+
+min(Cd(:))
+max(Cd(:))
+min(Cd(:))
+mean(Cd(:))
+
+
+100*sum(Cd(:)>0)/length(Cd(:))
+100*sum(Cd(:)<=0)/length(Cd(:))
+
+
+mrvNewGraphWin('CrossValEngvsHebFOV','wide',true);
+
+subplot(1,2,1)
+imagesc(Cd);axis equal;colormap(parula);colorbar;grid
+title("Cohen's d: mean of 50 crossvals [Eng-CB]")
+xlim([1,128]);ylim([1,128])
+xticks([1,64,128]); yticks([1,64,128])
+caxis([-0.4,2.2])
+xticklabels([-7,0,7]); yticklabels([-7,0,7])
+xlabel('Degs'); ylabel('Degs')
+cmap = colormap(parula);
+cmap1 = cmap(1:5:128,:);
+cmap2 = cmap(129:end,:);
+% vals  = linspace(0,1,50)';
+% lght  = linspace(0,.3,50)';
+% cmap1 = [vals,lght,lght];
+% cmap2 = [lght,lght,vals];
+% cmap=[flip(cmap2);cmap1];
+cmap=[cmap1;cmap2];
+colormap(cmap);
+colorbar
+
+
+
+
+
+subplot(1,2,2)
+[X,Y] = meshgrid(1:128,1:128);
+XX = ((X-64)/64)*7;
+YY = ((Y-64)/64)*7;
+YY = flipud(YY);
+surf(XX,YY,Cd);
+xlabel('X (degs)'); ylabel('Y (degs)')
+zlabel("Cohen's d")
+
+
+xlim([-7,7])
+ylim([-7,7])
+zlim([-0.4,2.2])
+xticks([-7,-5,-3,-1,1,3,5,7])
+yticks([-7,-5,-3,-1,1,3,5,7])
+xticklabels({'-7','-5','-3','-1','1','3','5','7'})
+yticklabels({''})
+set(gca,'FontSize',18)
+caxis([-0.4,2.2])
+colormap(cmap);
+
+
+
+ 
+
+
+
+
+
+
+
 
 %% COVERAGE: individual plots 
 for subind = 13 [1:12,14:16,18:20] % list_subInds
