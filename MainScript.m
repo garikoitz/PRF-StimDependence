@@ -1268,9 +1268,9 @@ list_roiNames = {'WangAtlas_V1v_left'
                  'WangAtlas_V3v_left'
                  'WangAtlas_hV4_left'
                  'WangAtlas_VO1_left'
-                 'lVOTRC' };
-                 % 'WangAtlas_IPS0'
-                 % 'WangAtlas_IPS1'
+                 'lVOTRC' 
+                 'WangAtlas_IPS0'
+                 'WangAtlas_IPS1'};
                  
 % A
 whatFit = 'new';  % 'new' | 'Rosemary'
@@ -1284,7 +1284,7 @@ end
 matname = ['rmroicell_subInds-31to36-38to44_dtNames-WE-WH_fits-' whatFit '.mat'];
 
 % B
-whatFit = 'Rosemary';  % 'new' | 'Rosemary'
+whatFit = 'new';  % 'new' | 'Rosemary'
 list_dtNames2     = {'Checkers'};
 list_rmDescripts2 = {'Checkers'};  
 if strcmp(whatFit,'Rosemary')
@@ -1307,10 +1307,10 @@ if readExisting
     rmroiCell(:,:,2) = A.rmroiCell;
     
 else
-    rmroiCell=ff_rmroiCell(cr,list_subInds,list_roiNames,list_dtNames,...
-                           list_rmNames,'list_path',cr.bk.list_sessionRet);
+    rmroiCell=ff_rmroiCell(cr,list_subInds,list_roiNames,list_dtNames2,...
+                           list_rmNames2,'list_path',cr.bk.list_sessionRet);
     % Save rmroicell just in case
-    save(fullfile(crRP,'DATA',matname),'rmroiCell')
+    save(fullfile(crRP,'DATA',matname2),'rmroiCell')
 end
 
 % Read the generic params for coverage for all subjects
