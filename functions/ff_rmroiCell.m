@@ -1,4 +1,4 @@
-function rmroiCell = ff_rmroiCell(cr, list_subInds, list_roiNames, list_dtNames, list_rmNames, varargin)
+function [rmroiCell, selindexCell] = ff_rmroiCell(cr, list_subInds, list_roiNames, list_dtNames, list_rmNames, varargin)
 % rmroiCell = ff_rmroiCell(list_subInds, list_roiNames, list_dtNames, list_rmNames, varargin)
 % 
 % If not specified, list_path will be list_sessionRet by default
@@ -43,7 +43,8 @@ numSubs = length(list_subInds);
 numRois = length(list_roiNames);
 numRms  = length(list_rmNames);
 
-rmroiCell = cell(numSubs, numRois, numRms);
+rmroiCell    = cell(numSubs, numRois, numRms);
+selindexCell = cell(numSubs, numRois);
 
 %% Do things
 
