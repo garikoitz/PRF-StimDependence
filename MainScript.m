@@ -289,9 +289,16 @@ else
         tmpT.W    = Wts(thisW.indices,:);
         tmpT.Wco  = 100*thisW.co';
         tmpT.Wecc = thisW.ecc';
+        tmpT.Wx   = thisW.x0';
+        tmpT.Wy   = thisW.y0';
+        tmpT.Wsig = thisW.sigma';
+        
         tmpT.FF   = FFts(thisFF.indices,:);
         tmpT.FFco = 100*thisFF.co';
         tmpT.FFecc= thisFF.ecc';
+        tmpT.FFx  = thisFF.x0';
+        tmpT.FFy  = thisFF.y0';
+        tmpT.FFsig= thisFF.sigma';
         
         % Concatenate tables
         tSs = [tSs ; tmpT];
