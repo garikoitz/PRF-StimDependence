@@ -250,51 +250,108 @@ cr.defaults.covfig.vfc.list_rmNames = list_rmNames;
 % cr.defaults.covfig.vfc = ff_vfcDefault_Hebrew();
 
 %% Time series comparisons
-rmroiCell_WFF    = rmroiCell(1:12,6,2:3);
-list_roiNames6   = list_roiNames(6);
-list_rmDescripts = {'Words','FalseFont'};
-tSs              = table();
-
-for subind=1:12
-    subname = cr.bk.list_sub{subind};
-    [~,anatName]=fileparts(cr.bk.list_anatomy{subind});
-    fprintf('\nSubDetails:\nInd:%i, StrInd:%s, subname:%s, Name:%s, anatName:%s\n',...
-                        subind,cr.bk.list_subNumberString{subind},subname,...
-                        cr.bk.list_names{subind},anatName)
-    % Select this subject
-    thisW     = rmroiCell_WFF{subind,1,1};
-    thisFF    = rmroiCell_WFF{subind,1,2};
-    assert(isequal(thisW.indices, thisFF.indices))
-    
-    % Load time series
-    Wts       = load(fullfile(cr.bk.list_sessionRet{subind},...
-                      'Gray','Words','TSeries','Scan1','tSeries1.mat'));
-    Wts       = Wts.tSeries';
-    FFts      = load(fullfile(cr.bk.list_sessionRet{subind},...
-                      'Gray','FalseFont','TSeries','Scan1','tSeries1.mat'));
-	FFts      = FFts.tSeries';
-                  
-    % Populate table
-    tmpT      = table(); 
-    tmpT.SUB  = categorical(repmat({subname},[length(thisW.indices),1]));
-    tmpT.indx = thisW.indices;
-    tmpT.W    = Wts(thisW.indices,:);
-    tmpT.Wco  = 100*thisW.co';
-    tmpT.Wecc = thisW.ecc';
-    tmpT.FF   = FFts(thisFF.indices,:);
-    tmpT.FFco = 100*thisFF.co';
-    tmpT.FFecc= thisFF.ecc';
-    
-    % Concatenate tables
-    tSs = [tSs ; tmpT];
-end
-
+readExisting = true;
+whatFit  = 'new';
 tsFname = ['tSeries_subInds-1to12_dtNames-w-ff_fits-' whatFit '.mat'];
+
 if readExisting
-    load(fullfile(crRP,'DATA',tsFname),'tSs');    
+    load(fullfile(crRP,'DATA',tsFname),'tSs');
 else
+    
+    rmroiCell_WFF    = rmroiCell(1:12,6,2:3);
+    list_roiNames6   = list_roiNames(6);
+    list_rmDescripts = {'Words','FalseFont'};
+    tSs              = table();
+    
+    for subind=1:12
+        subname = cr.bk.list_sub{subind};
+        [~,anatName]=fileparts(cr.bk.list_anatomy{subind});
+        fprintf('\nSubDetails:\nInd:%i, StrInd:%s, subname:%s, Name:%s, anatName:%s\n',...
+            subind,cr.bk.list_subNumberString{subind},subname,...
+            cr.bk.list_names{subind},anatName)
+        % Select this subject
+        thisW     = rmroiCell_WFF{subind,1,1};
+        thisFF    = rmroiCell_WFF{subind,1,2};
+        assert(isequal(thisW.indices, thisFF.indices))
+        
+        % Load time series
+        Wts       = load(fullfile(cr.bk.list_sessionRet{subind},...
+            'Gray','Words','TSeries','Scan1','tSeries1.mat'));
+        Wts       = Wts.tSeries';
+        FFts      = load(fullfile(cr.bk.list_sessionRet{subind},...
+            'Gray','FalseFont','TSeries','Scan1','tSeries1.mat'));
+        FFts      = FFts.tSeries';
+        
+        % Populate table
+        tmpT      = table();
+        tmpT.SUB  = categorical(repmat({subname},[length(thisW.indices),1]));
+        tmpT.indx = thisW.indices;
+        tmpT.W    = Wts(thisW.indices,:);
+        tmpT.Wco  = 100*thisW.co';
+        tmpT.Wecc = thisW.ecc';
+        tmpT.FF   = FFts(thisFF.indices,:);
+        tmpT.FFco = 100*thisFF.co';
+        tmpT.FFecc= thisFF.ecc';
+        
+        % Concatenate tables
+        tSs = [tSs ; tmpT];
+    end
     save(fullfile(crRP,'DATA',tsFname),'tSs')
 end
+
+
+% Compare the timeSeries
+% Filter: var expll > 20% & FFecc > 5deg
+% 
+comin = 20;
+tSsf = tSs(tSs.FFco > comin & tSs.Wco > comin & ...
+           tSs.FFecc > 5 & tSs.FFecc < 15 & ...
+           tSs.Wecc > 0 & tSs.Wecc < 1.6 & ...
+           tSs.SUB=='cc', :);%& ...
+           % tSs.FFecc > tSs.Wecc, :);
+       
+% Check by plotting it
+xx = mrvNewGraphWin('check time series',[],true);
+position = [0.005 0.062 .8 .8 ];
+set(xx, 'position',position)
+
+subplot(2,2,3)
+plot(tSsf.Wecc, tSsf.FFecc,'ko');identityLine(gca)
+xlabel('WORDS Eccentricity'); ylabel('FF Eccentricity'); 
+set(gca,'FontSize',14)
+
+% Obtain matrices with the time series
+W = tSsf.W;
+F = tSsf.FF;
+
+% Plot mean time series
+subplot(2,2,1)
+plot(mean(W),'r-');hold on; plot(mean(F),'b-')
+xlabel('time');legend({'Words','FalseFonts'}); ylabel('original signal')
+title('Mean signals: original')
+set(gca,'FontSize',14)
+
+% Demean and plot again
+dmW   = W - mean(W,2);
+dmF   = F - mean(F,2);
+subplot(2,2,2)
+% plot(mean(dmW),'r-');hold on; plot(mean(dmF),'b-')
+plot(dmW,'r-');hold on; plot(dmF,'b-')
+xlabel('time');legend({'Words','FalseFonts'});ylabel('demeaned signal')
+title('Mean signals: demeaned')
+set(gca,'FontSize',14)
+
+% TEST NUMBERS
+% Substract and plot difference
+dmWF  = dmW - dmF;
+dmdiv = dmW ./ dmF;
+subplot(2,2,4)
+plot(mean(dmWF),'k-');hold on;plot(mean(dmdiv),'k--');
+xlabel('time');legend({'Mean Words-FalseFonts','Mean Words ./ FalseFonts'})
+title('Mean of demeaned W-FF'); ylabel('demeaned W-FF')
+set(gca,'FontSize',14)
+
+
 %% Check median variance explained ver subject and ROI
 list_subInds  = [1:20];
 subnames      = cr.bk.list_sub(list_subInds);
