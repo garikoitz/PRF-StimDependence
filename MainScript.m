@@ -230,11 +230,6 @@ list_rmNames  = {'retModel-Checkers-css.mat'
                  'retModel-Words-css.mat' 
                  'retModel-FalseFont-css.mat'};
 %}
-list_rmDescripts = {'Words'...  % Words (large bars)
-                    'Checkers'...
-                    ... % 'Words_English'...
-                    ... % 'Words_Hebrew'... % Words (smalls bars)
-                    'FalseFont'};
 rmroiFname = ['rmroicell_subInds-1to20_dtNames-cb-w-ff_fits-' whatFit '.mat'];
 if readExisting
     load(fullfile(crRP,'DATA',rmroiFname),'rmroiCell');    
@@ -254,6 +249,52 @@ cr.defaults.covfig.vfc.list_rmNames = list_rmNames;
 % subinds = [31:36 38:44]; % Hebrew
 % cr.defaults.covfig.vfc = ff_vfcDefault_Hebrew();
 
+%% Time series comparisons
+rmroiCell_WFF    = rmroiCell(1:12,6,2:3);
+list_roiNames6   = list_roiNames(6);
+list_rmDescripts = {'Words','FalseFont'};
+tSs              = table();
+
+for subind=1:12
+    subname = cr.bk.list_sub{subind};
+    [~,anatName]=fileparts(cr.bk.list_anatomy{subind});
+    fprintf('\nSubDetails:\nInd:%i, StrInd:%s, subname:%s, Name:%s, anatName:%s\n',...
+                        subind,cr.bk.list_subNumberString{subind},subname,...
+                        cr.bk.list_names{subind},anatName)
+    % Select this subject
+    thisW     = rmroiCell_WFF{subind,1,1};
+    thisFF    = rmroiCell_WFF{subind,1,2};
+    assert(isequal(thisW.indices, thisFF.indices))
+    
+    % Load time series
+    Wts       = load(fullfile(cr.bk.list_sessionRet{subind},...
+                      'Gray','Words','TSeries','Scan1','tSeries1.mat'));
+    Wts       = Wts.tSeries';
+    FFts      = load(fullfile(cr.bk.list_sessionRet{subind},...
+                      'Gray','FalseFont','TSeries','Scan1','tSeries1.mat'));
+	FFts      = FFts.tSeries';
+                  
+    % Populate table
+    tmpT      = table(); 
+    tmpT.SUB  = categorical(repmat({subname},[length(thisW.indices),1]));
+    tmpT.indx = thisW.indices;
+    tmpT.W    = Wts(thisW.indices,:);
+    tmpT.Wco  = 100*thisW.co';
+    tmpT.Wecc = thisW.ecc';
+    tmpT.FF   = FFts(thisFF.indices,:);
+    tmpT.FFco = 100*thisFF.co';
+    tmpT.FFecc= thisFF.ecc';
+    
+    % Concatenate tables
+    tSs = [tSs ; tmpT];
+end
+
+tsFname = ['tSeries_subInds-1to12_dtNames-w-ff_fits-' whatFit '.mat'];
+if readExisting
+    load(fullfile(crRP,'DATA',tsFname),'tSs');    
+else
+    save(fullfile(crRP,'DATA',tsFname),'tSs')
+end
 %% Check median variance explained ver subject and ROI
 list_subInds  = [1:20];
 subnames      = cr.bk.list_sub(list_subInds);
