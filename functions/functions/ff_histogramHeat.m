@@ -15,7 +15,7 @@ switch fieldName
     case {'ecc','co'}
         minValueX = 0; %-2.3; % 0
         minValueY = 0; %-2.3; % 0
-    case {'x0'}
+    case {'x0','y0'}
         minValueX = -7; %-2.3; % 0
         minValueY = -7; %-2.3; % 0
 end
@@ -89,7 +89,7 @@ switch fieldName
             'Color','w','FontWeight','Bold','FontSize',14)
         text(maxValueX-(maxValueX-minValueX)*(1/4), 4.5 ,sprintf('d\'': %.2g',dfoveal),...
             'Color','w','FontWeight','Bold','FontSize',14)
-    case {'x0'}
+    case {'x0','y0'}
         line([minValueX, maxValueX], [5,5], 'LineStyle','-', 'Color', 'r', 'LineWidth',1)
         % Here we can do the ecc tests in BarData1 and BarData2
         % Cohens d

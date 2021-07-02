@@ -838,12 +838,27 @@ list_roiNames16 = list_roiNames(1:6);
 list_rmDescripts = {'Words_English','Words_Hebrew'};
 
 % Obtain equally thresholded voxels to scatterplot
+cothresh = 0.2;
 [R,C_data,cr]=crThreshGetSameVoxel(cr,...
                                    rmroiCell,...
                                    list_subInds,...
                                    list_roiNames16,...
-                                   'cothres', 0.2,...
+                                   'cothres', cothresh,...
                                    'fieldrange', 7);
+                               
+
+fprintf('------------------------------------\n')
+fprintf('         %s - %s (R2:%g)        \n', list_rmDescripts{2},list_rmDescripts{1},cothresh)
+fprintf('------------------------------------\n\n')
+for ii=1:6
+    fprintf('%s(N=%i)\n',strrep(list_roiNames16{ii},'WangAtlas_',''),length(R.X_rm2{ii})) 
+    [H P CI] = ttest(R.X_rm2{ii}-R.X_rm1{ii}); 
+    fprintf('(X) P:%g, CI: [%g %g]\n',P,CI(1),CI(2))
+    
+    [H P CI] = ttest(R.Y_rm2{ii}-R.Y_rm1{ii}); 
+    fprintf('(Y) P:%g, CI: [%g %g]\n\n',P,CI(1),CI(2))
+end
+                               
 
 fname = ['scatterplot_eccentricity_WordEngVsWordHeb_6ROIs_13subs_' whatFit 'Fit_v02'];
 fname = '';
@@ -854,6 +869,20 @@ crCreateScatterplot(R,C_data,cr,...
                     'ecc', ...  % 'co'
                     fname);
 
+crCreateScatterplot(R,C_data,cr,...
+                    list_subInds,...
+                    list_roiNames16,...
+                    list_rmDescripts,...
+                    'x0', ...  % 'co'
+                    fname);
+
+crCreateScatterplot(R,C_data,cr,...
+                    list_subInds,...
+                    list_roiNames16,...
+                    list_rmDescripts,...
+                    'y0', ...  % 'co'
+                    fname);
+                
 % FIGURE 6: (B) Variance Explained: Scatterplot: wordLarge-WordSmall
 % Uses the same voxel calculations from the previous plot
 % If doubt or this is moved, calculate it again here
@@ -891,20 +920,20 @@ list_rmNames     = {'retModel-Words_English-css-fFit.mat'
                 
 % Launch the function
 fname = 'Coverage_EngCB_';  %'Fig1_'; % '' for not saving
-% fname = '';
+fname = '';
 [RF_mean, RF_individuals,empties] = figFunction_coverage_maxProfile_group(cr,list_subInds, ...
                                       'flip',false, ...
-                                      'bootcontour', true, ...
+                                      'bootcontour', false, ...
                                       'rmroiCell',rmroiCell_VOTRC, ...
                                       'list_roiNames', list_roiNames, ...
                                       'list_dtNames', list_dtNames, ...
                                       'list_rmNames', list_rmNames, ...
                                       'sizedegs',7,...
-                                      'minvarexp', 0.2, ...
+                                      'minvarexp', 0.05, ...
                                       'numboots',25, ...
                                       'fname', fname, ...
                                       'vers',['v02_' whatFit 'fit'],...
-                                      'invisible',true);
+                                      'invisible',false);
 
 
 
@@ -1304,7 +1333,7 @@ if readExisting
     % If reading checkers
     rmroiCell = rmroiCell(:,1:6,:);
     A = load(fullfile(crRP,'DATA',matname2),'rmroiCell');
-    rmroiCell(:,:,2) = A.rmroiCell;
+    rmroiCell(:,1:6,2) = A.rmroiCell(:,1:6);
     
 else
     rmroiCell=ff_rmroiCell(cr,list_subInds,list_roiNames,list_dtNames2,...
@@ -1330,12 +1359,27 @@ list_roiNames16 = list_roiNames(1:6);
 list_rmDescripts = {'Words_English','Checkers'};  
 
 % Obtain equally thresholded voxels to scatterplot
+cothresh = 0.05;
 [R,C_data,cr]=crThreshGetSameVoxel(cr,...
                                    rmroiCell,...
                                    list_subInds,...
                                    list_roiNames16,...
-                                   'cothres', 0.2,...
+                                   'cothres', cothresh,...
                                    'fieldrange', 7);
+                               
+
+fprintf('------------------------------------\n')
+fprintf('         %s - %s (R2:%g)        \n', list_rmDescripts{2},list_rmDescripts{1},cothresh)
+fprintf('------------------------------------\n\n')
+for ii=1:6
+    fprintf('%s(N=%i)\n',strrep(list_roiNames16{ii},'WangAtlas_',''),length(R.X_rm2{ii})) 
+    [H P CI] = ttest(R.X_rm2{ii}-R.X_rm1{ii}); 
+    fprintf('(X) P:%g, CI: [%g %g]\n',P,CI(1),CI(2))
+    
+    [H P CI] = ttest(R.Y_rm2{ii}-R.Y_rm1{ii}); 
+    fprintf('(Y) P:%g, CI: [%g %g]\n\n',P,CI(1),CI(2))
+end
+                               
 
 fname = ['scatterplot_eccentricity_WordEngVsWordHeb_6ROIs_13subs_' whatFit 'Fit_v02'];
 fname = '';
@@ -1346,6 +1390,23 @@ crCreateScatterplot(R,C_data,cr,...
                     'ecc', ...  % 'co'
                     fname);
 
+crCreateScatterplot(R,C_data,cr,...
+                    list_subInds,...
+                    list_roiNames16,...
+                    list_rmDescripts,...
+                    'x0', ...  % 'co'
+                    fname);
+
+crCreateScatterplot(R,C_data,cr,...
+                    list_subInds,...
+                    list_roiNames16,...
+                    list_rmDescripts,...
+                    'y0', ...  % 'co'
+                    fname);
+                
+                
+                
+                
 % FIGURE 6: (B) Variance Explained: Scatterplot: wordLarge-WordSmall
 % Uses the same voxel calculations from the previous plot
 % If doubt or this is moved, calculate it again here
@@ -1368,21 +1429,21 @@ list_rmNames     = {'retModel-Words_English-css-fFit.mat'
                     'retModel-Checkers-css-fFit.mat' };
                 
 % Launch the function
-fname = 'Coverage_EngCB_';  %'Fig1_'; % '' for not saving
+fname = 'Coverage_EngCB_new_';  %'Fig1_'; % '' for not saving
 % fname = '';
 [RF_mean, RF_individuals,empties] = figFunction_coverage_maxProfile_group(cr,list_subInds, ...
                                       'flip',false, ...
-                                      'bootcontour', true, ...
+                                      'bootcontour', false, ...
                                       'rmroiCell',rmroiCell_VOTRC, ...
                                       'list_roiNames', list_roiNames, ...
                                       'list_dtNames', list_dtNames, ...
                                       'list_rmNames', list_rmNames, ...
                                       'sizedegs',7,...
-                                      'minvarexp', 0.2, ...
+                                      'minvarexp', 0.05, ...
                                       'numboots',25, ...
                                       'fname', fname, ...
                                       'vers',['v02_' whatFit 'fit'],...
-                                      'invisible',true);
+                                      'invisible',false);
 
 % PLOT the mean values per every ROI separately, 3 plots per ROI
 %{
@@ -1585,10 +1646,24 @@ set(ha(19:end),'XLabel',KK); set(ha([1,10,19]),'YLabel',KK)
 % PLOT THEM FOR VOTRC, DO BOOTSTRAPPING AND AVERAGE IT
 % engind = [  2,3,    6,  7,8, 9,10,11,12];
 % When using checkers
+% old fit
+%{
 allind = [1,2,3,4,5,6,7,8,9,10,11,12,13];
 chcind = [    1,  2,    3,4, 5, 6, 7, 8];
 engind = [1,2,3,4,5,6,  7,8, 9,10,11,12];
 engind = [    3  ,5,    7,8, 9,10,11,12];
+%}
+% new fit
+allind = [1,2,3,4,5,6,7,8,9,10,11,12,13];
+% R2 > 20%
+chcind = [    1,  2,    3,4, 5, 6, 7   ];
+engind = [1,2,3,4,5,6,  7,8, 9,10,11,12];
+engind = [    3  ,5,    7,8, 9,10,12]; 
+% R2 > 10%
+chcind = [  1,2,3,4,    5,6, 7, 8, 9,10];
+engind = [1,2,3,4,5,6,7,8,9,10,11,12,13];
+engind = [  2,3,4,5,    8,9,10,11,12,13]; 
+
 
 ALLeng=RF_individuals{1}(:,:,engind);
 ALLheb=RF_individuals{2};
@@ -1625,36 +1700,39 @@ mval   = mean(MVALS,3);
 stdval = mean(SVALS,3);
 Cd     = mean(DVALS,3);
 
-min(Cd(:))
-max(Cd(:))
-min(Cd(:))
-mean(Cd(:))
-
-
-100*sum(Cd(:)>0)/length(Cd(:))
-100*sum(Cd(:)<=0)/length(Cd(:))
+% min(Cd(:))
+% max(Cd(:))
+% min(Cd(:))
+% mean(Cd(:))
+% 
+% 100*sum(Cd(:)>0)/length(Cd(:))
+% 100*sum(Cd(:)<=0)/length(Cd(:))
 
 
 mrvNewGraphWin('CrossValEngvsHebFOV','wide',true);
+
+caxismin = min(Cd(:));
+caxismax = max(Cd(:));
 
 subplot(1,2,1)
 imagesc(Cd);axis equal;colormap(parula);colorbar;grid
 title("Cohen's d: mean of 50 crossvals [Eng-CB]")
 xlim([1,128]);ylim([1,128])
 xticks([1,64,128]); yticks([1,64,128])
-caxis([-0.4,2.2])
+caxis([caxismin,caxismax])
 xticklabels([-7,0,7]); yticklabels([-7,0,7])
 xlabel('Degs'); ylabel('Degs')
-cmap = colormap(parula);
-cmap1 = cmap(1:5:128,:);
-cmap2 = cmap(129:end,:);
+% cmap = colormap(parula);
+% cmap1 = cmap(1:5:128,:);
+% cmap2 = cmap(129:end,:);
 % vals  = linspace(0,1,50)';
 % lght  = linspace(0,.3,50)';
 % cmap1 = [vals,lght,lght];
 % cmap2 = [lght,lght,vals];
 % cmap=[flip(cmap2);cmap1];
-cmap=[cmap1;cmap2];
-colormap(cmap);
+% cmap=[cmap1;cmap2];
+% cmap = cmap(129:end,:);
+% colormap(cmap);
 colorbar
 
 
@@ -1673,14 +1751,15 @@ zlabel("Cohen's d")
 
 xlim([-7,7])
 ylim([-7,7])
-zlim([-0.4,2.2])
+zlim([caxismin,caxismax])
 xticks([-7,-5,-3,-1,1,3,5,7])
 yticks([-7,-5,-3,-1,1,3,5,7])
 xticklabels({'-7','-5','-3','-1','1','3','5','7'})
 yticklabels({''})
 set(gca,'FontSize',18)
-caxis([-0.4,2.2])
-colormap(cmap);
+caxis([caxismin,caxismax])
+% colormap(cmap);
+colormap(parula);
 
 
 
