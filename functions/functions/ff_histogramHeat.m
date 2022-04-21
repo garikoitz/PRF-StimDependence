@@ -1,4 +1,4 @@
-function ff_histogramHeat(x, y, maxValueX, maxValueY, numHistBins,cmapValuesHist,fov,roiName,fieldName)
+function c = ff_histogramHeat(x, y, minmaxX, minmaxY, numHistBins,cmapValuesHist,fov,roiName,fieldName,fontsize)
 % ff_histogramHeat(x, y, maxValueX, maxValueY, numHistBins) 
 %
 % Makes a heat map!
@@ -11,16 +11,15 @@ function ff_histogramHeat(x, y, maxValueX, maxValueY, numHistBins,cmapValuesHist
 % GLU: used numHistBins as the radius of scatplot now, it was unused
 
 %% 
-switch fieldName
-    case {'ecc','co'}
-        minValueX = 0; %-2.3; % 0
-        minValueY = 0; %-2.3; % 0
-    case {'x0','y0'}
-        minValueX = -7; %-2.3; % 0
-        minValueY = -7; %-2.3; % 0
-end
-axisLimsX = [minValueX maxValueX]; 
-axisLimsY = [minValueY maxValueY]; 
+minValueX = minmaxX(1);
+maxValueX = minmaxX(2);
+
+minValueY = minmaxY(1);
+maxValueY = minmaxY(2);
+
+
+axisLimsX = minmaxX; 
+axisLimsY = minmaxY; 
 % Ctrs{1} = linspace(minValueX, maxValueX, numHistBins);
 % Ctrs{2} = linspace(minValueY, maxValueY, numHistBins);
 
@@ -37,7 +36,7 @@ scatplot(x,y,'squares',numHistBins,100,5,1,10,cmapValuesHist);
 set(gca,'color','k');
 set(gca, 'xlim', axisLimsX);
 set(gca, 'ylim', axisLimsY);
-set(gca, 'FontSize', 14);
+set(gca, 'FontSize', fontsize);
 axis square;
 hold on
 % identityLine goes above everything else so that it can be seen
@@ -69,8 +68,8 @@ jbfill([minValueX,minValueX+fov, maxValueX-fov, maxValueX], ...
        iColor,iColor,0,0.4);
 roiName = strrep(ff_stringRemove(roiName, 'WangAtlas_'),'_left','');
 roiName = strrep(roiName,'l','');
-text(maxValueX-(maxValueX-minValueX)*(1/4), minValueY+fov/2,roiName,...
-     'Color','w','FontWeight','Bold','FontSize',18)
+text(maxValueX-(maxValueX-minValueX)*(1/3), minValueY+fov/2,roiName,...
+     'Color','w','FontWeight','Bold','FontSize',fontsize)
 colormap(cmapValuesHist); 
 c = colorbar;
 set(c, 'location', 'eastoutside')
@@ -85,10 +84,10 @@ switch fieldName
         fovealInd = (y <= 5);
         dfoveal = computeCohen_d(y(fovealInd), x(fovealInd),'paired');
         dperiph = computeCohen_d(y(~fovealInd), x(~fovealInd),'paired');
-        text(maxValueX-(maxValueX-minValueX)*(1/4), 5.5,sprintf('d\'': %.2g',dperiph),...
-            'Color','w','FontWeight','Bold','FontSize',14)
-        text(maxValueX-(maxValueX-minValueX)*(1/4), 4.5 ,sprintf('d\'': %.2g',dfoveal),...
-            'Color','w','FontWeight','Bold','FontSize',14)
+        text(maxValueX-(maxValueX-minValueX)*(1/3), 5.75,sprintf('d\'': %.2g',dperiph),...
+            'Color','w','FontWeight','Bold','FontSize',fontsize)
+        text(maxValueX-(maxValueX-minValueX)*(1/3), 4.25 ,sprintf('d\'': %.2g',dfoveal),...
+            'Color','w','FontWeight','Bold','FontSize',fontsize)
     case {'x0','y0'}
         line([minValueX, maxValueX], [5,5], 'LineStyle','-', 'Color', 'r', 'LineWidth',1)
         % Here we can do the ecc tests in BarData1 and BarData2
@@ -96,18 +95,16 @@ switch fieldName
         fovealInd = (y <= 5);
         dfoveal = computeCohen_d(y(fovealInd), x(fovealInd),'paired');
         dperiph = computeCohen_d(y(~fovealInd), x(~fovealInd),'paired');
-        text(maxValueX-(maxValueX-minValueX)*(1/4), 5.5,sprintf('d\'': %.2g',dperiph),...
-            'Color','w','FontWeight','Bold','FontSize',14)
-        text(maxValueX-(maxValueX-minValueX)*(1/4), 4.5 ,sprintf('d\'': %.2g',dfoveal),...
-            'Color','w','FontWeight','Bold','FontSize',14)
-        xlim([-7,7])
-        ylim([-7,7])
+        text(maxValueX-(maxValueX-minValueX)*(1/3), 5.75,sprintf('d\'': %.2g',dperiph),...
+            'Color','w','FontWeight','Bold','FontSize',fontsize)
+        text(maxValueX-(maxValueX-minValueX)*(1/3), 4.25 ,sprintf('d\'': %.2g',dfoveal),...
+            'Color','w','FontWeight','Bold','FontSize',fontsize)
     case {'co'}
         % Here we can do the ecc tests in BarData1 and BarData2
         % Cohens d
         d = computeCohen_d(y, x,'paired');
-        text(maxValueX-(maxValueX-minValueX)*(1/4), minValueY+fov ,sprintf('d\'': %.2g',d),...
-            'Color','w','FontWeight','Bold','FontSize',14)
+        text(maxValueX-(maxValueX-minValueX)*(1/3), minValueY+fov ,sprintf('d\'': %.2g',d),...
+            'Color','w','FontWeight','Bold','FontSize',fontsize)
     otherwise
         error('fieldName not known, only ecc and co implemented ')
         
