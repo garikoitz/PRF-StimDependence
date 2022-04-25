@@ -1,8 +1,9 @@
-function  [percentAboveSubs,perROI] = crCreateScatterplot(R, C_data, cr, ...
+function  crCreateScatterplot(R, C_data, cr, ...
                                                           list_subInds,...
                                                           list_roiNames,...
                                                           list_rmDescripts,...
                                                           fieldName, ...
+                                                          fontsize,...
                                                           fname)
 %%
 % colormap for histogram
@@ -31,34 +32,6 @@ close;
 %     'betaScale'   : how much to scale the predicted tseries by
 %     'meanMax'     : mean of the top 8 values
 %     'meanPeaks'   : mean of the outputs of matlab's meanPeaks
-list_fieldNames  = {    
-    'co'
-    'ecc'
-%     'sigma'
-%     'ph'
-    }; 
-
-list_fieldDescripts = {
-    'variance explained'
-    'eccentricity'
-%     'sigma';afo
-%     'polar angle'
-    }; 
-
-% which plots do we want? lots we can make ...
-plot_fit = false; % plotting the across-subject bootstrapped line w/ CIs
-
-% transparency of the plots
-alphaValue = 0.4; 
-
-
-
-% location of the colorbar
-% default: 'eastoutside'
-% 'southoutside': 
-cbarLocation = 'eastoutside';
-
-% end modification section
 
 numSubs = length(list_subInds);
 numRois = length(list_roiNames);
@@ -113,16 +86,20 @@ A = cell(numRois, 5);
     radius = 1;
     if strcmp(fieldName, 'sigma1') 
         maxValue = cr.defaults.covfig.vfc.sigmaMajthresh(2);
+        minValue = cr.defaults.covfig.vfc.sigmaMajthresh(1);
     elseif strcmp(fieldName, 'sigma')          
         maxValue = cr.defaults.covfig.vfc.sigmaEffthresh(2);
+        minValue = cr.defaults.covfig.vfc.sigmaMajthresh(1);
     elseif strcmp(fieldName, 'ecc')
         maxValue = cr.defaults.covfig.vfc.eccthresh(2);
+        minValue = cr.defaults.covfig.vfc.eccthresh(1);
         fov = 1.5; % width of the band
         nrows = 2; ncols = 3;
         position = [0.005 0.062 .95 .7 ];
         radius = 2;
     elseif strcmp(fieldName, 'co')
         maxValue = 1; 
+        minValue = 0; 
         fov = 0.2; % width of the band
         % nrows = 1; ncols = 6;
         nrows = 2; ncols = 3;
@@ -131,30 +108,53 @@ A = cell(numRois, 5);
         radius = .15;
     elseif strcmp(fieldName, 'exponent')
         maxValue = 2; 
+        minValue = 0; 
     elseif strcmp(fieldName, 'meanMax')
-        maxValue = 20; 
+        maxValue = 20;
+        minValue = 0; 
     elseif strcmp(fieldName, 'meanPeaks')
-        maxValue = 10; 
+        maxValue = 10;
+        minValue = 0; 
     elseif strcmp(fieldName, 'betaScale')
         maxValue = 5; 
+        minValue = 0; 
     elseif strcmp(fieldName, 'x0') || strcmp(fieldName, 'y0')
         maxValue = cr.defaults.covfig.vfc.fieldRange;
+        minValue = -cr.defaults.covfig.vfc.fieldRange;
+        fov = 1.5; % width of the band
+        nrows = 2; ncols = 3;
+        position = [0.005 0.062 .95 .7 ];
+        radius = 2;
     elseif strcmp(fieldName, 'ph')
-        maxValue = 2*pi; 
+        maxValue = 2*pi;
+        minValue = 0; 
     else
         error('Define the maxValue so we can normalize and fit the beta distribution.');
     end
+    
+    
+    
+    switch numRois
+        case 6
+            nrows = 2; ncols = 3;
+        case 8
+            nrows = 2; ncols = 4;
+        otherwise
+            nrows = 1; ncols = numRois;
+    end
 
-
+    
     xx = mrvNewGraphWin('Scatterplots');
+    position = [0 0 1 .75];
     set(xx,'Position',position);
+    ha = tight_subplot(nrows,ncols,[.005 .01],[.05 .01],[.05 .01]);
+    
     for jj = 1:numRois
         roiName = list_roiNames{jj};
-        subplot(nrows,ncols,jj);
-    
+        % subplot(nrows,ncols,jj);
+        axes(ha(jj));
 
         
-        axisLims = [0 maxValue]; 
         BarData1 = [];
         BarData2 = [];
         
@@ -263,32 +263,107 @@ A = cell(numRois, 5);
         npoints = 100; 
         
         % 3d histogram heat map -- absolute number of voxels
-        ff_histogramHeat(BarData1, BarData2, maxValue, maxValue,radius,cmapValuesHist,fov,roiName);
+        c = ff_histogramHeat(BarData1, BarData2, [minValue,maxValue], ...
+                             [minValue,maxValue],radius,cmapValuesHist,fov,...
+                             roiName,fieldName,fontsize);
         numVoxels = length(BarData1); 
         % axes and title
         switch fieldName
             case {'ecc'}
-                if jj==1 || jj==4
-                    ylabel(['pRF eccentricity for ' rm2Descript ' (deg)'])
-                end
-                if jj>3
-                    xlabel(['pRF eccentricity for ' rm1Descript ' (deg)'])
+                switch numRois
+                case {6,8}
+                    if jj==1 || jj==(numRois/2)+1
+                        ylabel(['pRF eccentricity for ' rm2Descript ' (deg)'],'FontSize',fontsize)
+                        set(ha(jj),'YTickLabel',ha(jj).YTick);set(ha(jj),'YTick',ha(jj).YTick)
+                    else
+                        set(ha(jj),'YTickLabel','');set(ha(jj),'YTick','')
+                    end
+                    if any(~(jj==(numRois/2) || jj==(numRois)))
+                        set(c, 'visible', 'off')
+                    end
+                    if jj<=(numRois/2)
+                        set(ha(jj),'XTickLabel','');set(ha(jj),'XTick','')
+                    else
+                        xlabel(['pRF eccentricity for ' rm1Descript ' (deg)'],'FontSize',fontsize)
+                        set(ha(jj),'XTickLabel',ha(jj).XTick);set(ha(jj),'XTick',ha(jj).XTick)
+                    end
+                otherwise
+                    ylabel(['pRF eccentricity for ' rm2Descript ' (deg)'],'FontSize',fontsize)
+                    xlabel(['pRF eccentricity for ' rm1Descript ' (deg)'],'FontSize',fontsize)
                 end
             case {'co'}
-                if jj==1 || jj==4
-                    ylabel(['Variance explained for ' rm2Descript ' (%)'])
+                switch numRois
+                case {6,8}
+                    if jj==1 || jj==(numRois/2)+1
+                        ylabel(['Variance explained for ' rm2Descript ' (%)'],'FontSize',fontsize)
+                        set(ha(jj),'YTickLabel',ha(jj).YTick);set(ha(jj),'YTick',ha(jj).YTick)
+                    else
+                        set(ha(jj),'YTickLabel','');set(ha(jj),'YTick','')
+                    end
+                    if any(~(jj==(numRois/2) || jj==(numRois)))
+                        set(c, 'visible', 'off')
+                    end
+                    if jj<=(numRois/2)
+                        set(ha(jj),'XTickLabel','');set(ha(jj),'XTick','')
+                    else
+                        xlabel(['Variance explained for ' rm1Descript ' (%)'],'FontSize',fontsize)
+                        set(ha(jj),'XTickLabel',ha(jj).XTick);set(ha(jj),'XTick',ha(jj).XTick)
+                    end
+                otherwise
+                    ylabel(['pRF eccentricity for ' rm2Descript ' (deg)'],'FontSize',fontsize)
+                    xlabel(['pRF eccentricity for ' rm1Descript ' (deg)'],'FontSize',fontsize)
                 end
-                if jj>3
-                    xlabel(['Variance explained for ' rm1Descript ' (%)'])
-                end
+            case {'x0','y0'}
+                meas = 'X';
+                if strcmp(fieldName,'y0');meas='Y';end
+                switch numRois
+                case {6,8}
+                    if jj==1 || jj==(numRois/2)+1
+                        ylabel([rm2Descript ' in ' meas ' axis (deg)'],'FontSize',fontsize)
+                        set(ha(jj),'YTickLabel',ha(jj).YTick);set(ha(jj),'YTick',ha(jj).YTick)
+                    else
+                        set(ha(jj),'YTickLabel','');set(ha(jj),'YTick','')
+                    end
+                    if any(~(jj==(numRois/2) || jj==(numRois)))
+                        set(c, 'visible', 'off')
+                    end
+                    if jj<=(numRois/2)
+                        set(ha(jj),'XTickLabel','');set(ha(jj),'XTick','')
+                    else
+                        xlabel([rm1Descript ' in ' meas ' axis (deg)'],'FontSize',fontsize)
+                        set(ha(jj),'XTickLabel',ha(jj).XTick);set(ha(jj),'XTick',ha(jj).XTick)
+                    end
+                otherwise
+                    ylabel(['pRF eccentricity for ' rm2Descript ' (deg)'],'FontSize',fontsize)
+                    xlabel(['pRF eccentricity for ' rm1Descript ' (deg)'],'FontSize',fontsize)
+                end                
             otherwise
-                if jj==1 || jj==4
-                    ylabel(['' rm2Descript ''])
-                end
-                if jj>3
-                    xlabel(['' rm1Descript ''])
+                switch numRois
+                case {6,8}
+                    if jj==1 || jj==(numRois/2)+1
+                        ylabel(['' rm2Descript ''],'FontSize',fontsize)
+                        set(ha(jj),'YTickLabel',ha(jj).YTick);set(ha(jj),'YTick',ha(jj).YTick)
+                    else
+                        set(ha(jj),'YTickLabel','');set(ha(jj),'YTick','')
+                    end
+                    if any(~(jj==(numRois/2) || jj==(numRois)))
+                        set(c, 'visible', 'off')
+                    end
+                    if jj<=(numRois/2)
+                        set(ha(jj),'XTickLabel','');set(ha(jj),'XTick','')
+                    else
+                        xlabel(['' rm1Descript ''],'FontSize',fontsize)
+                        set(ha(jj),'XTickLabel',ha(jj).XTick);set(ha(jj),'XTick',ha(jj).XTick)
+                    end
+                otherwise
+                    ylabel(['pRF eccentricity for ' rm2Descript ' (deg)'],'FontSize',fontsize)
+                    xlabel(['pRF eccentricity for ' rm1Descript ' (deg)'],'FontSize',fontsize)
                 end
         end
+        
+        
+        
+        
         
     end % loop over rois
 

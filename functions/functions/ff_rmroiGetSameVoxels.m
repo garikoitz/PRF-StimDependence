@@ -67,12 +67,18 @@ rmroi = rmroiCell{1};
         % histogram(rad2deg(rmroi.polar));hold on
         % histogram(rad2deg(rmroi.ph));hold on
         % I need ph, rads going ccw, not Polar. same but cw
+        
+        %{
         quads    = floor(rad2deg(rmroi.ph)/90)+1;
         hemiindx = ismember(quads, vfc.quadthresh);     
         
         % the indices after looping through rmrois
         indx = coindx & eccindx & sigmaMajindx & sigmaEffindx ... 
                & coceilindx & hemiindx; 
+        %}   
+        indx = coindx & eccindx & sigmaMajindx & sigmaEffindx & coceilindx;
+           
+           
 
         indxMaster = indx & indxMaster; 
         

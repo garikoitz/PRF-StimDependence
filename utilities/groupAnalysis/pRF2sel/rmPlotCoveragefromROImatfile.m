@@ -88,16 +88,21 @@ compVolume = false;
 % already have ph and ecc
 % [ph ecc] = cart2pol(x0, y0);
 % as a hack
+
+rm.co = 1- rm.rss./rm.rawrss;
+
+
 co      = rm.co;
-sigma1  = rm.sigma1;
-sigma2  = rm.sigma2;
-sigma   = rm.sigma; 
-theta   = rm.theta;
+sigma1  = rm.sigma1; %.major;
+sigma2  = rm.sigma2; % .minor;
+sigma   = sigma1; 
+theta   = rm.theta; %sigma.theta;
 beta    = rm.beta;
 x0      = rm.x0;
 y0      = rm.y0;
 ph      = rm.ph;
 ecc     = rm.ecc;
+[ph2, ecc2] = cart2pol(x0, y0);
 
 
 % insert a flag asking if we want to y flip?
