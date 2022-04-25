@@ -143,7 +143,7 @@ for jj = 1:numRois
             eccw = ecc_rm1(pp);
             eccc = ecc_rm2(pp);
             
-            
+            % [en,an,dn] = crMove2Horiz(e,a,d)
 
             % if qw==qc ; lineColor = [1 1 1];
             % else; lineColor = [.5 .5 .5]; end
