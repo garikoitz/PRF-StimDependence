@@ -89,7 +89,7 @@ for jj = 1:numRois
         pc   = ph_rm2(pp);
         eccw = ecc_rm1(pp);
         eccc = ecc_rm2(pp);
-        
+
         % fov can be 1.5, to exclude all values inside the green band of the
         % scatterplots
         if (abs(eccc - eccw)  > fov)

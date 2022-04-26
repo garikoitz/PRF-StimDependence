@@ -585,14 +585,28 @@ varExplained=0.05;
                                    'fieldrange', 15);
 
 % Plot it
-% FIG 1
-fname = ['scatterplot_eccentricity_WordVsCheck_6ROIs_20subs_' whatFit '_Fit_v02'];
-fname = ''
-crCreateScatterplot(R,C_data,cr,list_subInds,list_roiNames16,list_rmDescripts,...
-                                                                'ecc', ...  % 'co','ecc'
-                                                                fname);
-% Fig S1: Scatterplot: Variance explained WvsCB
+fname = ['scatterplot_eccentricity_WordVsCheck_6ROIs_20subs_' whatFit 'Fit_v01'];
+[percAboveIdentity,perROI] = crCreateScatterplot(R,C_data,cr,...
+                                    list_subInds,...
+                                    list_roiNames16,...
+                                    list_rmDescripts,...
+                                    'ecc', ...  % 'co'
+                                    '');
+   
+%% FIGURE 3: (B) Line plots: word-checkerboard 
+% Uses the same voxel calculations from the previous plot
+% If doubt or this is moved, calculate it again here
 
+% Plot it
+fname = ['lineplot_WordVsCheck_6ROIs_20subs_' whatFit 'Fit_v01'];
+crCreateLinePlot(R,C_data,cr,...
+                 list_subInds,...
+                 list_roiNames16,...
+                 list_rmNames,...
+                 list_rmDescripts,...
+                 '');
+             
+%% FIGURE 4: (A) Variance Explained: Scatterplot: word-checkerboard
 % Uses the same voxel calculations from the previous plot
 % If doubt or this is moved, calculate it again here
 

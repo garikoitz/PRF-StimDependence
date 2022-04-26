@@ -205,7 +205,7 @@ A = cell(numRois, 5);
                 percentAboveSubs(ii,jj) = perAbove; 
                 
                 % Just store the data and put it outside
-%                 diffAboveSubs(ii,jj) = x2-x1; 
+                % diffAboveSubs(ii,jj) = x2-x1; 
                 
                 %% concatenate
                 BarData1 = [BarData1, x1];
