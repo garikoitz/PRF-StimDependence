@@ -88,34 +88,54 @@ end
 
 
 
-namesurs = {};
+STs = table();
 for ns=1:length(sessionsInCollection)
     thisSession = st.fw.getSession(idGet(sessionsInCollection{ns}));
     % Get info for the project the session belong to
     thisProject  = st.fw.getProject(thisSession.project);
     projectLabel = thisProject.label;
     subCode      = thisSession.subject.code;
+    subID        = thisSession.subject.id;
     subj         = st.fw.getSubject(idGet(thisSession.subject));
-%     sesCode      = thisSession.label;
-%     acqus        = st.list('acquisition', idGet(thisSession));
-%     for na = 1:length(acqus)
-%         thisAcqu = st.fw.getAcquisition(idGet(acqus{na}));
-%         thisAcqu.label
-%     end
+    
     namesur = [lower(subj.firstname) ' ' lower(subj.lastname)];
-    if ismember(namesur, names20)  
-        fprintf('\nSubDetails: Name:%s \n',namesur)
+    if ismember(namesur, names20)
+        % fprintf('\nSubDetails: Name:%s \n',namesur)
+        acqus        = st.list('acquisition', idGet(thisSession));
+        for na = 1:length(acqus)
+            thisAcqu = st.fw.getAcquisition(idGet(acqus{na}));
+            if contains(thisAcqu.label,'Ret')
+                for nf=1:length(thisAcqu.files)
+                    [p,f,e] = fileparts(thisAcqu.files{nf}.name);
+                    if (strcmp('.json',e) && ~contains(f,'inplane'))
+                        % Read the json file into a string
+                        fprintf('\nns: %i, na: %i, nf: %i\n',ns,na,nf);
+                        sliceTiming = jsonread(...
+                            st.fw.downloadFileFromAcquisition(...
+                            idGet(thisAcqu),...
+                            [f e],...
+                            fullfile(crRP,'local',[f e])...
+                            )...
+                            ).SliceTiming;
+                        % Add Names
+                        subjName    = [string(namesur)];
+                        sessionName = [string(thisSession.label)];
+                        acquName    = [string(thisAcqu.label)];
+                        jsonName    = [string([f e])];
+                        % Add IDs
+                        subjID      = [string(subID)];
+                        sessionID   = [string(idGet(thisSession))];
+                        acquID      = [string(idGet(thisAcqu))];
+                        % Create table
+                        tmpst       = table(subjName,sessionName,acquName);
+                        % Add vector with ST
+                        tmpst.ST    = sliceTiming';
+                        % Concatenate
+                        STs = [STs;tmpst];
+                        
+                    end
+                end
+            end
+        end
     end
-    namesurs{ns} = namesur;
 end
-
-length(unique(namesurs))
-
-
-
-
-
-for ns = 1: length(sessionsInCollection)
-sessionsInCollection{1}.subject.info
-a = thisSession.acquisitions()
-a{1}.files{1}
