@@ -1107,29 +1107,52 @@ bk.list_rmName = [
     {{'Checkers';'Words'}}      % ab
     {{'Checkers';'Words'}}      % bw
     {{'Checkers';'Words'}}      % dys_ab
-    {{'Checkers'}}      % heb_ag
-    {{'Checkers'}}      % heb_aa
-    {{'Checkers'}}     % heb_ls
-    {{'Checkers'}}      % heb_toba
-    {{'Checkers'}}      % heb_maya
-    {{'Checkers'}}      % heb_yama
-    {{'Checkers'}}      % heb_blta
-    {{'Checkers'}}      % heb_mibe
-    {{'Checkers'}}
-    {{'Checkers'}}
-    {{'Checkers'}}
-    {{'Checkers'}}
-    {{'Checkers'}}
-    {{'Checkers'}}
-    {{'Checkers'}}
-    {{'Checkers'}}
-    {{'Checkers'}}
-    {{'Checkers'}}
-    {{'Checkers'}}
-    {{'Checkers'}}
-    {{'Checkers'}}
-    {{'Checkers'}}
+    {{'Words_English';'Words_Hebrew'}}      % heb_ag
+    {{'Words_English';'Words_Hebrew'}}      % heb_aa
+    {{'Words_English';'Words_Hebrew'}}     % heb_ls
+    {{'Words_English';'Words_Hebrew'}}      % heb_toba
+    {{'Words_English';'Words_Hebrew'}}      % heb_maya
+    {{'Words_English';'Words_Hebrew'}}      % heb_yama
+    {{'Words_English';'Words_Hebrew'}}      % heb_blta
+    {{'Words_English';'Words_Hebrew'}}      % heb_mibe
+    {{'Words_English';'Words_Hebrew'}}
+    {{'Words_English';'Words_Hebrew'}}
+    {{'Words_English';'Words_Hebrew'}}
+    {{'Words_English';'Words_Hebrew'}}
+    {{'Words_English';'Words_Hebrew'}}
+    {{'Words_English';'Words_Hebrew'}}
+    {{'Words_English';'Words_Hebrew'}}
+    {{'Words_English';'Words_Hebrew'}}
+    {{'Words_English';'Words_Hebrew'}}
+    {{'Words_English';'Words_Hebrew'}}
+    {{'Words_English';'Words_Hebrew'}}
+    {{'Words_English';'Words_Hebrew'}}
+    {{'Words_English';'Words_Hebrew'}}
+    {{'Words_English';'Words_Hebrew'}}
     ];
+%     {{'Checkers'}}      % heb_ag
+%     {{'Checkers'}}      % heb_aa
+%     {{'Checkers'}}     % heb_ls
+%     {{'Checkers'}}      % heb_toba
+%     {{'Checkers'}}      % heb_maya
+%     {{'Checkers'}}      % heb_yama
+%     {{'Checkers'}}      % heb_blta
+%     {{'Checkers'}}      % heb_mibe
+%     {{'Checkers'}}
+%     {{'Checkers'}}
+%     {{'Checkers'}}
+%     {{'Checkers'}}
+%     {{'Checkers'}}
+%     {{'Checkers'}}
+%     {{'Checkers'}}
+%     {{'Checkers'}}
+%     {{'Checkers'}}
+%     {{'Checkers'}}
+%     {{'Checkers'}}
+%     {{'Checkers'}}
+%     {{'Checkers'}}
+%     {{'Checkers'}}
+%     ];
     
     
     
