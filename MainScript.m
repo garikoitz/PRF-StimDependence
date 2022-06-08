@@ -36,13 +36,13 @@ cr.bk = bookKeeping(cr);
 if 0
 % subjects we want to do this for
 list_subInds        = [31:36 38:44];  % Hebrew
-% list_subInds        = [1:20];  % Original 20
+% list_subInds      = [1:20];  % Original 20
 % mw (13) for Words failed, continue with the next ones for now
-% list_subInds        = [18:20];
+% list_subInds      = [18:20];
 %17 and 13 failed at beginning
 % list_subInds     = [1,3,4,13:20];
 % list_dtNames     = {'WordSmall','WordLarge'};
-list_dtNames     = {'Checkers'};
+% list_dtNames     = {'Checkers'};
 
 for subind = list_subInds
     
@@ -230,11 +230,18 @@ list_rmNames  = {'retModel-Checkers-css.mat'
                  'retModel-Words-css.mat' 
                  'retModel-FalseFont-css.mat'};
 %}
-rmroiFname = ['rmroicell_subInds-1to20_dtNames-cb-w-ff_fits-' whatFit '.mat'];
+rmroiFname = ['rmroicell_subInds-1to20_dtNames-cb-w-ff_fits-' whatFit '_2022.mat'];
 if readExisting
     load(fullfile(crRP,'DATA',rmroiFname),'rmroiCell');    
 else
-    rmroiCell = ff_rmroiCell(cr,list_subInds,list_roiNames,list_dtNames, list_rmNames,'list_path',cr.bk.list_sessionRet);
+    rmroiCell = ff_rmroiCell(cr,...
+                             list_subInds,...
+                             list_roiNames,...
+                             list_dtNames, ...
+                             list_rmNames,...
+                             'list_path',cr.bk.list_sessionRet,...
+                             'latest_fFit',true, ...
+                             'checkYear','2022');
     % Save rmroicell
     save(fullfile(crRP,'DATA',rmroiFname),'rmroiCell')
 end
@@ -388,7 +395,8 @@ end
 
 
 %% (5) Check median variance explained ver subject and ROI
-list_subInds  = [1:20];
+% list_subInds  = [1:20];
+% list_subInds  = [31:36 38:44];
 subnames      = cr.bk.list_sub(list_subInds);
 list_dtNames  = {'Checkers','Words'};
 list_roiNames = {'WangAtlas_V1v_left'
@@ -2264,30 +2272,20 @@ list_roiNames = {'WangAtlas_V1v_left'
                  'WangAtlas_IPS0'
                  'WangAtlas_IPS1'};
                  
-% A
+
 whatFit = 'new';  % 'new' | 'Rosemary'
-list_dtNames     = {'Words_English','Words_Hebrew'};
-list_rmDescripts = {'Words_English','Words_Hebrew'};  
+list_dtNames     = {'Words_English','Words_Hebrew','Checkers'};
+list_rmDescripts = {'Words_English','Words_Hebrew','Checkers'};  
 if strcmp(whatFit,'Rosemary')
-    list_rmNames     = {'retModel-Words_English-css.mat','retModel-Words_Hebrew-css.mat' };
+    list_rmNames     = {'retModel-Words_English-css.mat',...
+                        'retModel-Words_Hebrew-css.mat', ...
+                        'retModel-Checkers-css.mat'};
 else
-     list_rmNames     = {'retModel-Words_English-css-fFit.mat','retModel-Words_Hebrew-css-fFit.mat' };
+     list_rmNames     = {'retModel-Words_English-css-fFit.mat',...
+                         'retModel-Words_Hebrew-css-fFit.mat', ...
+                         'retModel-Checkers-css-fFit.mat'};
 end
-matname = ['rmroicell_subInds-31to36-38to44_dtNames-WE-WH_fits-' whatFit '.mat'];
-
-% B
-whatFit = 'new';  % 'new' | 'Rosemary'
-list_dtNames2     = {'Checkers'};
-list_rmDescripts2 = {'Checkers'};  
-if strcmp(whatFit,'Rosemary')
-    list_rmNames2     = {'retModel-Checkers-css.mat' };
-else
-     list_rmNames2     = {'retModel-Checkers-css-fFit.mat' };
-end
-matname2 = ['rmroicell_subInds-31to36-38to44_dtNames-Checkers_fits-' whatFit '.mat'];
-
-
-
+matname = ['rmroicell_subInds-31to36-38to44_dtNames-ALL_fits-' whatFit '_2022.mat'];
 
 
 if readExisting
@@ -2301,9 +2299,15 @@ if readExisting
     % Change order so that it is x:Heb, y:CB
     rmroiCell = rmroiCell(:,:,[2,1]);
 else
-    rmroiCell=ff_rmroiCell(cr,list_subInds,list_roiNames,list_dtNames2,...
-                           list_rmNames2,'list_path',cr.bk.list_sessionRet);
-    % Save rmroicell just in case
+    rmroiCell = ff_rmroiCell(cr,...
+                             list_subInds,...
+                             list_roiNames,...
+                             list_dtNames, ...
+                             list_rmNames,...
+                             'list_path',cr.bk.list_sessionRet,...
+                             'latest_fFit',true, ...
+                             'checkYear','2022');
+    % Save rmroicell
     save(fullfile(crRP,'DATA',matname2),'rmroiCell')
 end
 
