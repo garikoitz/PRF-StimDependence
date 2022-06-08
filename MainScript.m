@@ -2308,7 +2308,7 @@ else
                              'latest_fFit',true, ...
                              'checkYear','2022');
     % Save rmroicell
-    save(fullfile(crRP,'DATA',matname2),'rmroiCell')
+    sss
 end
 
 % Read the generic params for coverage for all subjects
