@@ -1,4 +1,9 @@
-function [rmroiCell, selindexCell] = ff_rmroiCell(cr, list_subInds, list_roiNames, list_dtNames, list_rmNames, varargin)
+function [rmroiCell, selindexCell] = ff_rmroiCell(cr, ...
+                                                  list_subInds, ...
+                                                  list_roiNames, ...
+                                                  list_dtNames, ...
+                                                  list_rmNames, ...
+                                                  varargin)
 % rmroiCell = ff_rmroiCell(list_subInds, list_roiNames, list_dtNames, list_rmNames, varargin)
 % 
 % If not specified, list_path will be list_sessionRet by default
@@ -23,20 +28,20 @@ calcTSeries = false;
 % bookKeeping; % default values
 
 p = inputParser; 
-addParameter(p, 'list_path', cr.bk.list_sessionRet);
-addParameter(p, 'bookKeeping', 'rkimle')
-parse(p, varargin{:});
-list_path = p.Results.list_path; 
-bookKeepingOption = p.Results.bookKeeping; 
-
-% if strcmp(bookKeepingOption, 'rory')
-%     bookKeeping_rory; 
-% elseif strcmp(bookKeepingOption, 'rkimle')
-%     bookKeeping; 
-% else
-%     error('Check bookKeeping options')
-% end
-
+p.addRequired('cr'            , @isstruct);
+p.addRequired('list_subInds'  , @isfloat);
+p.addRequired('list_roiNames' , @iscell);
+p.addRequired('list_dtNames'  , @iscell);
+p.addRequired('list_rmNames'  , @iscell);
+p.addParameter('list_path', cr.bk.list_sessionRet);
+p.addParameter('latest_fFit', false, @islogical)
+p.addParameter('checkYear', '2022', @ischar)
+% Parse it
+p.parse(cr, list_subInds, list_roiNames, list_dtNames, list_rmNames, varargin{:});
+% Assign it
+list_path         = p.Results.list_path; 
+latest_fFit       = p.Results.latest_fFit; 
+checkYear         = p.Results.checkYear; 
 
 %% Define things
 numSubs = length(list_subInds);
@@ -66,7 +71,22 @@ for ii = 1:numSubs
 
        dtName = list_dtNames{kk};
        rmName = list_rmNames{kk};
-       rmPath = fullfile(dirVista,'Gray',dtName, rmName);
+       if latest_fFit
+           rmBasePath = fullfile(dirVista,'Gray',dtName);
+           allFiles = dir(fullfile(rmBasePath,['retModel-' dtName '-css-fFit*']));
+           [~,idx]  = sort([allFiles.datenum],'descend');
+           if length(idx) > 0
+                latest   = allFiles(idx(1));
+                % Check it is 2022 just in case
+                assert(contains(latest.date,checkYear))
+                rmPath = fullfile(latest.folder,latest.name);
+                fprintf('\n Will read %s, created: %s \n\n',rmPath,latest.date)
+           else
+               rmPath = '';
+           end
+       else
+           rmPath = fullfile(dirVista,'Gray',dtName, rmName);
+       end
        rmExists = exist(rmPath,'file');
        
        vw = viewSet(vw, 'curdt', dtName); 
