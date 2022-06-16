@@ -14,7 +14,8 @@ cr.dirs.DATA     = fullfile(cr.dirs.BASE,'DATA');
 cr.dirs.ANALYSIS = fullfile(cr.dirs.BASE,'ANALYSIS');
 cr.dirs.ORG      = fullfile(cr.codeDir,'DATA','ANALYSIS','matlabfiles','organization');
 cr.dirs.DEF      = fullfile(cr.codeDir,'DATA','ANALYSIS','matlabfiles','defineProjectDefaults');
-cr.dirs.FIG      = fullfile(cr.codeDir,'DATA','figures');
+% cr.dirs.FIG      = fullfile(cr.codeDir,'DATA','figures');
+cr.dirs.FIG     = fullfile('/Volumes/GoogleDrive/My Drive/STANFORD/PROJECTS/2018 Reading across maps (Rosemary)/__PUBLISH__/2022_PNAS(3rd)','figures');
 cr.dirs.FIGPNG  = fullfile(cr.dirs.FIG,'png');
 cr.dirs.FIGSVG  = fullfile(cr.dirs.FIG,'svg');
 if ~isfolder(cr.dirs.FIG); mkdir(cr.dirs.FIG); end

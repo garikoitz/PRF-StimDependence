@@ -1,4 +1,4 @@
-function  crCreateScatterplot(R, C_data, cr, ...
+function  [percentAboveSubs,perROI] = crCreateScatterplot(R, C_data, cr, ...
                                                           list_subInds,...
                                                           list_roiNames,...
                                                           list_rmDescripts,...
@@ -32,6 +32,34 @@ close;
 %     'betaScale'   : how much to scale the predicted tseries by
 %     'meanMax'     : mean of the top 8 values
 %     'meanPeaks'   : mean of the outputs of matlab's meanPeaks
+list_fieldNames  = {    
+    'co'
+    'ecc'
+%     'sigma'
+%     'ph'
+    }; 
+
+list_fieldDescripts = {
+    'variance explained'
+    'eccentricity'
+%     'sigma';afo
+%     'polar angle'
+    }; 
+
+% which plots do we want? lots we can make ...
+plot_fit = false; % plotting the across-subject bootstrapped line w/ CIs
+
+% transparency of the plots
+alphaValue = 0.4; 
+
+
+
+% location of the colorbar
+% default: 'eastoutside'
+% 'southoutside': 
+cbarLocation = 'eastoutside';
+
+% end modification section
 
 numSubs = length(list_subInds);
 numRois = length(list_roiNames);
@@ -151,10 +179,11 @@ A = cell(numRois, 5);
     
     for jj = 1:numRois
         roiName = list_roiNames{jj};
-        % subplot(nrows,ncols,jj);
-        axes(ha(jj));
+        subplot(nrows,ncols,jj);
+    
 
         
+        axisLims = [0 maxValue]; 
         BarData1 = [];
         BarData2 = [];
         
@@ -266,6 +295,13 @@ A = cell(numRois, 5);
         c = ff_histogramHeat(BarData1, BarData2, [minValue,maxValue], ...
                              [minValue,maxValue],radius,cmapValuesHist,fov,...
                              roiName,fieldName,fontsize);
+                         
+                         
+        c = ff_histogramHeat(x, y, minmaxX, minmaxY, numHistBins,...
+                             cmapValuesHist,fov,roiName,fieldName,fontsize)
+                         
+                         
+                         
         numVoxels = length(BarData1); 
         % axes and title
         switch fieldName
