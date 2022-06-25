@@ -297,8 +297,8 @@ A = cell(numRois, 5);
                              roiName,fieldName,fontsize);
                          
                          
-        c = ff_histogramHeat(x, y, minmaxX, minmaxY, numHistBins,...
-                             cmapValuesHist,fov,roiName,fieldName,fontsize)
+        % c = ff_histogramHeat(x, y, minmaxX, minmaxY, numHistBins,...
+        %                      cmapValuesHist,fov,roiName,fieldName,fontsize)
                          
                          
                          
@@ -310,18 +310,18 @@ A = cell(numRois, 5);
                 case {6,8}
                     if jj==1 || jj==(numRois/2)+1
                         ylabel(['pRF eccentricity for ' rm2Descript ' (deg)'],'FontSize',fontsize)
-                        set(ha(jj),'YTickLabel',ha(jj).YTick);set(ha(jj),'YTick',ha(jj).YTick)
+                        % set(ha(jj),'YTickLabel',ha(jj).YTick);set(ha(jj),'YTick',ha(jj).YTick)
                     else
-                        set(ha(jj),'YTickLabel','');set(ha(jj),'YTick','')
+                        % set(ha(jj),'YTickLabel','');set(ha(jj),'YTick','')
                     end
                     if any(~(jj==(numRois/2) || jj==(numRois)))
                         set(c, 'visible', 'off')
                     end
                     if jj<=(numRois/2)
-                        set(ha(jj),'XTickLabel','');set(ha(jj),'XTick','')
+                        % set(ha(jj),'XTickLabel','');set(ha(jj),'XTick','')
                     else
                         xlabel(['pRF eccentricity for ' rm1Descript ' (deg)'],'FontSize',fontsize)
-                        set(ha(jj),'XTickLabel',ha(jj).XTick);set(ha(jj),'XTick',ha(jj).XTick)
+                         %set(ha(jj),'XTickLabel',ha(jj).XTick);set(ha(jj),'XTick',ha(jj).XTick)
                     end
                 otherwise
                     ylabel(['pRF eccentricity for ' rm2Descript ' (deg)'],'FontSize',fontsize)
@@ -332,18 +332,18 @@ A = cell(numRois, 5);
                 case {6,8}
                     if jj==1 || jj==(numRois/2)+1
                         ylabel(['Variance explained for ' rm2Descript ' (%)'],'FontSize',fontsize)
-                        set(ha(jj),'YTickLabel',ha(jj).YTick);set(ha(jj),'YTick',ha(jj).YTick)
+                        % set(ha(jj),'YTickLabel',ha(jj).YTick);set(ha(jj),'YTick',ha(jj).YTick)
                     else
-                        set(ha(jj),'YTickLabel','');set(ha(jj),'YTick','')
+                        % set(ha(jj),'YTickLabel','');set(ha(jj),'YTick','')
                     end
                     if any(~(jj==(numRois/2) || jj==(numRois)))
                         set(c, 'visible', 'off')
                     end
                     if jj<=(numRois/2)
-                        set(ha(jj),'XTickLabel','');set(ha(jj),'XTick','')
+                        % set(ha(jj),'XTickLabel','');set(ha(jj),'XTick','')
                     else
                         xlabel(['Variance explained for ' rm1Descript ' (%)'],'FontSize',fontsize)
-                        set(ha(jj),'XTickLabel',ha(jj).XTick);set(ha(jj),'XTick',ha(jj).XTick)
+                        % set(ha(jj),'XTickLabel',ha(jj).XTick);set(ha(jj),'XTick',ha(jj).XTick)
                     end
                 otherwise
                     ylabel(['pRF eccentricity for ' rm2Descript ' (deg)'],'FontSize',fontsize)
@@ -356,18 +356,18 @@ A = cell(numRois, 5);
                 case {6,8}
                     if jj==1 || jj==(numRois/2)+1
                         ylabel([rm2Descript ' in ' meas ' axis (deg)'],'FontSize',fontsize)
-                        set(ha(jj),'YTickLabel',ha(jj).YTick);set(ha(jj),'YTick',ha(jj).YTick)
+                        % set(ha(jj),'YTickLabel',ha(jj).YTick);set(ha(jj),'YTick',ha(jj).YTick)
                     else
-                        set(ha(jj),'YTickLabel','');set(ha(jj),'YTick','')
+                        % set(ha(jj),'YTickLabel','');set(ha(jj),'YTick','')
                     end
                     if any(~(jj==(numRois/2) || jj==(numRois)))
                         set(c, 'visible', 'off')
                     end
                     if jj<=(numRois/2)
-                        set(ha(jj),'XTickLabel','');set(ha(jj),'XTick','')
+                        % set(ha(jj),'XTickLabel','');set(ha(jj),'XTick','')
                     else
                         xlabel([rm1Descript ' in ' meas ' axis (deg)'],'FontSize',fontsize)
-                        set(ha(jj),'XTickLabel',ha(jj).XTick);set(ha(jj),'XTick',ha(jj).XTick)
+                        % set(ha(jj),'XTickLabel',ha(jj).XTick);set(ha(jj),'XTick',ha(jj).XTick)
                     end
                 otherwise
                     ylabel(['pRF eccentricity for ' rm2Descript ' (deg)'],'FontSize',fontsize)
