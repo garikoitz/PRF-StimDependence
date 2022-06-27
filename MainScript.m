@@ -1044,7 +1044,7 @@ else
      list_rmNames     = {'retModel-Words_English-css-fFit.mat','retModel-Words_Hebrew-css-fFit.mat' };
 end
 matname = ['rmroicell_subInds-31to36-38to44_dtNames-WE-WH_fits-' whatFit '.mat'];
-
+matname = ['rmroicell_subInds-31to36-38to44_dtNames-ALL_fits-' whatFit '_2022.mat'];
 
 if readExisting
     load(fullfile(crRP,'DATA',matname),'rmroiCell');
@@ -1095,7 +1095,7 @@ end
                                
 
 fname = ['scatterplot_eccentricity_WordEngVsWordHeb_6ROIs_13subs_' whatFit 'Fit_v02'];
-fname = '';
+% fname = '';
 crCreateScatterplot(R,C_data,cr,...
                     list_subInds,...
                     list_roiNames16,...
@@ -1126,12 +1126,13 @@ crCreateScatterplot(R,C_data,cr,...
 
 % Plot it
 fname = ['scatterplot_varianceExplained_WordEngVsWordHeb_6ROIs_13subs_' whatFit 'Fit_v02'];
-fname = '';
+% fname = '';
 crCreateScatterplot(R,C_data,cr,...
                     list_subInds,...
                     list_roiNames16,...
                     list_rmDescripts,...
                     'co', ...  % 'co', 'ecc'
+                    fontsize, ...
                     fname);
 
                 
