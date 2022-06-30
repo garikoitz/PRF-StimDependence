@@ -469,7 +469,8 @@ list_rmNamesWC      = list_rmNames([2,1]);
 %}
 
 % Launch the function
-fname = ''; % 'CoverageBoot_';%'Fig1_'; % '' for not saving
+fname = 'CoverageBoot_';%'Fig1_'; % '' for not saving
+% fname = ''; % 
 [RF_mean, RF_individuals,empties] = figFunction_coverage_maxProfile_group(cr,list_subInds, ...
                                       'flip',false, ...
                                       'bootcontour', false, ...
@@ -481,7 +482,7 @@ fname = ''; % 'CoverageBoot_';%'Fig1_'; % '' for not saving
                                       'minvarexp', 0.2, ...
                                       'numboots',25, ...
                                       'fname', fname, ...
-                                      'vers',['v01_' whatFit 'fit'],...
+                                      'vers',['v02_' whatFit 'fit'],...
                                       'invisible',false);
                                   
 % PLOT THEM FOR VOTRC, DO BOOTSTRAPPING AND AVERAGE IT
@@ -612,7 +613,7 @@ fname = ['scatterplot_eccentricity_WordVsCheck_6ROIs_20subs_' whatFit 'Fit_v01']
 % Plot it
 A = colormap(jet);close all;
 fname = ['lineplot_WordVsCheck_6ROIs_20subs_' whatFit 'Fit_v02'];
-fname = '';
+% fname = '';
 [diffs15,diffs5,posangles15,negangles15,posangles5,negangles5] = ...
                          crCreateLinePlot(R,cr,list_roiNames16,fname);
 
@@ -661,7 +662,7 @@ for nx=1:2
         leg  = [leg ' (N=' num2str(length(X)) ')'];
         legs = [legs {leg}];
     end
-    ylim([0,0.022])
+    ylim([0,0.04])
     xlim([-90,90])
     plot([0,0],[0,0.1],'k-.')
     set(gca,'FontSize', 8)
@@ -723,11 +724,11 @@ for nx=1:2
         leg  = [leg ' (N=' num2str(length(X)) ')'];
         legs = [legs {leg}];
     end
-    ylim([0,0.6])
+    ylim([0,1])
     xlim([-4,8])
     % if nx==1;xlim([-4,4]);end
     % if nx==2;xlim([-5,10]);end
-    plot([0,0],[0,0.6],'k-.')
+    plot([0,0],[0,1],'k-.')
     set(gca,'FontSize', 8)
     legend(Hs,legs,'FontSize', 8)
     if nx==1; title('Perifoveal D','FontSize', 10);end
@@ -1050,7 +1051,9 @@ if readExisting
     load(fullfile(crRP,'DATA',matname),'rmroiCell');
 else
     rmroiCell=ff_rmroiCell(cr,list_subInds,list_roiNames,list_dtNames,...
-                           list_rmNames,'list_path',cr.bk.list_sessionRet);
+                           list_rmNames,'list_path',cr.bk.list_sessionRet,...
+                             'latest_fFit',true, ...
+                             'checkYear','2022');
     % Save rmroicell just in case
     save(fullfile(crRP,'DATA',matname),'rmroiCell')
 end
@@ -1144,7 +1147,7 @@ ves=[0.20,0.05];
 for ve=ves
     % Obtain equally thresholded voxels to scatterplot
     [R,C_data,cr]=crThreshGetSameVoxel(cr,...
-                                       rmroiCell,...
+                                       rmroiCell(:,:,[1,2]),...
                                        list_subInds,...
                                        list_roiNames,...
                                        'cothres', ve,...
@@ -1174,12 +1177,12 @@ end
 
 list_rmDescripts = {'Words_English','Words_Hebrew'};
 
-ve=0.05;
+ve=0.20;
 meass={'x0','y0'};
 for meas=meass
     % Obtain equally thresholded voxels to scatterplot
     [R,C_data,cr]=crThreshGetSameVoxel(cr,...
-                                       rmroiCell,...
+                                       rmroiCell(:,:,[1,2]),...
                                        list_subInds,...
                                        list_roiNames,...
                                        'cothres', ve,...
@@ -1478,7 +1481,7 @@ xlabel('Degs'); ylabel('Degs')
 %}
 
 
-rmroiCell_noIPS = rmroiCell(:,1:6,1:2);
+rmroiCell_noIPS = rmroiCell(:,1:6,[1,3]);
 list_roiNames   = {'WangAtlas_V1v_left'
                    'WangAtlas_V2v_left'
                    'WangAtlas_V3v_left'
@@ -1493,12 +1496,15 @@ list_dtNames     = {'Words_English','Words_Hebrew'};
 list_rmNames     = {'retModel-Words_English-css-fFit.mat'
                     'retModel-Words_Hebrew-css-fFit.mat' };
                 
+list_dtNames     = {'Words_English','CB'};
+list_rmNames     = {'retModel-Words_English-css-fFit.mat'
+                    'retModel-Checkers-css-fFit.mat' };
+                
 % Launch the function
-fname = 'Coverage_EngCB_';  %'Fig1_'; % '' for not saving
-fname = '';
 ves    = [0.05,0.2];
 cr.defaults.covfig.vfc.eccthresh = [0.2000 7];
 for ve=ves
+    fname = ['Coverage_EngCB_13subs-VE' num2str(100*ve)];
     [RF_mean, RF_individuals,empties] = figFunction_coverage_maxProfile_group(...
                                       cr,list_subInds, ...
                                       'flip',false, ...
@@ -1513,6 +1519,7 @@ for ve=ves
                                       'fname', fname, ...
                                       'vers',['v02_' whatFit 'fit'],...
                                       'invisible',true);
+end
     allsubnames = {'Sub1','Sub2','Sub3','Sub4','Sub5','Sub6','Sub7',...
                            'Sub8','Sub9','Sub10','Sub11','Sub12','Sub13'};
     % Filter results, not all subjects and depending on VE
@@ -1521,30 +1528,43 @@ for ve=ves
         case 0.2
             % ROI 1
             % Some subjects are missing, fix it
-            hebind{1}   = [  1,2,3,  4,5,6,7, 8, 9,10,11];
-            engind{1}   = [  2,3,4,  6,7,8,9,10,11,12,13];
-            subnames{1} = allsubnames(engind{1});
+             hebind{1}   = [1:13];
+             engind{1}   = [1:13];
+             subnames{1} = allsubnames;
+             hebind{2}=hebind{1};engind{2}=engind{1};subnames{2}=subnames{1};
+             hebind{3}=hebind{1};engind{3}=engind{1};subnames{3}=subnames{1};
+             hebind{4}=hebind{1};engind{4}=engind{1};subnames{4}=subnames{1};
+             hebind{5}=hebind{1};engind{5}=engind{1};subnames{5}=subnames{1};
+
+%             hebind{1}   = [  1,2,3,  4,5,6,7, 8, 9,10,11];
+%             engind{1}   = [  2,3,4,  6,7,8,9,10,11,12,13];
+%             subnames{1} = allsubnames(engind{1});
+%             
+%             
+%             % ROI 2
+%             % Some subjects are missing, fix it
+%             hebind{2}   = [  1,2,3,4,5,6,7,8, 9,10,11,12];
+%             engind{2}   = [  2,3,4,5,6,7,8,9,10,11,12,13];
+%             subnames{2} = allsubnames(engind{2});
+%             
+%             % ROI {3,4,5}
+%             % Some subjects are missing, fix it
+%             hebind{3}   = [  1,2,    3,4,5,6, 7, 8, 9,10];
+%             engind{3}   = [  2,3,    6,7,8,9,10,11,12,13];
+%             subnames{3} = allsubnames(engind{3});
+%             hebind{4}=hebind{3};engind{4}=engind{3};subnames{4}=subnames{3};
+%             hebind{5}=hebind{3};engind{5}=engind{3};subnames{5}=subnames{3};
+%             
+%             % ROI 6
+%             hebind{6}   = [  1,2,    3,  4,5, 6, 7, 8, 9];
+%             engind{6}   = [  2,3,    6,  7,8, 9,10,11,12];
+%             subnames{6} = {'Sub2','Sub3','Sub6','Sub8','Sub9','Sub10',...
+%                 'Sub11','Sub12','Sub13'};
             
-            
-            % ROI 2
-            % Some subjects are missing, fix it
-            hebind{2}   = [  1,2,3,4,5,6,7,8, 9,10,11,12];
-            engind{2}   = [  2,3,4,5,6,7,8,9,10,11,12,13];
-            subnames{2} = allsubnames(engind{2});
-            
-            % ROI {3,4,5}
-            % Some subjects are missing, fix it
-            hebind{3}   = [  1,2,    3,4,5,6, 7, 8, 9,10];
-            engind{3}   = [  2,3,    6,7,8,9,10,11,12,13];
-            subnames{3} = allsubnames(engind{3});
-            hebind{4}=hebind{3};engind{4}=engind{3};subnames{4}=subnames{3};
-            hebind{5}=hebind{3};engind{5}=engind{3};subnames{5}=subnames{3};
-            
-            % ROI 6
-            hebind{6}   = [  1,2,    3,  4,5, 6, 7, 8, 9];
-            engind{6}   = [  2,3,    6,  7,8, 9,10,11,12];
-            subnames{6} = {'Sub2','Sub3','Sub6','Sub8','Sub9','Sub10',...
-                'Sub11','Sub12','Sub13'};
+            hebind{6}   = [  1,2,3,4,5,6,8,9,10,11,12,13];
+            engind{6}   = [  1,2,3,4,5,6,7,8,9,10,11,12];
+            subnames{6} = {'Sub1','Sub2','Sub3','Sub4','Sub5','Sub6',...
+                           'Sub8','Sub9','Sub10','Sub11','Sub12','Sub13'};
             
         case 0.05
             % ROIs 1 to 5
@@ -1556,11 +1576,12 @@ for ve=ves
             hebind{3}=hebind{1};engind{3}=engind{1};subnames{3}=subnames{1};
             hebind{4}=hebind{1};engind{4}=engind{1};subnames{4}=subnames{1};
             hebind{5}=hebind{1};engind{5}=engind{1};subnames{5}=subnames{1};
+            hebind{6}=hebind{1};engind{6}=engind{1};subnames{6}=subnames{1};
             % ROI 6
-            hebind{6}   = [1:12];
-            engind{6}   = [1:3,5:13];
-            subnames{6} = {'Sub1','Sub2','Sub3','Sub5','Sub6','Sub7','Sub8',...
-                           'Sub9','Sub10','Sub11','Sub12','Sub13'};
+%             hebind{6}   = [1:12];
+%             engind{6}   = [1:3,5:13];
+%             subnames{6} = {'Sub1','Sub2','Sub3','Sub5','Sub6','Sub7','Sub8',...
+%                            'Sub9','Sub10','Sub11','Sub12','Sub13'};
     end
     for ii=1:6
         % Eng
@@ -1668,8 +1689,11 @@ for ve=ves
     
     titlefile  = ['alldprimes_Eng-Heb-' num2str(size(ALLeng,3)) ...
                   'subs-VE' num2str(100*ve)];
-    saveas(gcf, fullfile(crRP,'DATA','figures','png',[titlefile '.png']), 'png')
-    saveas(gcf, fullfile(crRP,'DATA','figures','svg',[titlefile '.svg']), 'svg')
+    saveas(gcf, fullfile(cr.dirs.FIGPNG,[titlefile '.png']), 'png')
+    saveas(gcf, fullfile(cr.dirs.FIGSVG,[titlefile '.svg']), 'svg')
+              
+    % saveas(gcf, fullfile(crRP,'DATA','figures','png',[titlefile '.png']), 'png')
+    % saveas(gcf, fullfile(crRP,'DATA','figures','svg',[titlefile '.svg']), 'svg')
     close all
         
         
@@ -1719,9 +1743,11 @@ for ve=ves
         titlefile  = ['Meshdprime_' list_roiNames{nnrr} ... 
                       '_Eng-Heb-' num2str(size(ALLeng,3)) ...
                       'subs-VE' num2str(100*ve)];
-        saveas(gcf, fullfile(crRP,'DATA','figures','png',[titlefile '.png']), 'png') 
-        saveas(gcf, fullfile(crRP,'DATA','figures','fig',[titlefile '.fig']), 'fig') 
-        saveas(gcf, fullfile(crRP,'DATA','figures','svg',[titlefile '.svg']), 'svg') 
+        saveas(gcf, fullfile(cr.dirs.FIGPNG,[titlefile '.png']), 'png')
+        saveas(gcf, fullfile(cr.dirs.FIGSVG,[titlefile '.svg']), 'svg')
+        % saveas(gcf, fullfile(crRP,'DATA','figures','png',[titlefile '.png']), 'png') 
+        % saveas(gcf, fullfile(crRP,'DATA','figures','fig',[titlefile '.fig']), 'fig') 
+        % saveas(gcf, fullfile(crRP,'DATA','figures','svg',[titlefile '.svg']), 'svg') 
         close all
     end                             
                                   
@@ -1757,83 +1783,11 @@ for ve=ves
     ha(1) = ylabel('Degs');
     titlefile  = ['IndividualSubjectEng-Heb-' num2str(size(ALLeng,3)) ...
                                                      'subs-VE' num2str(100*ve)];
-    saveas(gcf, fullfile(crRP,'DATA','figures','png',[titlefile '.png']), 'png') 
+    saveas(gcf, fullfile(cr.dirs.FIGPNG,[titlefile '.png']), 'png')
+    saveas(gcf, fullfile(cr.dirs.FIGSVG,[titlefile '.svg']), 'svg')
+    % saveas(gcf, fullfile(crRP,'DATA','figures','png',[titlefile '.png']), 'png') 
     close all
 end
-
-%% (7) PREPARE DATA: ENGLISH AND CB FROM ISRAEL
-% Generate the rmroicell that we will use in all plots in this script
-% This will read the results obtained by Rosemary or the re-run in 2021
-
-readExisting = true;
-% Do the same with the small and large words
-list_subInds     = [31:36 38:44];
-list_roiNames = {'WangAtlas_V1v_left'
-                 'WangAtlas_V2v_left'
-                 'WangAtlas_V3v_left'
-                 'WangAtlas_hV4_left'
-                 'WangAtlas_VO1_left'
-                 'lVOTRC' 
-                 'WangAtlas_IPS0'
-                 'WangAtlas_IPS1'};
-                 
-% A
-whatFit = 'new';  % 'new' | 'Rosemary'
-list_dtNames     = {'Words_English','Words_Hebrew'};
-list_rmDescripts = {'Words_English','Words_Hebrew'};  
-if strcmp(whatFit,'Rosemary')
-    list_rmNames     = {'retModel-Words_English-css.mat','retModel-Words_Hebrew-css.mat' };
-else
-     list_rmNames     = {'retModel-Words_English-css-fFit.mat','retModel-Words_Hebrew-css-fFit.mat' };
-end
-matname = ['rmroicell_subInds-31to36-38to44_dtNames-WE-WH_fits-' whatFit '.mat'];
-
-% B
-whatFit = 'new';  % 'new' | 'Rosemary'
-list_dtNames2     = {'Checkers'};
-list_rmDescripts2 = {'Checkers'};  
-if strcmp(whatFit,'Rosemary')
-    list_rmNames2     = {'retModel-Checkers-css.mat' };
-else
-     list_rmNames2     = {'retModel-Checkers-css-fFit.mat' };
-end
-matname2 = ['rmroicell_subInds-31to36-38to44_dtNames-Checkers_fits-' whatFit '.mat'];
-
-
-
-
-
-if readExisting
-    load(fullfile(crRP,'DATA',matname),'rmroiCell');
-    
-    % If reading checkers
-    rmroiCell = rmroiCell(:,:,:);
-    A = load(fullfile(crRP,'DATA',matname2),'rmroiCell');
-    rmroiCell(:,:,2) = A.rmroiCell(:,:);
-    
-else
-    rmroiCell=ff_rmroiCell(cr,list_subInds,list_roiNames,list_dtNames2,...
-                           list_rmNames2,'list_path',cr.bk.list_sessionRet);
-    % Save rmroicell just in case
-    save(fullfile(crRP,'DATA',matname2),'rmroiCell')
-end
-
-% Read the generic params for coverage for all subjects
-cr.defaults.covfig.vfc = ff_vfcDefault();
-cr.defaults.covfig.vfc.list_roiNames    = list_roiNames;
-% data types we want to look at
-cr.defaults.covfig.vfc.list_dtNames     = list_dtNames;
-% names of the rm in each dt
-cr.defaults.covfig.vfc.list_rmNames     = list_rmNames;
-cr.defaults.covfig.vfc.list_rmDescripts = list_rmDescripts;
-% subinds = [31:36 38:44]; % Hebrew
-% cr.defaults.covfig.vfc = ff_vfcDefault_Hebrew();  
-
-
-
-
-
-
 
 %% FIGURE S4: WE_CB
 % Order is WE_CB
@@ -2261,7 +2215,7 @@ colormap(parula);
 %% PREPARE DATA: HEBREW AND CB FROM ISRAEL
 % Generate the rmroicell that we will use in all plots in this script
 % This will read the results obtained by Rosemary or the re-run in 2021
-
+fontsize = 12;
 readExisting = true;
 % Do the same with the small and large words
 list_subInds     = [31:36 38:44];
