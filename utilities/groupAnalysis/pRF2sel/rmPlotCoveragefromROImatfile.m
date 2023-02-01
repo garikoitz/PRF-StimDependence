@@ -85,26 +85,41 @@ compVolume = false;
 % x0      = rmCoordsGet(vt, rmModel,'x0',         roi.indices);
 % y0      = rmCoordsGet(vt, rmModel,'y0',         roi.indices);
 % clear rmModel
-% already have ph and ecc
-% [ph ecc] = cart2pol(x0, y0);
-% as a hack
 
-rm.co = 1- rm.rss./rm.rawrss;
-
-
-co      = rm.co;
-sigma1  = rm.sigma1; %.major;
-sigma2  = rm.sigma2; % .minor;
-sigma   = sigma1; 
-theta   = rm.theta; %sigma.theta;
-beta    = rm.beta;
 x0      = rm.x0;
 y0      = rm.y0;
-ph      = rm.ph;
-ecc     = rm.ecc;
-[ph2, ecc2] = cart2pol(x0, y0);
-
-
+if ~isfield(rm, 'co')
+    rm.co = 1- rm.rss./rm.rawrss;
+else
+    co = rm.co;
+end
+sigma1  = rm.sigma1; %.major;
+sigma2  = rm.sigma2; % .minor;
+sigma   = sigma1;
+if isfield(rm, 'theta')
+   theta   = rm.theta; %sigma.theta;
+else
+    theta = zeros(size(sigma));
+end
+if isfield(rm, 'beta')
+   beta    = rm.beta;
+else
+   beta = zeros(size(sigma));
+end
+[ph2 ecc2] = cart2pol(x0, y0);
+if isfield(rm, 'ph')
+    ph = rm.ph;
+else
+    ph = ph2;
+end
+if isfield(rm, 'ecc')
+    ecc = rm.ecc;
+else
+    ecc = ecc2;
+end
+if isfield(rm, 'session')
+    rm.session = 'Check where this gets plotted';
+end
 % insert a flag asking if we want to y flip?
 % every model has a y flip - can see when plotting coverage for a quarter
 % field representation, and also when trying to define pixel location
@@ -310,13 +325,14 @@ weight = single(weight);
 %% do a lot of memory-hungry steps like making all pRFs. So, I've set those
 %% computations aside in their own subroutine. (ras)
 if isequal( lower(vfc.method), 'density' )
-    RFcov = prfCoverageDensityMap(vw, subx0, suby0, subSize1, X, Y);
+    RFcov = prfCoverageDensityMap(subx0, suby0, subSize1, X, Y);
     
     all_models = []; % not created for this option
     if vfc.newfig==-1
         figHandle = [];
     else
-        figHandle = createCoveragePlot(vw, RFcov, vfc, roi, data, m);
+        % figHandle = createCoveragePlot(vw, RFcov, vfc, roi, data, m);
+        figHandle = createCoveragePlot(RFcov, vfc, roi, data, m);
     end
     
     return
@@ -677,7 +693,8 @@ return;
 
 
 % /------------------------------------------------------------------/ %
-function RFcov = prfCoverageDensityMap(vw, x0, y0, sigma, X, Y) %#ok<INUSL>
+function RFcov = prfCoverageDensityMap(x0, y0, sigma, X, Y) %#ok<INUSL>
+% function RFcov = prfCoverageDensityMap(vw, x0, y0, sigma, X, Y) %#ok<INUSL>
 % for each point (x, y) in visual space, this returns
 % the proportion of voxels in the ROI for which (x, y) is
 % within one standard deviation of the pRF center.

@@ -1787,7 +1787,7 @@ end
     saveas(gcf, fullfile(cr.dirs.FIGSVG,[titlefile '.svg']), 'svg')
     % saveas(gcf, fullfile(crRP,'DATA','figures','png',[titlefile '.png']), 'png') 
     close all
-end
+% end
 
 %% FIGURE S4: WE_CB
 % Order is WE_CB
