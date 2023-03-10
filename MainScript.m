@@ -6,7 +6,7 @@
 close all; clear all;
 mrvCleanWorkspace;
 cr         = struct();
-cr.codeDir = crRP;
+cr.codeDir = sdRP;
 
 % WHERE THE NEW DATA IS
 cr.dirs.BASE     = '/black/localhome/glerma/TESTDATA/PRF-StimDependence';
@@ -114,14 +114,14 @@ if inTheServer
 else
     % Calculate variance explained between
     
-    cd(fullfile(crRP,'local'));
+    cd(fullfile(sdRP,'local'));
     % Load ROIs
-    roiPath = fullfile(crRP,'local','WangAtlas_V2v_left.mat');
-    % roiPath = fullfile(crRP,'local','lVOTRC.mat');
+    roiPath = fullfile(sdRP,'local','WangAtlas_V2v_left.mat');
+    % roiPath = fullfile(sdRP,'local','lVOTRC.mat');
     AA      = load(roiPath);
     % vw   = initHiddenGray;
     % vw   = rmLoadDefault(vw);
-    load(fullfile(crRP,'local','cc_vw.mat'))
+    load(fullfile(sdRP,'local','cc_vw.mat'))
     vw    = loadROI(vw, roiPath, [],[],1,0);
     assert(isequal(AA.ROI.coords, vw.ROIs(1).coords));
     vw    = viewSet(vw, 'curdt', 'Checkers');
@@ -130,8 +130,8 @@ else
     
     
     % Read checkers 1 and the average of 23
-    C1  = load(fullfile(crRP,'local','cc_checkers1_tSeries1.mat'));
-    C23 = load(fullfile(crRP,'local','cc_checkers23_tSeries1.mat'));
+    C1  = load(fullfile(sdRP,'local','cc_checkers1_tSeries1.mat'));
+    C23 = load(fullfile(sdRP,'local','cc_checkers23_tSeries1.mat'));
     C1  = C1.tSeries;
     C23 = C23.tSeries;
     
@@ -154,7 +154,7 @@ else
     
     
     % Read the latest model fit
-    C   = load(fullfile(crRP,'local','retModel-Checkers-css-fFit-fFit.mat'));
+    C   = load(fullfile(sdRP,'local','retModel-Checkers-css-fFit-fFit.mat'));
     % Filter for V1
     rss    = C.model{1}.rss(V1indices);
     rawrss = C.model{1}.rawrss(V1indices);
@@ -250,7 +250,7 @@ list_rmNames  = {'retModel-Checkers-css.mat'
 %}
 rmroiFname = ['rmroicell_subInds-1to20_dtNames-cb-w-ff_fits-' whatFit '_LeftRightROIs_2023.mat'];
 if readExisting
-    load(fullfile(crRP,'DATA',rmroiFname),'rmroiCell');    
+    load(fullfile(sdRP,'DATA',rmroiFname),'rmroiCell');    
 else
     rmroiCell = ff_rmroiCell(cr,...
                              list_subInds,...
@@ -261,7 +261,7 @@ else
                              'latest_fFit',true, ...
                              'checkYear','2022');
     % Save rmroicell
-    save(fullfile(crRP,'DATA',rmroiFname),'rmroiCell')
+    save(fullfile(sdRP,'DATA',rmroiFname),'rmroiCell')
 end
 
 % Read the generic params for coverage for all subjects
@@ -280,7 +280,7 @@ whatFit  = 'new';
 tsFname = ['tSeries_subInds-1to12_dtNames-w-ff_fits-' whatFit '.mat'];
 
 if readExisting
-    load(fullfile(crRP,'DATA',tsFname),'tSs');
+    load(fullfile(sdRP,'DATA',tsFname),'tSs');
 else
     
     rmroiCell_WFF    = rmroiCell(1:12,6,2:3);
@@ -328,7 +328,7 @@ else
         % Concatenate tables
         tSs = [tSs ; tmpT];
     end
-    save(fullfile(crRP,'DATA',tsFname),'tSs')
+    save(fullfile(sdRP,'DATA',tsFname),'tSs')
 end
 
 
@@ -603,7 +603,7 @@ list_rmDescripts = {'Words','Checkers'};%    {'FalseFont'}
 
 
 % Obtain equally thresholded voxels to scatterplot
-varExplained=0.05;
+varExplained=0.2;
 [R,C_data,cr]=crThreshGetSameVoxel(cr,...
                                    rmroiCell_WC,...
                                    list_subInds,...
@@ -613,7 +613,7 @@ varExplained=0.05;
 
 % Plot it
 fontsize = 20;
-fname = ['scatterplot_eccentricity_WordVsCheck_6ROIs_20subs_' whatFit 'Fit_v01'];
+fname = ['scatterplot_eccentricity_WordVsCheck_6DorsalROIs_20subs_' whatFit 'Fit_v01'];
 [percAboveIdentity,perROI] = crCreateScatterplot(R,C_data,cr,...
                                     list_subInds,...
                                     list_roiNames16,...
@@ -981,13 +981,13 @@ list_rmNames     = {'retModel-WordSmall-css.mat'
 list_rmDescripts = {'WordSmall'... 
                     'WordLarge'};           
 if readExisting
-    load(fullfile(crRP,'DATA',...
+    load(fullfile(sdRP,'DATA',...
       'rmroicell_subInds-1-3-4-13to20_dtNames-Wsmall-Wlarge_fits-Rosemary.mat'),'rmroiCell');
 else
     rmroiCell=ff_rmroiCell(cr,list_subInds,list_roiNames,list_dtNames,...
                            list_rmNames,'list_path',cr.bk.list_sessionSizeRet);
     % Save rmroicell just in case
-    save(fullfile(crRP,'DATA',...
+    save(fullfile(sdRP,'DATA',...
       'rmroicell_subInds-1-3-4-13to20_dtNames-Wsmall-Wlarge_fits-Rosemary.mat'),'rmroiCell')
 end
 
@@ -1065,14 +1065,14 @@ matname = ['rmroicell_subInds-31to36-38to44_dtNames-WE-WH_fits-' whatFit '.mat']
 matname = ['rmroicell_subInds-31to36-38to44_dtNames-ALL_fits-' whatFit '_2022.mat'];
 
 if readExisting
-    load(fullfile(crRP,'DATA',matname),'rmroiCell');
+    load(fullfile(sdRP,'DATA',matname),'rmroiCell');
 else
     rmroiCell=ff_rmroiCell(cr,list_subInds,list_roiNames,list_dtNames,...
                            list_rmNames,'list_path',cr.bk.list_sessionRet,...
                              'latest_fFit',true, ...
                              'checkYear','2022');
     % Save rmroicell just in case
-    save(fullfile(crRP,'DATA',matname),'rmroiCell')
+    save(fullfile(sdRP,'DATA',matname),'rmroiCell')
 end
 
 % Read the generic params for coverage for all subjects
@@ -1709,8 +1709,8 @@ end
     saveas(gcf, fullfile(cr.dirs.FIGPNG,[titlefile '.png']), 'png')
     saveas(gcf, fullfile(cr.dirs.FIGSVG,[titlefile '.svg']), 'svg')
               
-    % saveas(gcf, fullfile(crRP,'DATA','figures','png',[titlefile '.png']), 'png')
-    % saveas(gcf, fullfile(crRP,'DATA','figures','svg',[titlefile '.svg']), 'svg')
+    % saveas(gcf, fullfile(sdRP,'DATA','figures','png',[titlefile '.png']), 'png')
+    % saveas(gcf, fullfile(sdRP,'DATA','figures','svg',[titlefile '.svg']), 'svg')
     close all
         
         
@@ -1762,9 +1762,9 @@ end
                       'subs-VE' num2str(100*ve)];
         saveas(gcf, fullfile(cr.dirs.FIGPNG,[titlefile '.png']), 'png')
         saveas(gcf, fullfile(cr.dirs.FIGSVG,[titlefile '.svg']), 'svg')
-        % saveas(gcf, fullfile(crRP,'DATA','figures','png',[titlefile '.png']), 'png') 
-        % saveas(gcf, fullfile(crRP,'DATA','figures','fig',[titlefile '.fig']), 'fig') 
-        % saveas(gcf, fullfile(crRP,'DATA','figures','svg',[titlefile '.svg']), 'svg') 
+        % saveas(gcf, fullfile(sdRP,'DATA','figures','png',[titlefile '.png']), 'png') 
+        % saveas(gcf, fullfile(sdRP,'DATA','figures','fig',[titlefile '.fig']), 'fig') 
+        % saveas(gcf, fullfile(sdRP,'DATA','figures','svg',[titlefile '.svg']), 'svg') 
         close all
     end                             
                                   
@@ -1802,7 +1802,7 @@ end
                                                      'subs-VE' num2str(100*ve)];
     saveas(gcf, fullfile(cr.dirs.FIGPNG,[titlefile '.png']), 'png')
     saveas(gcf, fullfile(cr.dirs.FIGSVG,[titlefile '.svg']), 'svg')
-    % saveas(gcf, fullfile(crRP,'DATA','figures','png',[titlefile '.png']), 'png') 
+    % saveas(gcf, fullfile(sdRP,'DATA','figures','png',[titlefile '.png']), 'png') 
     close all
 % end
 
@@ -2262,11 +2262,11 @@ matname = ['rmroicell_subInds-31to36-38to44_dtNames-ALL_fits-' whatFit '_2022.ma
 
 
 if readExisting
-    load(fullfile(crRP,'DATA',matname),'rmroiCell');
+    load(fullfile(sdRP,'DATA',matname),'rmroiCell');
     
     % If reading checkers
     % rmroiCell = rmroiCell(:,1:6,:);
-    % A = load(fullfile(crRP,'DATA',matname2),'rmroiCell');
+    % A = load(fullfile(sdRP,'DATA',matname2),'rmroiCell');
     % Overwrite ENGLISH to have HEBREW and CB
     % rmroiCell(:,1:6,1) = A.rmroiCell(:,1:6);
     % Change order so that it is x:Heb, y:CB
@@ -3118,15 +3118,15 @@ if 0
     rmroiCell = ff_rmroiCell(cr,list_subInds, list_roiNames, list_dtNames, ...
             list_rmNames, 'list_path', list_path);
     % SAVE THIS TO WORK LOCALLY
-    mkdir(fullfile(crRP,'DATA'))
+    mkdir(fullfile(sdRP,'DATA'))
     % 20 subs, words and CBs
-    % save(fullfile(crRP,'DATA','rmroicell_1to20.mat'),'rmroiCell');
+    % save(fullfile(sdRP,'DATA','rmroicell_1to20.mat'),'rmroiCell');
     % ALL subs, words and CBs and FF and Heb
-    save(fullfile(crRP,'local','rmroicell_allandall.mat'),'rmroiCell');
+    save(fullfile(sdRP,'local','rmroicell_allandall.mat'),'rmroiCell');
 end
 if 0
-    % load(fullfile(crRP,'DATA','rmroicell_1to20.mat'));
-    load(fullfile(crRP,'local','rmroicell_allandall.mat'));
+    % load(fullfile(sdRP,'DATA','rmroicell_1to20.mat'));
+    load(fullfile(sdRP,'local','rmroicell_allandall.mat'));
     % Only the 20
     list_subInds  = [1:20]; 
     rmroiCell = rmroiCell(list_subInds,(1:6),[1,2]);
@@ -3571,7 +3571,7 @@ for jj = 1:numRois
 %         end
         xlim([-15, 18])
         % titlefile = strrep(titleName{1},' ','_');
-        % saveas(gcf, fullfile(crRP,'local','png',[titlefile '.png']), 'png') 
+        % saveas(gcf, fullfile(sdRP,'local','png',[titlefile '.png']), 'png') 
 %         subplot(2,numRois,numRois+jj); 
 %         polarhistogram(deg2rad([maxang5 minang5]),100, 'Normalization','probability',...
 %             'EdgeAlpha',1, 'EdgeColor','k','FaceAlpha',1, 'FaceColor','k'); 
@@ -3583,8 +3583,8 @@ for jj = 1:numRois
 
    end
 end
-saveas(gcf, fullfile(crRP,'local','png',['Radiality_Plots_2x' num2str(fov) '.png']), 'png')    
-saveas(gcf, fullfile(crRP,'local','svg',['Radiality_Plots_2x' num2str(fov) '.svg']), 'svg')    
+saveas(gcf, fullfile(sdRP,'local','png',['Radiality_Plots_2x' num2str(fov) '.png']), 'png')    
+saveas(gcf, fullfile(sdRP,'local','svg',['Radiality_Plots_2x' num2str(fov) '.svg']), 'svg')    
 close all
 end
 
@@ -3859,8 +3859,8 @@ for ff = 1:numFields
     % [num2str(numVoxels) ' voxels']
     %      };
     % title(titleName, 'FontWeight', 'Bold');
-    saveas(gcf, fullfile(crRP,'local','png',[titleName{1} '_' fieldName '_band-2x' num2str(fov) '.png']), 'png')
-    saveas(gcf, fullfile(crRP,'local','svg',[titleName{1} '_' fieldName '_band-2x' num2str(fov) '.svg']), 'svg')
+    saveas(gcf, fullfile(sdRP,'local','png',[titleName{1} '_' fieldName '_band-2x' num2str(fov) '.png']), 'png')
+    saveas(gcf, fullfile(sdRP,'local','svg',[titleName{1} '_' fieldName '_band-2x' num2str(fov) '.svg']), 'svg')
 end % loop over fields
 
 % percent above identityLine, pooled over subjects ... print out the 
