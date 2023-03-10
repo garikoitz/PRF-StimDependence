@@ -1,4 +1,4 @@
-%% (0) INIT
+    %% (0) INIT
 % This repository is based on the code created by Rosemary Le, part of coverageReading
 % repository. For the Stimulus Dependence paper (2019) we tried to make it into
 % a reproducible and reusable process. The thing is that we need to separate
@@ -18,9 +18,9 @@ cr.dirs.DEF      = fullfile(cr.codeDir,'DATA','ANALYSIS','matlabfiles','definePr
 cr.dirs.FIG     = fullfile('/Volumes/GoogleDrive/My Drive/STANFORD/PROJECTS/2018 Reading across maps (Rosemary)/__PUBLISH__/2022_PNAS(3rd)','figures');
 cr.dirs.FIGPNG  = fullfile(cr.dirs.FIG,'png');
 cr.dirs.FIGSVG  = fullfile(cr.dirs.FIG,'svg');
-if ~isfolder(cr.dirs.FIG); mkdir(cr.dirs.FIG); end
-if ~isfolder(cr.dirs.FIGPNG); mkdir(cr.dirs.FIGPNG); end
-if ~isfolder(cr.dirs.FIGSVG); mkdir(cr.dirs.FIGSVG); end
+% if ~isfolder(cr.dirs.FIG); mkdir(cr.dirs.FIG); end
+% if ~isfolder(cr.dirs.FIGPNG); mkdir(cr.dirs.FIGPNG); end
+% if ~isfolder(cr.dirs.FIGSVG); mkdir(cr.dirs.FIGSVG); end
 
 % CONTINUE WITH THE NORMAL PROCESSING
 % add to path the required matlab files inside the project, with info to run the project
@@ -221,6 +221,13 @@ list_roiNames = {'WangAtlas_V1v_left'
                  'lVOTRC' 
                  'WangAtlas_IPS0'
                  'WangAtlas_IPS1'};
+list_roiNames = {'WangAtlas_V1d_left'
+                 'WangAtlas_V2d_left'
+                 'WangAtlas_V3d_left'
+                 'WangAtlas_V3A_left'
+                 'WangAtlas_IPS0_left'
+                 'WangAtlas_IPS1_left'};
+             
 list_dtNames  = {'Checkers','Words','FalseFont'};
 list_rmNames  = {'retModel-Checkers-css-fFit.mat'
                  'retModel-Words-css-fFit.mat' 
@@ -231,7 +238,7 @@ list_rmNames  = {'retModel-Checkers-css.mat'
                  'retModel-Words-css.mat' 
                  'retModel-FalseFont-css.mat'};
 %}
-rmroiFname = ['rmroicell_subInds-1to20_dtNames-cb-w-ff_fits-' whatFit '_2022.mat'];
+rmroiFname = ['rmroicell_subInds-1to20_dtNames-cb-w-ff_fits-' whatFit '_dorsalROIs_2023.mat'];
 if readExisting
     load(fullfile(sdRP,'DATA',rmroiFname),'rmroiCell');    
 else
