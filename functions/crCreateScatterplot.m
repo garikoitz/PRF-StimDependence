@@ -1,4 +1,4 @@
-function  crCreateScatterplot(R, C_data, cr, ...
+function  [percentAboveSubs,perROI] = crCreateScatterplot(R, C_data, cr, ...
                                                           list_subInds,...
                                                           list_roiNames,...
                                                           list_rmDescripts,...
@@ -32,6 +32,34 @@ close;
 %     'betaScale'   : how much to scale the predicted tseries by
 %     'meanMax'     : mean of the top 8 values
 %     'meanPeaks'   : mean of the outputs of matlab's meanPeaks
+list_fieldNames  = {    
+    'co'
+    'ecc'
+%     'sigma'
+%     'ph'
+    }; 
+
+list_fieldDescripts = {
+    'variance explained'
+    'eccentricity'
+%     'sigma';afo
+%     'polar angle'
+    }; 
+
+% which plots do we want? lots we can make ...
+plot_fit = false; % plotting the across-subject bootstrapped line w/ CIs
+
+% transparency of the plots
+alphaValue = 0.4; 
+
+
+
+% location of the colorbar
+% default: 'eastoutside'
+% 'southoutside': 
+cbarLocation = 'eastoutside';
+
+% end modification section
 
 numSubs = length(list_subInds);
 numRois = length(list_roiNames);
@@ -151,10 +179,11 @@ A = cell(numRois, 5);
     
     for jj = 1:numRois
         roiName = list_roiNames{jj};
-        % subplot(nrows,ncols,jj);
-        axes(ha(jj));
+        subplot(nrows,ncols,jj);
+    
 
         
+        axisLims = [0 maxValue]; 
         BarData1 = [];
         BarData2 = [];
         
@@ -266,6 +295,13 @@ A = cell(numRois, 5);
         c = ff_histogramHeat(BarData1, BarData2, [minValue,maxValue], ...
                              [minValue,maxValue],radius,cmapValuesHist,fov,...
                              roiName,fieldName,fontsize);
+                         
+                         
+        % c = ff_histogramHeat(x, y, minmaxX, minmaxY, numHistBins,...
+        %                      cmapValuesHist,fov,roiName,fieldName,fontsize)
+                         
+                         
+                         
         numVoxels = length(BarData1); 
         % axes and title
         switch fieldName
@@ -274,18 +310,18 @@ A = cell(numRois, 5);
                 case {6,8}
                     if jj==1 || jj==(numRois/2)+1
                         ylabel(['pRF eccentricity for ' rm2Descript ' (deg)'],'FontSize',fontsize)
-                        set(ha(jj),'YTickLabel',ha(jj).YTick);set(ha(jj),'YTick',ha(jj).YTick)
+                        % set(ha(jj),'YTickLabel',ha(jj).YTick);set(ha(jj),'YTick',ha(jj).YTick)
                     else
-                        set(ha(jj),'YTickLabel','');set(ha(jj),'YTick','')
+                        % set(ha(jj),'YTickLabel','');set(ha(jj),'YTick','')
                     end
                     if any(~(jj==(numRois/2) || jj==(numRois)))
                         set(c, 'visible', 'off')
                     end
                     if jj<=(numRois/2)
-                        set(ha(jj),'XTickLabel','');set(ha(jj),'XTick','')
+                        % set(ha(jj),'XTickLabel','');set(ha(jj),'XTick','')
                     else
                         xlabel(['pRF eccentricity for ' rm1Descript ' (deg)'],'FontSize',fontsize)
-                        set(ha(jj),'XTickLabel',ha(jj).XTick);set(ha(jj),'XTick',ha(jj).XTick)
+                         %set(ha(jj),'XTickLabel',ha(jj).XTick);set(ha(jj),'XTick',ha(jj).XTick)
                     end
                 otherwise
                     ylabel(['pRF eccentricity for ' rm2Descript ' (deg)'],'FontSize',fontsize)
@@ -296,18 +332,18 @@ A = cell(numRois, 5);
                 case {6,8}
                     if jj==1 || jj==(numRois/2)+1
                         ylabel(['Variance explained for ' rm2Descript ' (%)'],'FontSize',fontsize)
-                        set(ha(jj),'YTickLabel',ha(jj).YTick);set(ha(jj),'YTick',ha(jj).YTick)
+                        % set(ha(jj),'YTickLabel',ha(jj).YTick);set(ha(jj),'YTick',ha(jj).YTick)
                     else
-                        set(ha(jj),'YTickLabel','');set(ha(jj),'YTick','')
+                        % set(ha(jj),'YTickLabel','');set(ha(jj),'YTick','')
                     end
                     if any(~(jj==(numRois/2) || jj==(numRois)))
                         set(c, 'visible', 'off')
                     end
                     if jj<=(numRois/2)
-                        set(ha(jj),'XTickLabel','');set(ha(jj),'XTick','')
+                        % set(ha(jj),'XTickLabel','');set(ha(jj),'XTick','')
                     else
                         xlabel(['Variance explained for ' rm1Descript ' (%)'],'FontSize',fontsize)
-                        set(ha(jj),'XTickLabel',ha(jj).XTick);set(ha(jj),'XTick',ha(jj).XTick)
+                        % set(ha(jj),'XTickLabel',ha(jj).XTick);set(ha(jj),'XTick',ha(jj).XTick)
                     end
                 otherwise
                     ylabel(['pRF eccentricity for ' rm2Descript ' (deg)'],'FontSize',fontsize)
@@ -320,18 +356,18 @@ A = cell(numRois, 5);
                 case {6,8}
                     if jj==1 || jj==(numRois/2)+1
                         ylabel([rm2Descript ' in ' meas ' axis (deg)'],'FontSize',fontsize)
-                        set(ha(jj),'YTickLabel',ha(jj).YTick);set(ha(jj),'YTick',ha(jj).YTick)
+                        % set(ha(jj),'YTickLabel',ha(jj).YTick);set(ha(jj),'YTick',ha(jj).YTick)
                     else
-                        set(ha(jj),'YTickLabel','');set(ha(jj),'YTick','')
+                        % set(ha(jj),'YTickLabel','');set(ha(jj),'YTick','')
                     end
                     if any(~(jj==(numRois/2) || jj==(numRois)))
                         set(c, 'visible', 'off')
                     end
                     if jj<=(numRois/2)
-                        set(ha(jj),'XTickLabel','');set(ha(jj),'XTick','')
+                        % set(ha(jj),'XTickLabel','');set(ha(jj),'XTick','')
                     else
                         xlabel([rm1Descript ' in ' meas ' axis (deg)'],'FontSize',fontsize)
-                        set(ha(jj),'XTickLabel',ha(jj).XTick);set(ha(jj),'XTick',ha(jj).XTick)
+                        % set(ha(jj),'XTickLabel',ha(jj).XTick);set(ha(jj),'XTick',ha(jj).XTick)
                     end
                 otherwise
                     ylabel(['pRF eccentricity for ' rm2Descript ' (deg)'],'FontSize',fontsize)

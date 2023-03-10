@@ -1,4 +1,5 @@
-function c = ff_histogramHeat(x, y, minmaxX, minmaxY, numHistBins,cmapValuesHist,fov,roiName,fieldName,fontsize)
+function c = ff_histogramHeat(x, y, minmaxX, minmaxY, numHistBins,...
+                             cmapValuesHist,fov,roiName,fieldName,fontsize)
 % ff_histogramHeat(x, y, maxValueX, maxValueY, numHistBins) 
 %
 % Makes a heat map!

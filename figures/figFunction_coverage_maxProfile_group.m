@@ -28,7 +28,9 @@ p.addOptional('sizedegs' , 0, @isnumeric);
 p.addOptional('numboots' , 3, @isnumeric);
 p.addOptional('vers','v01', @ischar);
 p.addOptional('fname',''  , @ischar);
+p.addOptional('method','max'  , @ischar);
 p.addOptional('invisible',false  , @islogical);
+p.addOptional('density',false  , @islogical);
 p.addOptional('minvarexp' , 0, @isnumeric);
 
 
@@ -40,6 +42,8 @@ bootcontour   = p.Results.bootcontour;
 rmroiCell     = p.Results.rmroicell;
 vers          = p.Results.vers;
 fname         = p.Results.fname;
+method        = p.Results.method;
+density       = p.Results.density;
 invisible     = p.Results.invisible;
 list_roiNames = p.Results.list_roiNames;
 list_dtNames  = p.Results.list_dtNames;
@@ -58,7 +62,9 @@ else
     visibility = 'on';
 end
 
-
+if ~strcmp(method, 'avg')
+    density = false;
+end
 
 %%
 vfc = cr.defaults.covfig.vfc;
@@ -71,7 +77,7 @@ end
 vfc.cothresh = minvarexp; 
 
 
-% vfc.method = 'max'; % avg | 'max'
+vfc.method = method; % 'max'; % avg | 'max'
 
 % session list, see bookKeeping
 list_path     = cr.bk.list_sessionRet; 
@@ -164,6 +170,7 @@ for jj = 1:numRois
                     vfc, ...
                     'flip',flip, ...
                     'visibility',visibility, ...
+                    'density', density, ...
                     'fname', [roiName '- ' rmName]);
                 RFMEAN(:,:,bb) = RF_mean;
             end
@@ -172,6 +179,7 @@ for jj = 1:numRois
                 vfc, ...
                 'flip',flip, ...
                 'visibility',visibility, ...
+                'density', density, ...
                 'fname', [roiName '- ' rmName]);
         end
         RF_Mean_Cells{jj,kk}  = RF_mean;

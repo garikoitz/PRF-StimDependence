@@ -45,11 +45,13 @@ par.addRequired('vfc'      , @isstruct);
 addOptional(par, 'flip'      , true, @islogical); 
 addOptional(par, 'fname'     , ''  , @ischar); 
 addOptional(par, 'visibility', 'on', @ischar); 
+addOptional(par, 'density', false, @islogical);
 
 parse(par, M, vfc, varargin{:});
 flip       = par.Results.flip; 
 fname      = par.Results.fname; 
 visibility = par.Results.visibility; 
+density    = par.Results.density; 
 
 
 %% get the rf information for each subject
@@ -65,7 +67,8 @@ for ii = 1:numSubs
                 data.suby0 = -data.suby0;
             end
         end
-        
+
+                
         % check that rf isn't all nans. (this happens when we don't have a ret model or roi defined?)
         coverageHasNans = (sum(sum(~isnan(rf))) == 0);
         
@@ -84,7 +87,15 @@ for ii = 1:numSubs
         % if ~coverageHasNans
             
             counter = counter + 1;
-            
+
+
+            if density
+                warning('We using avg and density true')
+                rf = rf ./ length(data.suby0);
+                rf = rf ./ max(rf(:));
+            end
+
+
             % store it in RF
             RF(:,:,counter) = rf; 
             if ~noVoxelsPassThreshold
