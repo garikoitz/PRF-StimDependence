@@ -1,4 +1,4 @@
-function rootPath=crRP()
+function rootPath=sdRP()
 %
 %        rootPath =mrvRootPath;
 %
@@ -9,7 +9,7 @@ function rootPath=crRP()
 %
 % Wandell
 
-rootPath=which('crRP');
+rootPath=which('sdRP');
 
 [rootPath,fName,ext]=fileparts(rootPath);
 
