@@ -221,12 +221,22 @@ list_roiNames = {'WangAtlas_V1v_left'
                  'lVOTRC' 
                  'WangAtlas_IPS0'
                  'WangAtlas_IPS1'};
-list_roiNames = {'WangAtlas_V1d_left'
-                 'WangAtlas_V2d_left'
-                 'WangAtlas_V3d_left'
+list_roiNames = {'WangAtlas_V1_left'
+                 'WangAtlas_V2_left'
+                 'WangAtlas_V3_left'
+                 'WangAtlas_hV4_left'
+                 'WangAtlas_VO1_left'
                  'WangAtlas_V3A_left'
                  'WangAtlas_IPS0_left'
-                 'WangAtlas_IPS1_left'};
+                 'WangAtlas_IPS1_left'
+                 'WangAtlas_V1_right'
+                 'WangAtlas_V2_right'
+                 'WangAtlas_V3_right'
+                 'WangAtlas_hV4_right'
+                 'WangAtlas_VO1_right'
+                 'WangAtlas_V3A_right'
+                 'WangAtlas_IPS0_right'
+                 'WangAtlas_IPS1_right'};
              
 list_dtNames  = {'Checkers','Words','FalseFont'};
 list_rmNames  = {'retModel-Checkers-css-fFit.mat'
@@ -238,7 +248,7 @@ list_rmNames  = {'retModel-Checkers-css.mat'
                  'retModel-Words-css.mat' 
                  'retModel-FalseFont-css.mat'};
 %}
-rmroiFname = ['rmroicell_subInds-1to20_dtNames-cb-w-ff_fits-' whatFit '_dorsalROIs_2023.mat'];
+rmroiFname = ['rmroicell_subInds-1to20_dtNames-cb-w-ff_fits-' whatFit '_LeftRightROIs_2023.mat'];
 if readExisting
     load(fullfile(crRP,'DATA',rmroiFname),'rmroiCell');    
 else
