@@ -85,31 +85,41 @@ compVolume = false;
 % x0      = rmCoordsGet(vt, rmModel,'x0',         roi.indices);
 % y0      = rmCoordsGet(vt, rmModel,'y0',         roi.indices);
 % clear rmModel
-% already have ph and ecc
-% [ph ecc] = cart2pol(x0, y0);
-% as a hack
 
-% rm.co = 1- rm.rss./rm.rawrss;
-
-
-co      = rm.co;
-sigma1  = rm.sigma1; %.major;
-sigma2  = rm.sigma2; % .minor;
-sigma   = sigma1; 
-if isfield(rm,'theta')
-    theta   = rm.theta; %sigma.theta;
-else
-    theta = zeros(size(co));
-end
-
-beta    = rm.beta;
 x0      = rm.x0;
 y0      = rm.y0;
-ph      = rm.ph;
-ecc     = rm.ecc;
-[ph2, ecc2] = cart2pol(x0, y0);
-
-
+if ~isfield(rm, 'co')
+    rm.co = 1- rm.rss./rm.rawrss;
+else
+    co = rm.co;
+end
+sigma1  = rm.sigma1; %.major;
+sigma2  = rm.sigma2; % .minor;
+sigma   = sigma1;
+if isfield(rm, 'theta')
+   theta   = rm.theta; %sigma.theta;
+else
+    theta = zeros(size(sigma));
+end
+if isfield(rm, 'beta')
+   beta    = rm.beta;
+else
+   beta = zeros(size(sigma));
+end
+[ph2 ecc2] = cart2pol(x0, y0);
+if isfield(rm, 'ph')
+    ph = rm.ph;
+else
+    ph = ph2;
+end
+if isfield(rm, 'ecc')
+    ecc = rm.ecc;
+else
+    ecc = ecc2;
+end
+if isfield(rm, 'session')
+    rm.session = 'Check where this gets plotted';
+end
 % insert a flag asking if we want to y flip?
 % every model has a y flip - can see when plotting coverage for a quarter
 % field representation, and also when trying to define pixel location
@@ -196,10 +206,10 @@ suby0    = y0(coIndices);
 if vfc.smoothSigma
     % vfc.smoothSigma should just really be the smoothing kernel
     if vfc.smoothSigma == 1
-        
+
         vfc.smoothSigma = 3; % default
     end
-    
+
     % what if we have less voxels  than smoothing kernel size?
     %* rl: add an if statement to just let n = 1 then
     if vfc.smoothSigma > length(rm.co)
@@ -208,10 +218,10 @@ if vfc.smoothSigma
         n = vfc.smoothSigma;
     end
     %* rl
-    if length(subSize1) < vfc.smoothSigma; 
-        n = 1; 
+    if length(subSize1) < vfc.smoothSigma;
+        n = 1;
     end
-    
+
     % check sigma1==sigma2
     if subSize1 == subSize2
         %         for every voxel
@@ -276,7 +286,7 @@ data.subSize2  = subSize2;  % sigma minor
 data.X         = X;
 data.Y         = Y;
 data.subSize   = subSize;   % effective sigma
-    
+
 
 % For the pRF center plot, use a small constant pRF size
 % not sure what happens when you set the size yourself
@@ -293,14 +303,14 @@ end
 switch lower(vfc.weight)
     case 'fixed'
         weight = ones(size(subCo));
-        
+
     case 'parameter map'
         weight = getCurDataROI(vw,'map',curScan,roi.coords);
         weight = weight(coIndices);
-        
+
     case {'variance explained', 'varexp', 've'}
         weight = subCo;
-        
+
     otherwise
         error('Unknown weight parameter: %s',vfc.weight);
 end
@@ -315,15 +325,16 @@ weight = single(weight);
 %% do a lot of memory-hungry steps like making all pRFs. So, I've set those
 %% computations aside in their own subroutine. (ras)
 if isequal( lower(vfc.method), 'density' )
-    RFcov = prfCoverageDensityMap(vw, subx0, suby0, subSize1, X, Y);
-    
+    RFcov = prfCoverageDensityMap(subx0, suby0, subSize1, X, Y);
+
     all_models = []; % not created for this option
     if vfc.newfig==-1
         figHandle = [];
     else
-        figHandle = createCoveragePlot(vw, RFcov, vfc, roi, data, m);
+        % figHandle = createCoveragePlot(vw, RFcov, vfc, roi, data, m);
+        figHandle = createCoveragePlot(RFcov, vfc, roi, data, m);
     end
-    
+
     return
 end
 
@@ -339,11 +350,11 @@ s = [(1:ceil(n./1000):n-2) n+1];
 
 % NOTE: (RL)
 % For the line above (which assumes that we have at least 3 voxels,
-% probably for median smoothing),  s is an empty vector when n is less than 
-% 3 voxels -- and an empty rfcov is  returned when we try to plot the 
-% coverage. So modify s accordingly for these edge cases: 
+% probably for median smoothing),  s is an empty vector when n is less than
+% 3 voxels -- and an empty rfcov is  returned when we try to plot the
+% coverage. So modify s accordingly for these edge cases:
 if n < 3
-    s = [1:n+1]; 
+    s = [1:n+1];
 end
 
 % matrix for storing models image size (as vector) x num of prfs
@@ -364,7 +375,7 @@ for n=1:numel(s)-1,
     all_models(:,s(n):s(n+1)-1) = rf;
 end;
 
-n; % debugging purposes, remove anytime 
+n; % debugging purposes, remove anytime
 
 % so rf is a 2d matrix
 % each column is a centered prf fit
@@ -384,7 +395,7 @@ if compVolume
     vol = sigma1(coIndices).^2;
     %     then multiply them by 2 pi
     vol = vol * (2 * pi);
-    
+
     all_models = all_models ./ (tmp * vol);
 end
 
@@ -410,9 +421,9 @@ end
 
 % If we are only working with 1 voxel, bootstrapping will not make a
 % difference. We turn it off because the bootstp function does not handle
-% this case well. 
+% this case well.
 if size(subX,2) == 1
-    vfc.nboot = 0; 
+    vfc.nboot = 0;
 end
 
 if vfc.nboot>0
@@ -422,7 +433,7 @@ if vfc.nboot>0
         return;
     end
     all_models(isnan(all_models))=0;
-    
+
     switch lower(vfc.method)
         %         sample with replacement. compute average of all pRFs
         case {'sum','add','avg','average everything'}
@@ -430,86 +441,86 @@ if vfc.nboot>0
             %         sample with replacement.  take max value at each location
         case {'max','profile','maximum profile' 'maximum'}
             m = bootstrp(vfc.nboot, @max, all_models');
-            
+
         otherwise
             error('Unknown method %s',vfc.method)
     end
     % take mean of bootstraps
     RFcov=mean(m,1)';
-    
+
     % no bootstrap
 else
-    
-    m = []; 
+
+    m = [];
     switch lower(vfc.method)
-        
+
         % coverage = sum(pRF(i)*w(i)) / (sum(pRF(i))
         case {'beta-sum','betasum','weight average'}
             RFcov = sum(all_models_weighted, 2) ./ sum(all_models,2);
-            
+
             % coverage = sum(pRF(i)*w(i)) / (sum(pRF(i)) + clipping
         case {'clipped beta-sum','clippedbeta','clipped weight average'}
             % set all pRF beyond 2 sigmas to zero
             clipval = exp( -.5 *((2./1).^2));
             all_models(all_models<clipval) = 0;
             n = all_models > 0;
-            
+
             % recompute all_models_weighted
             tmp = ones( size(all_models,1), 1, 'single' );
             all_models_weighted = all_models .* (tmp*weight);
-            
+
             % compute weighted clipped sum/average
             sumn = sum(n,2);
             mask = sumn==0;
             sumn(mask) = 1; % prevent dividing by 0
             RFcov = sum(all_models_weighted,2) ./ sum(all_models,2);
             RFcov(mask) = 0;
-            
+
             %clip to zero if n<clipn
             if isnumeric(vfc.clipn)
                 RFcov(sumn<=vfc.clipn) = 0;
             end
-            
+
             % coverage = sum(pRF(i)*w(i)) / (sum(w(i))
         case {'sum','add','avg','average','prf average'}
             RFcov = sum(all_models_weighted, 2) ./ sum(weight);
-            
+
             % coverage = sum(pRF(i)*w(i)) / (sum(w(i)) + clipping
         case {'clipped average','clipped','clipped prf average'}
             % set all pRF beyond 2 sigmas to zero
             clipval = exp( -.5 *((2./1).^2));
             all_models(all_models<clipval) = 0;
             n = all_models > 0;
-            
+
             % recompute all_models_weighted
             tmp = ones( size(all_models,1), 1, 'single' );
             all_models_weighted = all_models .* (tmp*weight);
-            
+
             % compute weighted clipped mean
             sumn = sum(weight.*n);
             mask = sumn==0;
             sumn(mask) = 1; % prevent dividing by 0
             RFcov = sum(all_models_weighted,2) ./ sumn;
             RFcov(mask) = 0;
-            
+
             %clip to zero if n<clipn
             if isnumeric(vfc.clipn)
                 RFcov(sumn<=vfc.clipn) = 0;
             end
-            
+
             % coverage = max(pRF(i))
         case {'maximum profile', 'max', 'maximum'}
             RFcov = max(all_models_weighted,[],2);
-            
+
         case {'signed profile'}
             RFcov  = max(all_models_weighted,[],2);
             covmin = min(all_models_weighted,[],2);
             ii = RFcov<abs(covmin);
             RFcov(ii)=covmin(ii);
-            
+
         case {'p','probability','weighted statistic corrected for upsampling'}
             RFcov = zeros(vfc.nSamples);
-            
+
             % I guess this upsample factor assumes your functional data are
             % 2.5 x 2.5 x 3 mm?
             upsamplefactor = 2.5*2.5*3; % sigh.....
@@ -519,7 +530,7 @@ else
                     RFcov(ii) = 1 - t2p(s.tval,1,s.df);
                 end
             end
-            
+
         otherwise
             error('Unknown method %s',vfc.method)
     end
@@ -624,8 +635,8 @@ if isfield(vfc, 'ellipsePlot') || isfield(vfc, 'contourPlot')
         ff_contourMatrix_makeFromMatrix(RFcov,vfc,vfc.contourLevel);
 
     % transform so that we can plot it on the polar plot
-    contourX = contourCoordsX/vfc.nSamples*(2*vfc.fieldRange) - vfc.fieldRange; 
-    contourY = contourCoordsY/vfc.nSamples*(2*vfc.fieldRange) - vfc.fieldRange;  
+    contourX = contourCoordsX/vfc.nSamples*(2*vfc.fieldRange) - vfc.fieldRange;
+    contourY = contourCoordsY/vfc.nSamples*(2*vfc.fieldRange) - vfc.fieldRange;
 end
 
 if isfield(vfc, 'ellipsePlot')
@@ -682,7 +693,8 @@ return;
 
 
 % /------------------------------------------------------------------/ %
-function RFcov = prfCoverageDensityMap(vw, x0, y0, sigma, X, Y) %#ok<INUSL>
+function RFcov = prfCoverageDensityMap(x0, y0, sigma, X, Y) %#ok<INUSL>
+% function RFcov = prfCoverageDensityMap(vw, x0, y0, sigma, X, Y) %#ok<INUSL>
 % for each point (x, y) in visual space, this returns
 % the proportion of voxels in the ROI for which (x, y) is
 % within one standard deviation of the pRF center.
