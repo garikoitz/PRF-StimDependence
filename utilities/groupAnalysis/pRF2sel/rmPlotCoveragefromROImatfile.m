@@ -89,14 +89,19 @@ compVolume = false;
 % [ph ecc] = cart2pol(x0, y0);
 % as a hack
 
-rm.co = 1- rm.rss./rm.rawrss;
+% rm.co = 1- rm.rss./rm.rawrss;
 
 
 co      = rm.co;
 sigma1  = rm.sigma1; %.major;
 sigma2  = rm.sigma2; % .minor;
 sigma   = sigma1; 
-theta   = rm.theta; %sigma.theta;
+if isfield(rm,'theta')
+    theta   = rm.theta; %sigma.theta;
+else
+    theta = zeros(size(co));
+end
+
 beta    = rm.beta;
 x0      = rm.x0;
 y0      = rm.y0;

@@ -15,7 +15,7 @@ cr.dirs.ANALYSIS = fullfile(cr.dirs.BASE,'ANALYSIS');
 cr.dirs.ORG      = fullfile(cr.codeDir,'DATA','ANALYSIS','matlabfiles','organization');
 cr.dirs.DEF      = fullfile(cr.codeDir,'DATA','ANALYSIS','matlabfiles','defineProjectDefaults');
 % cr.dirs.FIG      = fullfile(cr.codeDir,'DATA','figures');
-cr.dirs.FIG     = fullfile('/Volumes/GoogleDrive/My Drive/STANFORD/PROJECTS/2018 Reading across maps (Rosemary)/__PUBLISH__/2022_PNAS(3rd)','figures');
+cr.dirs.FIG     = fullfile('/Users/glerma/Library/CloudStorage/GoogleDrive-garikoitz@gmail.com/My Drive/STANFORD/PROJECTS/2018 Reading across maps (Rosemary)/__PUBLISH__/2022_PNAS(3rd)','figures');
 cr.dirs.FIGPNG  = fullfile(cr.dirs.FIG,'png');
 cr.dirs.FIGSVG  = fullfile(cr.dirs.FIG,'svg');
 if ~isfolder(cr.dirs.FIG); mkdir(cr.dirs.FIG); end
@@ -45,56 +45,56 @@ list_subInds        = [31:36 38:44];  % Hebrew
 % list_dtNames     = {'WordSmall','WordLarge'};
 % list_dtNames     = {'Checkers'};
 
-for subind = list_subInds
-    
-    mrvCleanWorkspace;
-    % subind  = list_subInds(ns);
-    subname = cr.bk.list_sub{subind};
-    [~,anatName]=fileparts(cr.bk.list_anatomy{subind});
-    fprintf('\nSubDetails:\nInd:%i, StrInd:%s, subname:%s, Name:%s, anatName:%s\n',...
-        subind,cr.bk.list_subNumberString{subind},subname,...
-        cr.bk.list_names{subind},anatName)
-    
-    % Change dir, we need to run analysis where mrSession is
-    % FOR ALL
-    chdir(cr.bk.list_sessionRet{subind})
-    prf.dirVistacc = cr.bk.list_sessionRet{subind};
-    % FOR WORD LARGE SMALL
-    % chdir(cr.bk.list_sessionSizeRet{subind})
-    % prf.dirVistacc = cr.bk.list_sessionSizeRet{subind};
-        
-    %% PRF analysis
-    % Read the generic params for all subjects
-    run(fullfile(cr.dirs.DEF,'prfrun_defaults.m'));
-    cr.defaults.prfrun.params = params; 
-    cr.defaults.prfrun.p      = p; 
-    clear('params'); clear('p');
-    % Read prfRun_params specific to this subject
-    % run(cr.bk.list_prfParams{subind}); NOT NECESSARY
-    
-    prf.dirAnatomy = cr.bk.list_anatomy{subind};
-    prf.list_rmName= cr.bk.list_rmName{subind};
-    prf.p.stimSize = cr.bk.list_stimSize(subind);
-    prf.wSearch    = cr.bk.list_wSearch(subind);
-    prf.prfModel   = cr.bk.list_prfModels{subind};
-    prf.rois       = cr.bk.list_ROIs{subind};
-    
-    cr.subj.(subname).params.prf = prf;
-    clear('prf');
-    % This was on generics but requires specifics so... this is why I am
-    % calling generics as many times as calling different subjects just in case
-    cr.defaults.prfrun.params.stimSize = cr.subj.(subname).params.prf.p.stimSize; 
-    % Run the prfModel with mrVista
-    % RUN USING mrVISTA NORMAL INSTALLATION
-        cr = cr_prfRun(cr, subind);
-        % Clean workspace of globals after each subject finishes
+    for subind = list_subInds
+
         mrvCleanWorkspace;
-    % RUN USING container prfanalyze-vista:2.0.0 (no modelpred, we get r2)
-        % Generate the config file     
-        % Run the container
-        % pmLaunchDockerCommand('prfanalyze','ellipse','tr1dur300v3','afni6')
-        % Convert the data back so that the rest of the scripts continue working
-end
+        % subind  = list_subInds(ns);
+        subname = cr.bk.list_sub{subind};
+        [~,anatName]=fileparts(cr.bk.list_anatomy{subind});
+        fprintf('\nSubDetails:\nInd:%i, StrInd:%s, subname:%s, Name:%s, anatName:%s\n',...
+            subind,cr.bk.list_subNumberString{subind},subname,...
+            cr.bk.list_names{subind},anatName)
+
+        % Change dir, we need to run analysis where mrSession is
+        % FOR ALL
+        chdir(cr.bk.list_sessionRet{subind})
+        prf.dirVistacc = cr.bk.list_sessionRet{subind};
+        % FOR WORD LARGE SMALL
+        % chdir(cr.bk.list_sessionSizeRet{subind})
+        % prf.dirVistacc = cr.bk.list_sessionSizeRet{subind};
+
+        %% PRF analysis
+        % Read the generic params for all subjects
+        run(fullfile(cr.dirs.DEF,'prfrun_defaults.m'));
+        cr.defaults.prfrun.params = params; 
+        cr.defaults.prfrun.p      = p; 
+        clear('params'); clear('p');
+        % Read prfRun_params specific to this subject
+        % run(cr.bk.list_prfParams{subind}); NOT NECESSARY
+
+        prf.dirAnatomy = cr.bk.list_anatomy{subind};
+        prf.list_rmName= cr.bk.list_rmName{subind};
+        prf.p.stimSize = cr.bk.list_stimSize(subind);
+        prf.wSearch    = cr.bk.list_wSearch(subind);
+        prf.prfModel   = cr.bk.list_prfModels{subind};
+        prf.rois       = cr.bk.list_ROIs{subind};
+
+        cr.subj.(subname).params.prf = prf;
+        clear('prf');
+        % This was on generics but requires specifics so... this is why I am
+        % calling generics as many times as calling different subjects just in case
+        cr.defaults.prfrun.params.stimSize = cr.subj.(subname).params.prf.p.stimSize; 
+        % Run the prfModel with mrVista
+        % RUN USING mrVISTA NORMAL INSTALLATION
+            cr = cr_prfRun(cr, subind);
+            % Clean workspace of globals after each subject finishes
+            mrvCleanWorkspace;
+        % RUN USING container prfanalyze-vista:2.0.0 (no modelpred, we get r2)
+            % Generate the config file     
+            % Run the container
+            % pmLaunchDockerCommand('prfanalyze','ellipse','tr1dur300v3','afni6')
+            % Convert the data back so that the rest of the scripts continue working
+    end
 
 
 
@@ -213,14 +213,25 @@ whatFit = 'new';  % 'new' | 'Rosemary'
 
 % 
 list_subInds  = [1:20];
-list_roiNames = {'WangAtlas_V1v_left'
-                 'WangAtlas_V2v_left'
-                 'WangAtlas_V3v_left'
-                 'WangAtlas_hV4_left'
-                 'WangAtlas_VO1_left'
-                 'lVOTRC' 
+% TEST what happens with dorsal 
+% V1-3d, V3a,IPS0-1
+% list_roiNames = {'WangAtlas_V1v_left'
+%                  'WangAtlas_V2v_left'
+%                  'WangAtlas_V3v_left'
+%                  'WangAtlas_hV4_left'
+%                  'WangAtlas_VO1_left'
+%                  'lVOTRC' 
+%                  'WangAtlas_IPS0'
+%                  'WangAtlas_IPS1'};
+list_roiNames = {'WangAtlas_V1d_left'
+                 'WangAtlas_V2d_left'
+                 'WangAtlas_V3d_left'
+                 'WangAtlas_V3a_leftxxxxxx'
                  'WangAtlas_IPS0'
                  'WangAtlas_IPS1'};
+
+
+
 list_dtNames  = {'Checkers','Words','FalseFont'};
 list_rmNames  = {'retModel-Checkers-css-fFit.mat'
                  'retModel-Words-css-fFit.mat' 
@@ -586,7 +597,7 @@ list_rmDescripts = {'Words','Checkers'};%    {'FalseFont'}
 
 
 % Obtain equally thresholded voxels to scatterplot
-varExplained=0.05;
+varExplained=0.2;
 [R,C_data,cr]=crThreshGetSameVoxel(cr,...
                                    rmroiCell_WC,...
                                    list_subInds,...
@@ -596,7 +607,7 @@ varExplained=0.05;
 
 % Plot it
 fontsize = 20;
-fname = ['scatterplot_eccentricity_WordVsCheck_6ROIs_20subs_' whatFit 'Fit_v01'];
+fname = ['scatterplot_eccentricity_WordVsCheck_6ROIsDorsal_20subs_' whatFit 'Fit_v01'];
 [percAboveIdentity,perROI] = crCreateScatterplot(R,C_data,cr,...
                                     list_subInds,...
                                     list_roiNames16,...
@@ -1787,7 +1798,6 @@ end
     saveas(gcf, fullfile(cr.dirs.FIGSVG,[titlefile '.svg']), 'svg')
     % saveas(gcf, fullfile(crRP,'DATA','figures','png',[titlefile '.png']), 'png') 
     close all
-end
 
 %% FIGURE S4: WE_CB
 % Order is WE_CB

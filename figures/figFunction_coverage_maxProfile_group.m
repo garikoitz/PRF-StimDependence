@@ -30,7 +30,8 @@ p.addOptional('vers','v01', @ischar);
 p.addOptional('fname',''  , @ischar);
 p.addOptional('invisible',false  , @islogical);
 p.addOptional('minvarexp' , 0, @isnumeric);
-
+p.addOptional('method' , 'max', @ischar);
+p.addOptional('density', false  , @islogical);
 
 % Parse. Assign result inside each case
 p.parse(cr, subinds, varargin{:});
@@ -47,6 +48,8 @@ list_rmNames  = p.Results.list_rmNames;
 sizedegs      = p.Results.sizedegs;
 minvarexp     = p.Results.minvarexp;
 numboots      = p.Results.numboots;
+method        = p.Results.method;
+density       = p.Results.density;
 
 if isempty(fname);savefig=false;else;savefig=true;end
 
