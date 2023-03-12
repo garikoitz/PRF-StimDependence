@@ -223,12 +223,12 @@ list_subInds  = [1:20];
 %                  'lVOTRC'
 %                  'WangAtlas_IPS0'
 %                  'WangAtlas_IPS1'};
-list_roiNames = {'WangAtlas_V1d_left'
-                 'WangAtlas_V2d_left'
-                 'WangAtlas_V3d_left'
-                 'WangAtlas_V3a_leftxxxxxx'
-                 'WangAtlas_IPS0'
-                 'WangAtlas_IPS1'};
+% list_roiNames = {'WangAtlas_V1d_left'
+%                  'WangAtlas_V2d_left'
+%                  'WangAtlas_V3d_left'
+%                  'WangAtlas_V3a_leftxxxxxx'
+%                  'WangAtlas_IPS0'
+%                  'WangAtlas_IPS1'};
 list_roiNames = {'WangAtlas_V1_left'
                  'WangAtlas_V2_left'
                  'WangAtlas_V3_left'
@@ -604,9 +604,12 @@ saveas(gcf, fullfile(cr.dirs.FIGSVG,[fname '.svg']), 'svg')
 
 %% FIGURE 2: (C) Eccentricity: Scatterplots: word-checkerboard (no IPS)
 % Order is CB, W, FF, invert it so that it is W then CB
-rmroiCell_WC     = rmroiCell(:,1:6,1:2);
+
+% LEFT
+
+rmroiCell_WC     = rmroiCell(:,1:8,1:2);
 rmroiCell_WC     = flip(rmroiCell_WC,3);
-list_roiNames16  = list_roiNames(1:6);
+list_roiNames16  = list_roiNames(1:8);
 list_rmDescripts = {'Words','Checkers'};%    {'FalseFont'}
 
 
@@ -621,7 +624,7 @@ varExplained=0.2;
 
 % Plot it
 fontsize = 20;
-fname = ['scatterplot_eccentricity_WordVsCheck_6DorsalROIs_20subs_' whatFit 'Fit_v01'];
+fname = ['LEFT_scatterplot_eccentricity_WordVsCheck_6DorsalROIs_20subs_' whatFit 'Fit_v01'];
 [percAboveIdentity,perROI] = crCreateScatterplot(R,C_data,cr,...
                                     list_subInds,...
                                     list_roiNames16,...
@@ -630,7 +633,38 @@ fname = ['scatterplot_eccentricity_WordVsCheck_6DorsalROIs_20subs_' whatFit 'Fit
                                     fontsize, ...
                                     '');
 
+% RIGHT
 
+rmroiCell_WC     = rmroiCell(:,9:16,1:2);
+rmroiCell_WC     = flip(rmroiCell_WC,3);
+list_roiNames16  = list_roiNames(9:16);
+list_rmDescripts = {'Words','Checkers'};%    {'FalseFont'}
+
+
+% Obtain equally thresholded voxels to scatterplot
+varExplained=0.2;
+[R,C_data,cr]=crThreshGetSameVoxel(cr,...
+                                   rmroiCell_WC,...
+                                   list_subInds,...
+                                   list_roiNames16,...
+                                   'cothres', varExplained,...
+                                   'fieldrange', 15);
+
+% Plot it
+fontsize = 20;
+fname = ['RIGHT_scatterplot_eccentricity_WordVsCheck_6DorsalROIs_20subs_' whatFit 'Fit_v01'];
+[percAboveIdentity,perROI] = crCreateScatterplot(R,C_data,cr,...
+                                    list_subInds,...
+                                    list_roiNames16,...
+                                    list_rmDescripts,...
+                                    'ecc', ...  % 'co'
+                                    fontsize, ...
+                                    '');
+
+                                
+                                
+                                
+                                
 %% FIGURE 3: (B) Line plots: word-checkerboard
 % Uses the same voxel calculations from the previous plot
 % If doubt or this is moved, calculate it again here
