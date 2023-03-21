@@ -3,6 +3,8 @@
 % repository. For the Stimulus Dependence paper (2019) we tried to make it into
 % a reproducible and reusable process. The thing is that we need to separate
 % this specific project from others, we need to separate data from code.
+tbUse PRF-StimDependence;
+
 close all; clear all;
 mrvCleanWorkspace;
 cr         = struct();
