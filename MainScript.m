@@ -223,23 +223,29 @@ list_subInds  = [1:20];
 %                  'lVOTRC'
 %                  'WangAtlas_IPS0'
 %                  'WangAtlas_IPS1'};
-% list_roiNames = {'WangAtlas_V1d_left'
-%                  'WangAtlas_V2d_left'
-%                  'WangAtlas_V3d_left'
-%                  'WangAtlas_V3a_leftxxxxxx'
-%                  'WangAtlas_IPS0'
-%                  'WangAtlas_IPS1'};
-list_roiNames = {'WangAtlas_V1_left'
-                 'WangAtlas_V2_left'
-                 'WangAtlas_V3_left'
+list_roiNames = {'WangAtlas_V1d_left'
+                 'WangAtlas_V2d_left'
+                 'WangAtlas_V3d_left'
+                 'WangAtlas_V3A_left'
+                 'WangAtlas_IPS0'
+                 'WangAtlas_IPS1'};
+list_roiNames = {'WangAtlas_V1d_left'
+                 'WangAtlas_V2d_left'
+                 'WangAtlas_V3d_left'
+                 'WangAtlas_V1v_left'
+                 'WangAtlas_V2v_left'
+                 'WangAtlas_V3v_left'
                  'WangAtlas_hV4_left'
                  'WangAtlas_VO1_left'
                  'WangAtlas_V3A_left'
                  'WangAtlas_IPS0_left'
                  'WangAtlas_IPS1_left'
-                 'WangAtlas_V1_right'
-                 'WangAtlas_V2_right'
-                 'WangAtlas_V3_right'
+                 'WangAtlas_V1d_right'
+                 'WangAtlas_V2d_right'
+                 'WangAtlas_V3d_right'
+                 'WangAtlas_V1v_right'
+                 'WangAtlas_V2v_right'
+                 'WangAtlas_V3v_right'
                  'WangAtlas_hV4_right'
                  'WangAtlas_VO1_right'
                  'WangAtlas_V3A_right'
@@ -257,19 +263,78 @@ list_rmNames  = {'retModel-Checkers-css.mat'
                  'retModel-FalseFont-css.mat'};
 %}
 rmroiFname = ['rmroicell_subInds-1to20_dtNames-cb-w-ff_fits-' whatFit '_LeftRightROIs_2023.mat'];
+rmroiFname='rmroicell_subInds-1to20_dtNames-cb-w-ff_fits-new_dorsalROIs_2023.mat';
 if readExisting
-    load(fullfile(sdRP,'DATA',rmroiFname),'rmroiCell');
+    % Check if the file exists in the local dir, otherwise download from
+    % OSF
+    fpath = fullfile(sdRP,'local',rmroiFname);
+    
+    if ~isfile(fpath)
+        % Download from OSF
+        url = 'https://osf.io/download/y7wp6/';
+        location = websave(fpath,url);   % >>> NOT WORKING
+    end
+    % Load it
+    load(fpath,'rmroiCell');
+    load(fullfile(sdRP,'DATA',rmroiFname))
+    
+    % If we have ventral ROIs, we should merge them with dorsal ones
+    bu_rmroiCell = rmroiCell;
+    bu_list_roiNames = list_roiNames;
+    list_roiNames = {'WangAtlas_V1_left'
+        'WangAtlas_V2_left'
+        'WangAtlas_V3_left'
+        'WangAtlas_hV4_left'
+        'WangAtlas_VO1_left'
+        'WangAtlas_V3A_left'
+        'WangAtlas_IPS0_left'
+        'WangAtlas_IPS1_left'
+        'WangAtlas_V1_right'
+        'WangAtlas_V2_right'
+        'WangAtlas_V3_right'
+        'WangAtlas_hV4_right'
+        'WangAtlas_VO1_right'
+        'WangAtlas_V3A_right'
+        'WangAtlas_IPS0_right'
+        'WangAtlas_IPS1_right'};
+    rmroiCell = cell([size(bu_rmroiCell,1), (22-6), size(bu_rmroiCell,3)]);
+    if strcmp('WangAtlas_V1v_left',bu_list_roiNames{4}) && length(bu_list_roiNames)==22
+        nnr = 0;
+        for nr=1:size(bu_rmroiCell,2)
+            if ismember(nr,[1:3,12:14])
+                
+                nnr = nnr + 1
+                for ii=1:3
+                    for jj=1:size(bu_rmroiCell,1)
+                        rmroiCell(jj,nnr,ii) = merge_cell_content(bu_rmroiCell,jj,nr,ii);
+                    end
+                end
+            elseif ismember(nr,[7:11, 18:22])
+                
+                nnr = nnr + 1
+                for ii=1:3
+                    rmroiCell(:,nnr,ii) = bu_rmroiCell(:,nr,ii);
+                end
+            end
+        end
+        
+        
+        
+    end
+    
+    
 else
     rmroiCell = ff_rmroiCell(cr,...
-                             list_subInds,...
-                             list_roiNames,...
-                             list_dtNames, ...
-                             list_rmNames,...
-                             'list_path',cr.bk.list_sessionRet,...
-                             'latest_fFit',true, ...
-                             'checkYear','2022');
+        list_subInds,...
+        list_roiNames,...
+        list_dtNames, ...
+        list_rmNames,...
+        'list_path',cr.bk.list_sessionRet,...
+        'latest_fFit',true, ...
+        'checkYear','2022');
     % Save rmroicell
     save(fullfile(sdRP,'DATA',rmroiFname),'rmroiCell')
+    
 end
 
 % Read the generic params for coverage for all subjects
@@ -607,10 +672,10 @@ saveas(gcf, fullfile(cr.dirs.FIGSVG,[fname '.svg']), 'svg')
 
 % LEFT
 
-rmroiCell_WC     = rmroiCell(:,1:8,1:2);
+rmroiCell_WC     = rmroiCell(:,1:6,1:3);
 rmroiCell_WC     = flip(rmroiCell_WC,3);
-list_roiNames16  = list_roiNames(1:8);
-list_rmDescripts = {'Words','Checkers'};%    {'FalseFont'}
+list_roiNames16  = list_roiNames(1:6);
+list_rmDescripts = {'FalseFont', 'Checkers'};%     {'FalseFont'}
 
 
 % Obtain equally thresholded voxels to scatterplot
@@ -623,9 +688,9 @@ varExplained=0.2;
                                    'fieldrange', 15);
 
 % Plot it
-fontsize = 20;
-fname = ['LEFT_scatterplot_eccentricity_WordVsCheck_6DorsalROIs_20subs_' whatFit 'Fit_v01'];
-[percAboveIdentity,perROI] = crCreateScatterplot(R,C_data,cr,...
+fontsize = 12;
+fname = ['LEFT_scatterplot_eccentricity_FFVsCheck_6DorsalROIs_20subs_' whatFit 'Fit_v01'];
+[percAboveIdentity,~] = crCreateScatterplot(R,C_data,cr,...
                                     list_subInds,...
                                     list_roiNames16,...
                                     list_rmDescripts,...
@@ -651,9 +716,9 @@ varExplained=0.2;
                                    'fieldrange', 15);
 
 % Plot it
-fontsize = 20;
+fontsize = 12;
 fname = ['RIGHT_scatterplot_eccentricity_WordVsCheck_6DorsalROIs_20subs_' whatFit 'Fit_v01'];
-[percAboveIdentity,perROI] = crCreateScatterplot(R,C_data,cr,...
+[percAboveIdentity,~] = crCreateScatterplot(R,C_data,cr,...
                                     list_subInds,...
                                     list_roiNames16,...
                                     list_rmDescripts,...
