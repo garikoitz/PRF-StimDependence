@@ -1161,6 +1161,29 @@ list_roiNames = {'WangAtlas_V1v_left'
                  'lVOTRC'
                  'WangAtlas_IPS0'
                  'WangAtlas_IPS1'};
+             
+list_roiNames = {'WangAtlas_V1d_left'
+                 'WangAtlas_V2d_left'
+                 'WangAtlas_V3d_left'
+                 'WangAtlas_V1v_left'
+                 'WangAtlas_V2v_left'
+                 'WangAtlas_V3v_left'
+                 'WangAtlas_hV4_left'
+                 'WangAtlas_VO1_left'
+                 'WangAtlas_V3A_left'
+                 'WangAtlas_IPS0_left'
+                 'WangAtlas_IPS1_left'
+                 'WangAtlas_V1d_right'
+                 'WangAtlas_V2d_right'
+                 'WangAtlas_V3d_right'
+                 'WangAtlas_V1v_right'
+                 'WangAtlas_V2v_right'
+                 'WangAtlas_V3v_right'
+                 'WangAtlas_hV4_right'
+                 'WangAtlas_VO1_right'
+                 'WangAtlas_V3A_right'
+                 'WangAtlas_IPS0_right'
+                 'WangAtlas_IPS1_right'};             
 
 whatFit = 'new';  % 'new' | 'Rosemary'
 list_dtNames     = {'Words_English','Words_Hebrew'};
@@ -2353,7 +2376,28 @@ list_roiNames = {'WangAtlas_V1v_left'
                  'lVOTRC'
                  'WangAtlas_IPS0'
                  'WangAtlas_IPS1'};
-
+list_roiNames = {'WangAtlas_V1d_left'
+                 'WangAtlas_V2d_left'
+                 'WangAtlas_V3d_left'
+                 'WangAtlas_V1v_left'
+                 'WangAtlas_V2v_left'
+                 'WangAtlas_V3v_left'
+                 'WangAtlas_hV4_left'
+                 'WangAtlas_VO1_left'
+                 'WangAtlas_V3A_left'
+                 'WangAtlas_IPS0_left'
+                 'WangAtlas_IPS1_left'
+                 'WangAtlas_V1d_right'
+                 'WangAtlas_V2d_right'
+                 'WangAtlas_V3d_right'
+                 'WangAtlas_V1v_right'
+                 'WangAtlas_V2v_right'
+                 'WangAtlas_V3v_right'
+                 'WangAtlas_hV4_right'
+                 'WangAtlas_VO1_right'
+                 'WangAtlas_V3A_right'
+                 'WangAtlas_IPS0_right'
+                 'WangAtlas_IPS1_right'};
 
 whatFit = 'new';  % 'new' | 'Rosemary'
 list_dtNames     = {'Words_English','Words_Hebrew','Checkers'};
@@ -2367,7 +2411,8 @@ else
                          'retModel-Words_Hebrew-css-fFit.mat', ...
                          'retModel-Checkers-css-fFit.mat'};
 end
-matname = ['rmroicell_subInds-31to36-38to44_dtNames-ALL_fits-' whatFit '_2022.mat'];
+% matname = ['rmroicell_subInds-31to36-38to44_dtNames-ALL_fits-' whatFit '_2022.mat'];
+matname = ['rmroicell_subInds-31to36-38to44_dtNames-ALL-LeftRight_fits-' whatFit '_2023.mat'];
 
 
 if readExisting
@@ -2390,7 +2435,7 @@ else
                              'latest_fFit',true, ...
                              'checkYear','2022');
     % Save rmroicell
-    sss
+    save(fullfile(sdRP,'DATA',matname),'rmroiCell')
 end
 
 % Read the generic params for coverage for all subjects
