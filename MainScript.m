@@ -1,4 +1,4 @@
-    %% (0) INIT
+%% (0) INIT
 % This repository is based on the code created by Rosemary Le, part of coverageReading
 % repository. For the Stimulus Dependence paper (2019) we tried to make it into
 % a reproducible and reusable process. The thing is that we need to separate
