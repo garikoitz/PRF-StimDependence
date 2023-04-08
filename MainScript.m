@@ -3810,7 +3810,7 @@ for ff = 1:numFields
                 %% the percentage of voxels above the identityLine
                 perAbove = sum(x2 > x1) / length(x2);
                 percentAboveSubs(ii,jj,ff) = perAbove;
-
+  
                 %% concatenate
                 BarData1 = [BarData1, x1];
                 BarData2 = [BarData2, x2];
