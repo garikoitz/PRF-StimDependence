@@ -4,7 +4,8 @@ function  [percentAboveSubs] = crCreateScatterplot(R, C_data, cr, ...
                                                           list_rmDescripts,...
                                                           fieldName, ...
                                                           fontsize,...
-                                                          fname)
+                                                          fname, ...
+                                                          cutoff)
 %%
 % colormap for histogram
 % cmapValuesHist = colormap('pink');
@@ -121,7 +122,7 @@ A = cell(numRois, 5);
     elseif strcmp(fieldName, 'ecc')
         maxValue = cr.defaults.covfig.vfc.eccthresh(2);
         minValue = cr.defaults.covfig.vfc.eccthresh(1);
-        fov = 1.5; % width of the band
+        fov = 1; % width of the band, selected by looking at the std of words-FF, because we consider them as replications. TODO: pass this as a variable. 
         nrows = 2; ncols = 3;
         position = [0.005 0.062 .95 .7 ];
         radius = 2;
@@ -149,7 +150,7 @@ A = cell(numRois, 5);
     elseif strcmp(fieldName, 'x0') || strcmp(fieldName, 'y0')
         maxValue = cr.defaults.covfig.vfc.fieldRange;
         minValue = -cr.defaults.covfig.vfc.fieldRange;
-        fov = 1.5; % width of the band
+        fov = 1; % width of the band, look comment for ecc
         nrows = 2; ncols = 3;
         position = [0.005 0.062 .95 .7 ];
         radius = 2;
@@ -163,8 +164,8 @@ A = cell(numRois, 5);
     
     
     switch numRois
-        case 6
-            nrows = 2; ncols = 3;
+        % case 6
+        %     nrows = 2; ncols = 3;
         case 8
             nrows = 2; ncols = 4;
         otherwise
@@ -294,7 +295,7 @@ A = cell(numRois, 5);
         % 3d histogram heat map -- absolute number of voxels
         c = ff_histogramHeat(BarData1, BarData2, [minValue,maxValue], ...
                              [minValue,maxValue],radius,cmapValuesHist,fov,...
-                             roiName,fieldName,fontsize);
+                             roiName,fieldName,fontsize, cutoff);
                          
                          
         % c = ff_histogramHeat(x, y, minmaxX, minmaxY, numHistBins,...
@@ -307,7 +308,7 @@ A = cell(numRois, 5);
         switch fieldName
             case {'ecc'}
                 switch numRois
-                case {6,8}
+                case {8}
                     if jj==1 || jj==(numRois/2)+1
                         ylabel(['pRF eccentricity for ' rm2Descript ' (deg)'],'FontSize',fontsize)
                         % set(ha(jj),'YTickLabel',ha(jj).YTick);set(ha(jj),'YTick',ha(jj).YTick)
@@ -323,6 +324,16 @@ A = cell(numRois, 5);
                         xlabel(['pRF eccentricity for ' rm1Descript ' (deg)'],'FontSize',fontsize)
                          %set(ha(jj),'XTickLabel',ha(jj).XTick);set(ha(jj),'XTick',ha(jj).XTick)
                     end
+                case {5,6}
+                    if jj==1
+                        ylabel(['pRF eccentricity for ' rm2Descript ' (deg)'],'FontSize',fontsize)
+                    end
+                    if any(~(jj==(numRois/2) || jj==(numRois)))
+                        set(c, 'visible', 'off')
+                    end
+                    
+                    xlabel(['pRF eccentricity for ' rm1Descript ' (deg)'],'FontSize',fontsize)
+                                        
                 otherwise
                     ylabel(['pRF eccentricity for ' rm2Descript ' (deg)'],'FontSize',fontsize)
                     xlabel(['pRF eccentricity for ' rm1Descript ' (deg)'],'FontSize',fontsize)
