@@ -76,16 +76,17 @@ jbfill([minValueX,minValueX+fov, maxValueX-fov, maxValueX], ...
 % Guess hemi
 hemi = 'L ';
 if contains(lower(roiName),'right'); hemi = 'R '; end
-if hemi=='L '
+if strcmp(hemi,'L ')
     roiName = strrep(ff_stringRemove(roiName, 'WangAtlas_'),'_left','');
     roiName = strrep(roiName,'l','');
 end
-if hemi=='R '
+if strcmp(hemi,'R ')
     roiName = strrep(ff_stringRemove(roiName, 'WangAtlas_'),'_right','');
     roiName = strrep(roiName,'r','');
 end
-text(maxValueX-(maxValueX-minValueX)*(1/3), minValueY+fov/2,[hemi roiName],...
-     'Color','w','FontWeight','Bold','FontSize',fontsize)
+text(maxValueX-(maxValueX-minValueX)*(1/2), minValueY+fov/2, ...
+    sprintf('%s %s (N:%i)',hemi, roiName, size(x,2)) , ...
+     'Color','w','FontWeight','Bold','FontSize',fontsize+4)
 colormap(cmapValuesHist); 
 c = colorbar;
 set(c, 'location', 'eastoutside')
