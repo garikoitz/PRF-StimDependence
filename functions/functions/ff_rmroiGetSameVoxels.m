@@ -28,7 +28,8 @@ rmroi = rmroiCell{1};
     if ~isempty(rmroi)
 
     % the number of voxels in the original roi definition
-    numVoxels = length(rmroi.indices); 
+    % numVoxels = length(rmroi.indices); 
+    numVoxels = length(rmroi.x0); 
 
     % number of ret models we are working with
     numRms = length(rmroiCell); 

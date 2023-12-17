@@ -6,24 +6,27 @@ function rmroiCoord = ff_rmroi_subset(rmroi, indx)
 
 rmroiCoord = rmroi; 
 
-rmroiCoord.coords = rmroi.coords(:, indx); 
-rmroiCoord.indices = rmroi.indices(indx); 
+% rmroiCoord.coords = rmroi.coords(:, indx); 
+% rmroiCoord.indices = rmroi.indices(indx); 
 rmroiCoord.co = rmroi.co(indx); 
 rmroiCoord.sigma1 = rmroi.sigma1(indx); 
 rmroiCoord.sigma2 = rmroi.sigma2(indx); 
-rmroiCoord.theta = rmroi.theta(indx); 
-rmroiCoord.beta = rmroi.beta(indx, :);
+% rmroiCoord.theta = rmroi.theta(indx); 
+% rmroiCoord.beta = rmroi.beta(indx, :);
 rmroiCoord.x0 = rmroi.x0(indx);
 rmroiCoord.y0 = rmroi.y0(indx);
 rmroiCoord.sigma = rmroi.sigma(indx);
-rmroiCoord.exponent = rmroi.exponent(indx);
+% rmroiCoord.exponent = rmroi.exponent(indx);
 rmroiCoord.polar = rmroi.polar(indx);
-rmroiCoord.rawrss = rmroi.rawrss(indx);
-rmroiCoord.rss = rmroi.rss(indx);
-rmroiCoord.thetaCenters = rmroi.thetaCenters(indx);
-rmroiCoord.ph = rmroi.ph(indx);
+% rmroiCoord.rawrss = rmroi.rawrss(indx);
+% rmroiCoord.rss = rmroi.rss(indx);
+% rmroiCoord.thetaCenters = rmroi.thetaCenters(indx);
+
+% NASTY GLU FIX IT
+% rmroiCoord.ph = rmroi.ph(indx);
+rmroiCoord.ph = zeros(size(rmroi.ecc(indx)));
 rmroiCoord.ecc = rmroi.ecc(indx);
-rmroiCoord.betaScale = rmroi.betaScale(indx);
+% rmroiCoord.betaScale = rmroi.betaScale(indx);
 
 % these fields are not always computed because it takes a while
 if isfield(rmroi, 'betaScale')

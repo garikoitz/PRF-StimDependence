@@ -140,7 +140,7 @@ for jj = 1:numRois
     for ii = 1:numSubs
         rmroi1 = rmroiCellSameVox{ii,jj,1};
         rmroi2 = rmroiCellSameVox{ii,jj,2};
-        
+      
         % some subjects don't have 
         if ~isempty(rmroi1) & ~isempty(rmroi2)
             data1 = rmroi1.ph;
@@ -175,7 +175,8 @@ for jj = 1:numRois
             
             sm_rm1    = [sm_rm1 rmroi1.sigma1];
             sm_rm2    = [sm_rm2 rmroi2.sigma1];
-        end        
+        end 
+       
     end
     L_data{jj} = ldata; 
     
