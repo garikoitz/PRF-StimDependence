@@ -293,10 +293,13 @@ A = cell(numRois, 5);
         npoints = 100; 
         
         % 3d histogram heat map -- absolute number of voxels
-        c = ff_histogramHeat(BarData1, BarData2, [minValue,maxValue], ...
+        if length(BarData1) > 0
+            c = ff_histogramHeat(BarData1, BarData2, [minValue,maxValue], ...
                              [minValue,maxValue],radius,cmapValuesHist,fov,...
                              roiName,fieldName,fontsize, cutoff);
-                         
+        else
+            continue
+        end
                          
         % c = ff_histogramHeat(x, y, minmaxX, minmaxY, numHistBins,...
         %                      cmapValuesHist,fov,roiName,fieldName,fontsize)

@@ -86,8 +86,8 @@ if nargin<8 | isempty(N)
     N = 100; %length of grid
 end
 %Correct data if necessary
-x = x(:);
-y = y(:);
+x = double(x(:));
+y = double(y(:));
 %Asuming x and y match
 idat = isfinite(x);
 x = x(idat);
