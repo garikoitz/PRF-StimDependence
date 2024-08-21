@@ -18,6 +18,7 @@ cr.dirs.ORG      = fullfile(cr.codeDir,'DATA','ANALYSIS','matlabfiles','organiza
 cr.dirs.DEF      = fullfile(cr.codeDir,'DATA','ANALYSIS','matlabfiles','defineProjectDefaults');
 % cr.dirs.FIG      = fullfile(cr.codeDir,'DATA','figures');
 cr.dirs.FIG     = fullfile('/Users/glerma/Library/CloudStorage/GoogleDrive-garikoitz@gmail.com/My Drive/STANFORD/PROJECTS/2018 Reading across maps (Rosemary)/__PUBLISH__/2022_PNAS(3rd)','figures');
+cr.dirs.FIG     = fullfile('/Users/glerma/toolboxes/PRF-StimDependence','local', 'figures');
 cr.dirs.FIGPNG  = fullfile(cr.dirs.FIG,'png');
 cr.dirs.FIGSVG  = fullfile(cr.dirs.FIG,'svg');
 % if ~isfolder(cr.dirs.FIG); mkdir(cr.dirs.FIG); end
@@ -274,7 +275,7 @@ if readExisting
     if ~isfile(fpath)
         % Download from OSF
         url = 'https://osf.io/download/y7wp6/';
-        location = websave(fpath,url);   % >>> NOT WORKING
+        location = websave(fpath,url);
     end
     % Load it
     load(fpath,'rmroiCell');
@@ -692,13 +693,14 @@ varExplained=0.2;
 % Plot it
 fontsize = 12;
 fname = ['LEFT_scatterplot_eccentricity_FFVsCheck_6DorsalROIs_20subs_' whatFit 'Fit_v01'];
-[percAboveIdentity,~] = crCreateScatterplot(R,C_data,cr,...
+[percAboveIdentity] = crCreateScatterplot(R,C_data,cr,...
                                     list_subInds,...
                                     list_roiNames16,...
                                     list_rmDescripts,...
                                     'ecc', ...  % 'co'
                                     fontsize, ...
-                                    '');
+                                    '', ...
+                                    0);
 
 % RIGHT
 
