@@ -1,4 +1,5 @@
-function [RFcov, figHandle, all_models, weight, data] = rmPlotCoveragefromROImatfile(rm,vfc)
+function [RFcov, figHandle, all_models, weight, data] = ...
+    rmPlotCoveragefromROImatfile(rm,vfc,size_factor)
 % [RFcov, figHandle, all_models, weight, data] = rmPlotCoveragefromROImatfile(rm,vfc)
 % rmPlotCoverage - calulate the visual field coverage within an ROI
 % adapted from serge's code.  I have already gotten all the rm model
@@ -93,9 +94,9 @@ if ~isfield(rm, 'co')
 else
     co = rm.co;
 end
-sigma1  = rm.sigma1; %.major;
-sigma2  = rm.sigma2; % .minor;
-sigma   = sigma1;
+sigma1  = size_factor * rm.sigma1; %.major;
+sigma2  = size_factor * rm.sigma2; % .minor;
+sigma   = size_factor * sigma1;
 if isfield(rm, 'theta')
    theta   = rm.theta; %sigma.theta;
 else

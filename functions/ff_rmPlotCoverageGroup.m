@@ -46,19 +46,21 @@ addOptional(par, 'flip'      , true, @islogical);
 addOptional(par, 'fname'     , ''  , @ischar); 
 addOptional(par, 'visibility', 'on', @ischar); 
 addOptional(par, 'density', false, @islogical);
+addOptional(par, 'size_factor', 1, @isnumeric);
 
 parse(par, M, vfc, varargin{:});
 flip       = par.Results.flip; 
 fname      = par.Results.fname; 
 visibility = par.Results.visibility; 
 density    = par.Results.density; 
-
+size_factor= par.Results.size_factor;
 
 %% get the rf information for each subject
 thisEmpties = [];
 for ii = 1:numSubs
    if ~isempty(M{ii})
-        [rf, figHandle, all_models, weight, data]  = rmPlotCoveragefromROImatfile(M{ii}, vfc);
+        [rf, figHandle, all_models, weight, data] = ...
+            rmPlotCoveragefromROImatfile(M{ii}, vfc, size_factor);
         
         % y flippage!
         if flip

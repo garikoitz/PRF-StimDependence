@@ -32,6 +32,7 @@ p.addOptional('method','max'  , @ischar);
 p.addOptional('invisible',false  , @islogical);
 p.addOptional('density',false  , @islogical);
 p.addOptional('minvarexp' , 0, @isnumeric);
+p.addOptional('size_factor' , 1, @isnumeric);
 
 
 % Parse. Assign result inside each case
@@ -51,6 +52,7 @@ list_rmNames  = p.Results.list_rmNames;
 sizedegs      = p.Results.sizedegs;
 minvarexp     = p.Results.minvarexp;
 numboots      = p.Results.numboots;
+size_factor   = p.Results.size_factor;
 
 
 if isempty(fname);savefig=false;else;savefig=true;end
@@ -172,6 +174,7 @@ for jj = 1:numRois
                     'flip',flip, ...
                     'visibility',visibility, ...
                     'density', density, ...
+                    'size_factor', size_factor, ...
                     'fname', [roiName '- ' rmName]);
                 RFMEAN(:,:,bb) = RF_mean;
             end
@@ -181,6 +184,7 @@ for jj = 1:numRois
                 'flip',flip, ...
                 'visibility',visibility, ...
                 'density', density, ...
+                'size_factor', size_factor, ...
                 'fname', [roiName '- ' rmName]);
         end
         RF_Mean_Cells{jj,kk}  = RF_mean;
