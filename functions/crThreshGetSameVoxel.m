@@ -106,10 +106,24 @@ for jj = 1:numRois
         if (~isempty(D{1,1,1}) && ~isempty(D{1,1,2})) 
             % GLU EDIT function: remove voxels from the oppossite hemifield
             rmroiCellSameVox(ii,jj,:) = ff_rmroiGetSameVoxels(D, cr.defaults.covfig.vfc);
+            [v,i]=max(rmroiCellSameVox{ii,jj,1}.ecc - rmroiCellSameVox{ii,jj,2}.ecc);
+            coords = rmroiCellSameVox{ii,jj,1}.coords;
+            coord = join(string(coords(:,i)));
+            voxel_indices = rmroiCellSameVox{ii,jj,1}.indices;
+            voxel_index = voxel_indices(i);
+            fprintf("Sub:%i, roi:%s, ecc_diff: %.2g, coord:%s, index:%i \n", ...
+                ii, ...
+                list_roiNames{jj}, ...
+                v, ...
+                coord, ...
+                voxel_index)
+    
+
         else
             disp('')
         end
     end
+    disp('--')
 end
 
 % Linearize the data

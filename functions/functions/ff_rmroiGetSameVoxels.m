@@ -1,4 +1,4 @@
-function rmroiCellSameVox = ff_rmroiGetSameVoxels(rmroiCell, vfc)
+function [rmroiCellSameVox, ind_max_diff_ecc] = ff_rmroiGetSameVoxels(rmroiCell, vfc)
 %
 % sameVoxRmroi = ff_rmroiGetSameVoxels(rmroiCell, vfc)
 % We want to be sure that we're looking at the same voxels for each ROI,
@@ -25,7 +25,7 @@ rmroiCellSameVox = cell(size(rmroiCell));
 % get a single rmroi to get basic info
 rmroi = rmroiCell{1}; 
 
-    if ~isempty(rmroi)
+if ~isempty(rmroi)
 
     % the number of voxels in the original roi definition
     % numVoxels = length(rmroi.indices); 
@@ -91,6 +91,8 @@ rmroi = rmroiCell{1};
             newRmroi = ff_rmroi_subset(rmroi, indxMaster); 
             rmroiCellSameVox{kk} = newRmroi;  
         end
+
+        % 
     
     end
 end

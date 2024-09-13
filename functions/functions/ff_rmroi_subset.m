@@ -5,9 +5,12 @@ function rmroiCoord = ff_rmroi_subset(rmroi, indx)
 % the information for a single voxel (as indicated by ind)
 
 rmroiCoord = rmroi; 
-
-% rmroiCoord.coords = rmroi.coords(:, indx); 
-% rmroiCoord.indices = rmroi.indices(indx); 
+if isfield(rmroi, 'coords')
+    rmroiCoord.coords = rmroi.coords(:,indx);
+end
+if isfield(rmroi, 'indices')
+    rmroiCoord.indices = rmroi.indices(indx);
+end
 rmroiCoord.co = rmroi.co(indx); 
 rmroiCoord.sigma1 = rmroi.sigma1(indx); 
 rmroiCoord.sigma2 = rmroi.sigma2(indx); 
