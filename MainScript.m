@@ -217,6 +217,8 @@ merge_data='left_dorsal'; % 'merge_dorsal_ventral';
 
 %
 list_subInds  = [1:20];
+list_subInds  = [31:36 38:44];
+
 % TEST what happens with dorsal
 % V1-3d, V3a,IPS0-1
 % list_roiNames = {'WangAtlas_V1v_left'
@@ -268,10 +270,11 @@ list_rmNames  = {'retModel-Checkers-css.mat'
 %}
 % rmroiFname = ['rmroicell_subInds-1to20_dtNames-cb-w-ff_fits-' whatFit '_LeftRightROIs_2023.mat'];
 rmroiFname='rmroicell_subInds-1to20_dtNames-cb-w-ff_fits-new_dorsalROIs_2023.mat';
+rmroiFname='rmroicell_subInds-31to36-38to44_dtNames-ALL-LeftRight_fits-new_2023.mat';
 if readExisting
     % Check if the file exists in the local dir, otherwise download from
     % OSF
-    fpath = fullfile(sdRP,'local',rmroiFname);
+    fpath = fullfile(sdRP,'DATA',rmroiFname);
     
     if ~isfile(fpath)
         % Download from OSF
