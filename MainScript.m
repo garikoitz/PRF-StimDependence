@@ -11,7 +11,7 @@ cr         = struct();
 cr.codeDir = sdRP;
 
 % WHERE THE NEW DATA IS
-cr.dirs.BASE     = '/black/localhome/glerma/TESTDATA/PRF-StimDependence';
+cr.dirs.BASE     = '/acorn/data/neuro/gari/PRF-StimDependence';
 cr.dirs.DATA     = fullfile(cr.dirs.BASE,'DATA');
 cr.dirs.ANALYSIS = fullfile(cr.dirs.BASE,'ANALYSIS');
 cr.dirs.ORG      = fullfile(cr.codeDir,'DATA','ANALYSIS','matlabfiles','organization');
