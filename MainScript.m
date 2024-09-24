@@ -271,6 +271,7 @@ list_rmNames  = {'retModel-Checkers-css.mat'
 % rmroiFname = ['rmroicell_subInds-1to20_dtNames-cb-w-ff_fits-' whatFit '_LeftRightROIs_2023.mat'];
 rmroiFname='rmroicell_subInds-1to20_dtNames-cb-w-ff_fits-new_dorsalROIs_2023.mat';
 rmroiFname='rmroicell_subInds-31to36-38to44_dtNames-ALL-LeftRight_fits-new_2023.mat';
+
 if readExisting
     % Check if the file exists in the local dir, otherwise download from
     % OSF
@@ -278,7 +279,13 @@ if readExisting
     
     if ~isfile(fpath)
         % Download from OSF
-        url = 'https://osf.io/download/y7wp6/';
+        if strcmp(rmroiFname, 'rmroicell_subInds-1to20_dtNames-cb-w-ff_fits-new_dorsalROIs_2023.mat')
+            url = 'https://osf.io/download/y7wp6/';
+        elseif strcmp(rmroiFname, 'rmroicell_subInds-31to36-38to44_dtNames-ALL-LeftRight_fits-new_2023.mat')
+            url = 'https://osf.io//download/b35qe/';
+        else
+            error('File not known')
+        end
         location = websave(fpath,url);
     end
     % Load it
@@ -704,7 +711,7 @@ varExplained=0.2;
 
 % Plot it
 fontsize = 12;
-fname = ['LEFT_scatterplot_eccentricity_FFVsCheck_6DorsalROIs_20subs_' whatFit 'Fit_v01'];
+% fname = ['LEFT_scatterplot_eccentricity_FFVsCheck_6DorsalROIs_20subs_' whatFit 'Fit_v01'];
 [percAboveIdentity] = crCreateScatterplot(R,C_data,cr,...
                                     list_subInds,...
                                     new_list_roiNames,...
