@@ -13,18 +13,16 @@ p.addRequired('rmroicell'     , @iscell);
 p.addRequired('list_subInds'  , @isnumeric);
 p.addRequired('list_roiNames' , @iscell);
 
-p.addOptional('cothresh'      , 0.2,  @isnumeric);
-p.addOptional('fieldrange'    , 15 ,  @isnumeric);
+p.addOptional('cothresh'      , 0.2,    @isnumeric);
+p.addOptional('fieldrange'    , 15 ,    @isnumeric);
+p.addOptional('show_summary'  , false , @islogical);
 
 % Parse. Assign result inside each case
 p.parse(cr, rmroiCell, list_subInds, list_roiNames, varargin{:});
 % Read here only the generic ones
 cothresh      = p.Results.cothresh;
 fieldRange    = p.Results.fieldrange;
-
-                                     
-                                     
-                                     
+show_summary  = p.Results.show_summary;
                                      
 %%                                     
 %  Threshold and get identical voxels for each subject
@@ -100,30 +98,73 @@ Ecc_rm2 = cell(1, numRois);
 % because of the thresholding. In this cell we redefine the rmroi
 rmroiCellSameVox = cell(size(rmroiCell));
 for jj = 1:numRois
+    mean_subjects = NaN([numSubs,1]);
+    std_subjects = NaN([numSubs,1]);
+    max_subjects = NaN([numSubs,1]);
+    pct_subjects = NaN([numSubs,1]);
+    N_subjects = NaN([numSubs,1]);
     for ii = 1:numSubs        
         % get identical voxels for each subject's roi over all ret models
         D = rmroiCell(ii,jj,:);
         if (~isempty(D{1,1,1}) && ~isempty(D{1,1,2})) 
             % GLU EDIT function: remove voxels from the oppossite hemifield
             rmroiCellSameVox(ii,jj,:) = ff_rmroiGetSameVoxels(D, cr.defaults.covfig.vfc);
-            [v,i]=max(rmroiCellSameVox{ii,jj,1}.ecc - rmroiCellSameVox{ii,jj,2}.ecc);
-            coords = rmroiCellSameVox{ii,jj,1}.coords;
-            coord = join(string(coords(:,i)));
-            voxel_indices = rmroiCellSameVox{ii,jj,1}.indices;
-            voxel_index = voxel_indices(i);
-            fprintf("Sub:%i, roi:%s, ecc_diff: %.2g, coord:%s, index:%i \n", ...
-                ii, ...
-                list_roiNames{jj}, ...
-                v, ...
-                coord, ...
-                voxel_index)
-    
+            % Calculate eccentricity differences
+            ecc_diffs = rmroiCellSameVox{ii,jj,2}.ecc - rmroiCellSameVox{ii,jj,1}.ecc;
+            % Calculate N
+            N = length(ecc_diffs);
+            % Calculate max difference and the index
+            [max_val,max_ind]=max(ecc_diffs);
+            mean_diff = mean(ecc_diffs);
+            std_diff = std(ecc_diffs);
+            % Instead of the max value, calculate a percentile value
+            pctilval = 75;
+            prct_diff = prctile(ecc_diffs, pctilval);
+            % obtain the index value for plotting
+            [~, prctile_ind] = min(abs(ecc_diffs - prct_diff));
 
+            voxel_indices = rmroiCellSameVox{ii,jj,1}.indices;
+            if show_summary
+                fprintf("ROI:%s, Sub:%i, N: %i, ecc_diff_prctile-%s: %.2g (prctl_index: %i), ecc_diff_max: %.2g (max_index:%i), MEAN: %.2g, STD: %.2g\n", ...
+                    list_roiNames{jj}, ...
+                    ii, ...
+                    N, ...
+                    num2str(pctilval), ...
+                    prct_diff, ...
+                    voxel_indices(prctile_ind), ...
+                    max_val, ...
+                    voxel_indices(max_ind), ...
+                    mean_diff, ...
+                    std_diff);
+            end
+                % Add to vector to capture all subjects values
+                mean_subjects(ii) = mean_diff;
+                std_subjects(ii) = std_diff;
+                max_subjects(ii) = max_val;
+                pct_subjects(ii) = prct_diff;
+                N_subjects(ii) = N;
         else
             disp('')
         end
     end
-    disp('--')
+    if show_summary
+        disp('--')
+        fprintf("ROI: %s, N: %.4g (%.4g), mean_prctile-%s: %.2g (%.2g), mean_max: %.2g (%.2g), mean_MEAN: %.2g (%.2g), mean_STD: %.2g (%.2g)\n", ...
+                list_roiNames{jj}, ...
+                mean(N_subjects), ...
+                std(N_subjects), ...
+                num2str(pctilval), ...
+                mean(pct_subjects), ...
+                std(pct_subjects), ...
+                mean(max_subjects), ...
+                std(max_subjects), ...
+                mean(mean_subjects), ...
+                std(mean_subjects), ...
+                mean(std_subjects), ...
+                std(std_subjects));
+        disp('--')
+        disp('--')
+    end
 end
 
 % Linearize the data

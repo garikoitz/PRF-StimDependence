@@ -17,8 +17,9 @@ cr.dirs.ANALYSIS = fullfile(cr.dirs.BASE,'ANALYSIS');
 cr.dirs.ORG      = fullfile(cr.codeDir,'DATA','ANALYSIS','matlabfiles','organization');
 cr.dirs.DEF      = fullfile(cr.codeDir,'DATA','ANALYSIS','matlabfiles','defineProjectDefaults');
 % cr.dirs.FIG      = fullfile(cr.codeDir,'DATA','figures');
-cr.dirs.FIG     = fullfile('/Users/glerma/Library/CloudStorage/GoogleDrive-garikoitz@gmail.com/My Drive/STANFORD/PROJECTS/2018 Reading across maps (Rosemary)/__PUBLISH__/2022_PNAS(3rd)','figures');
-cr.dirs.FIG     = fullfile('/Users/glerma/toolboxes/PRF-StimDependence','local', 'figures');
+% cr.dirs.FIG     = fullfile('/Users/glerma/Library/CloudStorage/GoogleDrive-garikoitz@gmail.com/My Drive/STANFORD/PROJECTS/2018 Reading across maps (Rosemary)/__PUBLISH__/2022_PNAS(3rd)','figures');
+cr.dirs.FIG     = fullfile('~/toolboxes/PRF-StimDependence','DATA', 'figures');
+
 cr.dirs.FIGPNG  = fullfile(cr.dirs.FIG,'png');
 cr.dirs.FIGSVG  = fullfile(cr.dirs.FIG,'svg');
 % if ~isfolder(cr.dirs.FIG); mkdir(cr.dirs.FIG); end
@@ -268,8 +269,7 @@ list_rmNames  = {'retModel-Checkers-css.mat'
                  'retModel-Words-css.mat'
                  'retModel-FalseFont-css.mat'};
 %}
-% rmroiFname = ['rmroicell_subInds-1to20_dtNames-cb-w-ff_fits-' whatFit '_LeftRightROIs_2023.mat'];
-rmroiFname='rmroicell_subInds-1to20_dtNames-cb-w-ff_fits-new_dorsalROIs_2023.mat';
+rmroiFname = ['rmroicell_subInds-1to20_dtNames-cb-w-ff_fits-' whatFit '_LeftRightROIs_2023.mat'];
 rmroiFname='rmroicell_subInds-31to36-38to44_dtNames-ALL-LeftRight_fits-new_2023.mat';
 
 if readExisting
@@ -279,10 +279,19 @@ if readExisting
     
     if ~isfile(fpath)
         % Download from OSF
-        if strcmp(rmroiFname, 'rmroicell_subInds-1to20_dtNames-cb-w-ff_fits-new_dorsalROIs_2023.mat')
+        if strcmp(rmroiFname, ['rmroicell_subInds-1to20_dtNames-cb-w-ff_fits-' whatFit '_LeftRightROIs_2023.mat'])
             url = 'https://osf.io/download/y7wp6/';
         elseif strcmp(rmroiFname, 'rmroicell_subInds-31to36-38to44_dtNames-ALL-LeftRight_fits-new_2023.mat')
             url = 'https://osf.io//download/b35qe/';
+
+            list_dtNames     = {'Words_English','Words_Hebrew','Checkers'};
+            list_rmDescripts = {'Words_English','Words_Hebrew','Checkers'};
+            if strcmp(whatFit,'Rosemary')
+                list_rmNames     = {'retModel-Words_English-css.mat','retModel-Words_Hebrew-css.mat' };
+            else
+                 list_rmNames     = {'retModel-Words_English-css-fFit.mat','retModel-Words_Hebrew-css-fFit.mat' };
+            end
+            
         else
             error('File not known')
         end
@@ -694,11 +703,18 @@ saveas(gcf, fullfile(cr.dirs.FIGSVG,[fname '.svg']), 'svg')
 % Order is CB, W, FF, invert it so that it is W then CB
 
 % LEFT
-
+% CNI
+%{
 rmroiCell_WC     = new_rmroiCell(:,:,1:2);
 rmroiCell_WC     = flip(rmroiCell_WC,3);
 list_rmDescripts = {'Words', 'Checkers'};%     {'FalseFont'}
-
+%}
+% ISRAEL
+% {
+rmroiCell_WC     = new_rmroiCell(:,:,1:3);
+rmroiCell_WC     = flip(rmroiCell_WC,3);
+list_rmDescripts = {'Words_English', 'Checkers'};%     {'Words_Hebrew'}
+%}
 
 % Obtain equally thresholded voxels to scatterplot
 varExplained=0.2;
@@ -753,10 +769,21 @@ fname = ['RIGHT_scatterplot_eccentricity_WordVsCheck_6DorsalROIs_20subs_' whatFi
 
 %% FIGURE 2B:
 %% See time series of a subject that has higher CB and lower 
-   
+% Heb
+% Sub:1, roi:WangAtlas_hV4_left, ecc_diff: 7.6, coord:126 176 66, index:217734 
+plot_params = struct();
+plot_params.p2_ret_data = '/acorn/data/neuro/gari/PRF-StimDependence/DATA/heb_pilot09/RetAndHebrewLoc/Gray';
+plot_params.generic = 'TSeries/Scan1/tSeries1.mat';
+plot_params.ind = 217734;
+plot_params.what_data_types =  {'Words_English','Words_Hebrew','Checkers'};
+plot_params.rmNames = {'retModel-Words_English-css-fFit-fFit.mat',...
+           'retModel-Words_Hebrew-css-fFit-fFit.mat',...
+           'retModel-Checkers-css-fFit-fFit.mat'};
+pp=plot_params;
+plot_time_series(plot_params)
 
-                                
-                                
+
+
                                 
 %% FIGURE 3: (B) Line plots: word-checkerboard
 % Uses the same voxel calculations from the previous plot
