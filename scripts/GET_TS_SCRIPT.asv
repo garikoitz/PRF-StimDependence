@@ -1,27 +1,15 @@
-clear all; 
-
 %% Time series test
 basedir = '/acorn/data/neuro/gari/PRF-StimDependence/DATA';
 cd(basedir);
 
-% normalize function from matlab is being shadowed by another one with same name in here
-rmpath(fullfile(fileparts(sdRP),'vistasoft/mrBOLD/Utilities/'));
-
 subname = 'heb_pilot13';
 anat_subname = 'Dael';
 scan_name = 'RetAndHebrewLoc';
-gray_dir = fullfile(basedir,subname,scan_name,'Gray');
-% save image dir
-image_dir = fullfile(sdRP,'DATA','figures','png');
 
-% To filter too small VE
-VE = .20;
-% To eliminate de fovea
-min_ecc = 2;
+VE = .2;
 
 % Load ROIs
-roi = 'VO1';
-roiPath = fullfile(basedir,'anatomy',anat_subname,'ROIs',['WangAtlas_' roi '_left.mat']);
+roiPath = fullfile(basedir,'anatomy',anat_subname,'ROIs','WangAtlas_V3v_left.mat');
 AA      = load(roiPath);
 % Load the vw
 cd(fullfile(basedir,subname,scan_name))
@@ -36,31 +24,32 @@ assert(isequal(AA.ROI.coords, vw.ROIs(1).coords));
 ROIindices   = viewGet(vw, 'roiIndices');
 
 % Read results
-CBresults = load(fullfile(gray_dir,'Checkers','retModel-Checkers-css-fFit-fFit.mat'));
+CBresults = load(fullfile(basedir,subname,scan_name,'Gray','Checkers',...
+    'retModel-Checkers-css-gFit-gFit-gFit.mat'));
 [~,CBecc] = cart2pol(CBresults.model{1}.x0, CBresults.model{1}.y0); 
 CBr2 = 1 - CBresults.model{1}.rss ./ CBresults.model{1}.rawrss;
 
-WEresults = load(fullfile(gray_dir,'Words_English','retModel-Words_English-css-fFit-fFit.mat'));
+WEresults = load(fullfile(basedir,'WE_pilot13_sub35_retModel-Words_English-css.mat'));
 [~,WEecc] = cart2pol(WEresults.model{1}.x0, WEresults.model{1}.y0); 
 WEr2 = 1 - WEresults.model{1}.rss ./ WEresults.model{1}.rawrss;
 
-WHresults = load(fullfile(gray_dir,'Words_Hebrew','retModel-Words_Hebrew-css-fFit-fFit.mat'));
+WHresults = load(fullfile(basedir,'WH_pilot13_sub35_retModel-Words_Hebrew-css.mat'));
 [~,WHecc] = cart2pol(WHresults.model{1}.x0, WHresults.model{1}.y0); 
 WHr2 = 1 - WHresults.model{1}.rss ./ WHresults.model{1}.rawrss;
 
 
 % Read TS
-CB  = load(fullfile(gray_dir,'Checkers','TSeries','Scan1','tSeries1.mat'));
+CB  = load(fullfile(basedir,'CB_pilot13_sub35_tSeries1'));
 CBts = CB.tSeries;
 
-WE  = load(fullfile(gray_dir,'Words_English','TSeries','Scan1','tSeries1.mat'));
+WE  = load(fullfile(basedir,'WE_pilot13_sub35_tSeries1'));
 WEts = WE.tSeries;
 
-WH  = load(fullfile(gray_dir,'Words_Hebrew','TSeries','Scan1','tSeries1.mat'));
+WH  = load(fullfile(basedir,'WH_pilot13_sub35_tSeries1'));
 WHts = WH.tSeries;
 
 
-%% Filter to the ROI
+%% Filter to the ROI and VE
 CBroi = CBts(:,ROIindices);
 CBecc_roi = CBecc(ROIindices);
 CBr2_roi = CBr2(ROIindices);
@@ -73,117 +62,71 @@ WHroi = WHts(:,ROIindices);
 WHecc_roi = WHecc(ROIindices);
 WHr2_roi = WHr2(ROIindices);
 
-
-% FILTER FOR VE AND MIN ECC
-filterVE_ecc = find(CBr2_roi>VE & WEr2_roi>VE & WHr2_roi>VE ...
-                & CBecc_roi>min_ecc & WEecc_roi>min_ecc & WHecc_roi>min_ecc);
-% Eliminate VEmin and fovea
-CBroi_VE_minecc = CBroi(:,filterVE_ecc);
-CBecc_roi_VE_minecc = CBecc_roi(filterVE_ecc);
-CBr2_roi_VE_minecc = CBr2_roi(filterVE_ecc);
-
-WEroi_VE_minecc = WEroi(:,filterVE_ecc);
-WEecc_roi_VE_minecc = WEecc_roi(filterVE_ecc);
-WEr2_roi_VE_minecc = WEr2_roi(filterVE_ecc);
-
-WHroi_VE_minecc = WHroi(:,filterVE_ecc);
-WHecc_roi_VE_minecc = WHecc_roi(filterVE_ecc);
-WHr2_roi_VE_minecc = WHr2_roi(filterVE_ecc);
-
-% Check 
-[(1:1:length(CBecc_roi_VE_minecc))', CBecc_roi_VE_minecc',WEecc_roi_VE_minecc',WHecc_roi_VE_minecc']
+filterVE = find(CBr2_roi>VE & WEr2_roi>VE & WHr2_roi>VE);
 
 
+CBroi_VE = CBroi(:,filterVE);
+CBecc_roi_VE = CBecc_roi(filterVE);
+CBr2_roi_VE = CBr2_roi(filterVE);
 
-% ind = filterVE_ecc(1);
-% ind = 3;
-indstr = input('Enter index voxel for time series: ', 's');
-ind = str2num(indstr);
+WEroi_VE = WEroi(:,filterVE);
+WEecc_roi_VE = WEecc_roi(filterVE);
+WEr2_roi_VE = WEr2_roi(filterVE);
 
+WHroi_VE = WHroi(:,filterVE);
+WHecc_roi_VE = WHecc_roi(filterVE);
+WHr2_roi_VE = WHr2_roi(filterVE);
+
+
+value_voxel = 5.09886;
+value_voxel = 4.67229;
+[v,ind] = min(abs(WEecc_roi_VE-value_voxel)); 
 titlestr = sprintf(...
     'CBecc(r2):%.2g(%.2g), WEecc(r2):%.2g(%.2g), WHecc(r2):%.2g(%.2g)', ...
-        CBecc_roi_VE_minecc(ind), CBr2_roi_VE_minecc(ind), ...
-        WEecc_roi_VE_minecc(ind), WEr2_roi_VE_minecc(ind), ...
-        WHecc_roi_VE_minecc(ind), WHr2_roi_VE_minecc(ind));
+        CBecc_roi_VE(ind), CBr2_roi_VE(ind), ...
+        WEecc_roi_VE(ind), WEr2_roi_VE(ind), ...
+        WHecc_roi_VE(ind), WHr2_roi_VE(ind));
 
 
 % plot scatterplot
-hh = figure('visible','off');
-nrow = 4; ncol = 3;
-subplot(nrow,ncol,1)
-plot(WEecc_roi_VE_minecc, CBecc_roi_VE_minecc, 'b.'); axis equal
-hold on; plot(WEecc_roi_VE_minecc(ind), CBecc_roi_VE_minecc(ind), 'ro')
+figure(1)
+subplot(3,3,1)
+plot(WEecc_roi_VE, CBecc_roi_VE, 'b.'); axis equal
 xlabel('ENGLISH'); xlim([0,15])
 ylabel('CHECKER'); ylim([0,15])
 identityLine(gca);
 
-subplot(nrow,ncol,2)
-plot(WHecc_roi_VE_minecc, CBecc_roi_VE_minecc, 'b.'); axis equal
-hold on; plot(WHecc_roi_VE_minecc(ind), CBecc_roi_VE_minecc(ind), 'ro')
+subplot(3,3,2)
+plot(WHecc_roi_VE, CBecc_roi_VE, 'b.'); axis equal
 xlabel('HEBREW'); xlim([0,15])
 ylabel('CHECKER'); ylim([0,15])
 identityLine(gca);
 
-subplot(nrow,ncol,3)
-plot(WEecc_roi_VE_minecc, WHecc_roi_VE_minecc, 'b.'); axis equal
-hold on; plot(WEecc_roi_VE_minecc(ind), WHecc_roi_VE_minecc(ind), 'ro')
+subplot(3,3,3)
+plot(WEecc_roi_VE, WHecc_roi_VE, 'b.'); axis equal
 xlabel('ENGLISH'); xlim([0,15])
 ylabel('HEBREW'); ylim([0,15])
 identityLine(gca);
 
-% Normalize time series so that the values go from 0 to 1 using matlab's normalize, 'range' defaults to [0,1]
-CBnorm = normalize(CBroi_VE_minecc, 'range');
-WEnorm = normalize(WEroi_VE_minecc, 'range');
-WHnorm = normalize(WHroi_VE_minecc, 'range');
-% Obtain predictions
-CBmp = normalize(pmVistaObtainPrediction1voxel(CBresults, ind), 'range');
-WEmp = normalize(pmVistaObtainPrediction1voxel(WEresults, ind), 'range');
-WHmp = normalize(pmVistaObtainPrediction1voxel(WHresults, ind), 'range');
-
-subplot(nrow,ncol,4)
-plot(WEnorm(:), CBnorm(:), 'b.'); axis equal
-hold on; plot(WEnorm(:,ind), CBnorm(:,ind), 'r.')
-xlabel('ENGLISH'); xlim([0,1])
-ylabel('CHECKER'); ylim([0,1])
-identityLine(gca);
-
-subplot(nrow,ncol,5)
-plot(WHnorm(:), CBnorm(:), 'b.'); axis equal
-hold on; plot(WHnorm(:,ind), CBnorm(:,ind), 'r.')
-xlabel('HEBREW'); xlim([0,1])
-ylabel('CHECKER'); ylim([0,1])
-identityLine(gca);
-
-subplot(nrow,ncol,6)
-plot(WEnorm(:), WHnorm(:), 'b.'); axis equal
-hold on; plot(WEnorm(:,ind), WHnorm(:,ind), 'r.')
-xlabel('ENGLISH'); xlim([0,1])
-ylabel('HEBREW'); ylim([0,1])
-identityLine(gca);
-
-subplot(nrow,ncol,2*ncol+1:3*ncol)
-plot(2+CBnorm(:,ind), 'k-', 'LineWidth', 0.3); hold on;
-plot(1+WEnorm(:,ind), 'r-', 'LineWidth', 0.3);
-plot(WHnorm(:,ind), 'b-', 'LineWidth', 0.3);
-legend([{'CB'},{'WE'},{'WH'}]);
+subplot(3,3,4:6)
+plot(normalize(CBroi_VE(:,ind),0,1), 'k-'); hold on;
+plot(normalize(WEroi_VE(:,ind),0,1), 'r-');
+plot(normalize(WHroi_VE(:,ind),0,1), 'b-');
+legend([{'Checkers'},{'English'},{'Hebrew'}]);
 xlabel('Volumes'); 
 ylabel('BOLD');
 title(titlestr)
 
-subplot(nrow,ncol,3*ncol+1:4*ncol)
-plot(2+CBmp, 'k-', 'LineWidth', 0.3); hold on;
-plot(1+WEmp, 'r-', 'LineWidth', 0.3);
-plot(WHmp, 'b-', 'LineWidth', 0.3);
+subplot(3,3,7:9)
+CBmp = pmVistaObtainPrediction1voxel(CBresults, ind);
+WEmp = pmVistaObtainPrediction1voxel(WEresults, ind);
+WHmp = pmVistaObtainPrediction1voxel(WHresults, ind);
+plot(normalize(CBmp,0,1), 'k-'); hold on;
+plot(normalize(WEmp,0,1), 'r-');
+plot(normalize(WHmp,0,1), 'b-');
 legend([{'CB pred.'},{'WE pred.'},{'WH pred.'}])
 xlabel('Volumes'); 
 ylabel('BOLD');
-
-fname = ['TS_roi-' roi '_vox-' num2str(ind) '_sub-' subname '_v2.png'];
-fpath = fullfile(image_dir, fname)
-% Adjust margins
-set(hh, 'PaperUnits', 'inches');
-set(hh, 'PaperPosition', [0 0 10 10]); % Adjust the size as needed
-saveas(hh, fpath, 'png') 
 
 
 function prediction = pmVistaObtainPrediction1voxel(results, voxel)
