@@ -82,8 +82,10 @@ for nr=1:length(roi_names)
     for ns=1:size(DATA,1)
         data1 = [data1, DATA{ns, nr, 1}.ecc];
         data2 = [data2, DATA{ns, nr, 2}.ecc];
-        data1_filt=[data1_filt, data1(data2>filter_value)];
-        data2_filt=[data2_filt, data2(data2>filter_value)];
+        % Create filter for minimum eccentricity, all should be above this value, in pairs
+        filter_ecc = data1>filter_value & data2>filter_value;
+        data1_filt=[data1_filt, data1(filter_ecc)];
+        data2_filt=[data2_filt, data2(filter_ecc)];
         N = [N, length(data1)];
         N_filt = [N_filt, length(data1_filt)];
     end

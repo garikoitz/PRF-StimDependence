@@ -1,4 +1,4 @@
-%% INIT
+%% INIT od script sd_create_distr_plot.m
 tbUse PRF-StimDependence;
 
 close all; clear all;
@@ -79,7 +79,7 @@ fieldrange = 15;
 % Create distribution comparisons plots
 save_fig = true;
 show_fig = 'off';
-filter_value = 5; % deg of visual field
+filter_value = 2; % deg of visual field
 fname = ['distr_comp_CNI_RIGHT_' CNI_data_types{2} '-'  CNI_data_types{1}];
 fpath = '~/toolboxes/PRF-StimDependence/DATA/figures/png/distr';
 path_fname = fullfile(fpath, [fname '.png']);
@@ -105,7 +105,7 @@ HEB_data_types = HEB_list_dtNames(HEB_data_type_ind);
 new_HEB_rmroiCell = HEB_rmroiCell(:,new_roi_ind,CNI_data_type_ind);
 
 cr.defaults.covfig.vfc.list_dtNames = HEB_list_dtNames;
-varExplained=0.05;
+varExplained=0.2;
 fieldrange = 7;
 [HEB_R,HEB_C_data,HEB_cr]=crThreshGetSameVoxel( cr,...
                                     new_HEB_rmroiCell,...
@@ -113,14 +113,14 @@ fieldrange = 7;
                                     new_list_roiNames,...
                                     'cothres', varExplained,...
                                     'fieldrange', fieldrange, ...
-                                    'show_summary', false);
+                                    'show_summary', true);
 
 % Create distribution comparisons plots
 save_fig = true;
 show_fig = 'off';
-filter_value = 2.34; % deg of visual field
+filter_value = 2; % deg of visual field
 fname = ['distr_comp_HEB_LEFT_' HEB_data_types{2} '-filterdeg-' num2str(filter_value) '_'  HEB_data_types{1}];
-fpath = '~/toolboxes/PRF-StimDependence/DATA/figures/png/distr';
+fpath = fullfile(sdRP, 'DATA/figures/png/distr');
 path_fname = fullfile(fpath, [fname '.png']);
 sd_create_distr_plot(HEB_R, ...
                      HEB_data_types, ...
