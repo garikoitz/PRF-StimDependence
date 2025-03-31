@@ -7,7 +7,7 @@ cr.codeDir = sdRP;
 % WHERE THE NEW DATA IS
 cr.dirs.BASE     = '/acorn/data/neuro/gari/PRF-StimDependence';
 cr.dirs.DATA     = fullfile(cr.dirs.BASE,'DATA');
-cr.dirs.local    = fullfile(cr.dirs.BASE,'local');
+cr.dirs.local    = fullfile(cr.codeDir,'local');
 cr.dirs.ANALYSIS = fullfile(cr.dirs.BASE,'ANALYSIS');
 cr.dirs.ORG      = fullfile(cr.codeDir,'DATA','ANALYSIS','matlabfiles','organization');
 cr.dirs.DEF      = fullfile(cr.codeDir,'DATA','ANALYSIS','matlabfiles','defineProjectDefaults');
@@ -15,6 +15,7 @@ cr.dirs.TMP      = fullfile(cr.codeDir,'DATA','ANALYSIS','TMP');
 cr.dirs.FIG      = fullfile(cr.codeDir,'DATA','figures');
 cr.dirs.FIGPNG  = fullfile(cr.dirs.FIG,'png');
 cr.dirs.FIGSVG  = fullfile(cr.dirs.FIG,'svg');
+if ~isfolder(cr.dirs.local); mkdir(cr.dirs.local); end
 if ~isfolder(cr.dirs.TMP); mkdir(cr.dirs.TMP); end
 if ~isfolder(cr.dirs.FIG); mkdir(cr.dirs.FIG); end
 if ~isfolder(cr.dirs.FIGPNG); mkdir(cr.dirs.FIGPNG); end
@@ -99,18 +100,18 @@ sd_data.ISRAEL.TSFname = 'TS_ISRAEL_subInds-31-36-38-44_dtNames-CB-WE-WH_ROI-all
 % sd_data = read_download_data(sd_data, cr, 'rmroiCell');
 % If working with time series, load them too
 % sd_data = read_download_data(sd_data, cr, 'TS');
-all_sd_data_file = fullfile(cr.dirs.BASE, 'PRFstim_sd_data_31march2025.mat');
+all_sd_data_file = fullfile(cr.dirs.local, 'PRFstim_sd_data_31march2025.mat');
 % save(all_sd_data_file,'sd_data')
-if ~isfile(all_sd_data_file); check_download_from_osf(fpath); end
+if ~isfile(all_sd_data_file); check_download_from_osf(all_sd_data_file); end
 load(all_sd_data_file)
 
 
-% Read the generic params for coverage for all subjects
-cr.defaults.covfig.vfc = ff_vfcDefault();
-cr.defaults.covfig.vfc.list_roiNames = new_list_roiNames;
-% data types we want to look at
-cr.defaults.covfig.vfc.list_dtNames = list_dtNames;
-% names of the rm in each dt
-cr.defaults.covfig.vfc.list_rmNames = list_rmNames;
-% subinds = [31:36 38:44]; % Hebrew
-% cr.defaults.covfig.vfc = ff_vfcDefault_Hebrew();
+% % Read the generic params for coverage for all subjects
+% cr.defaults.covfig.vfc = ff_vfcDefault();
+% cr.defaults.covfig.vfc.list_roiNames = list_roiNames;
+% % data types we want to look at
+% cr.defaults.covfig.vfc.list_dtNames = list_dtNames;
+% % names of the rm in each dt
+% cr.defaults.covfig.vfc.list_rmNames = list_rmNames;
+% % subinds = [31:36 38:44]; % Hebrew
+% % cr.defaults.covfig.vfc = ff_vfcDefault_Hebrew();

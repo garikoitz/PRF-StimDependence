@@ -3,13 +3,16 @@
 % repository. For the Stimulus Dependence paper (2019) we tried to make it into
 % a reproducible and reusable process. The thing is that we need to separate
 % this specific project from others, we need to separate data from code.
+
+% All data from the server has been read on the variable sd_data. 
 tbUse PRF-StimDependence;
 
 close all; clear all;
 mrvCleanWorkspace;
-MainScriptHelper;
+MainScript_helper;
 
 
+%% (1) Scatterplots
 
 
 

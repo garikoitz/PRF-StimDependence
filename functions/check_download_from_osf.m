@@ -1,8 +1,8 @@
 function is_file_osf = check_download_from_osf(rmroi_fpath)
 %check_download_from_osf Check if file is in osf, if it is, download it. 
     is_file_osf = false;
-    [fpath, fname, fext] = fileparts();
-    switch rmroi_fpath
+    [fpath, fname, fext] = fileparts(rmroi_fpath);
+    switch fname
         case 'rmroicell_subInds-1to20_dtNames-cb-w-ff_fits-new_LeftRightROIs_2023'
             url = 'https://osf.io/download/y7wp6/';
         case 'rmroicell_subInds-31to36-38to44_dtNames-ALL-LeftRight_fits-new_2023'
@@ -19,10 +19,9 @@ function is_file_osf = check_download_from_osf(rmroi_fpath)
             url = 'https://osf.io/download/a2vwz';
         otherwise
             error([fname fext ' file not known'])
-            return
     end
 
-    location = websave(rmroi_fpath, url);
+    websave(rmroi_fpath, url);
     is_file_osf = true;
  
 end
