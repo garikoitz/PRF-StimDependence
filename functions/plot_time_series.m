@@ -7,13 +7,14 @@ function pp = plot_time_series(pp, path_fname)
     plot_time_series(pp, path_fname)
 
     %}
-    f = figure('visible','off');
-    % f = figure('visible','on');
+    % f = figure('visible','off');
+    f = figure('visible','on');
     
     % Extract the time series and plots them. 
     pp.input_time_series = struct();
     pp.modelpred_time_series = struct();
         % Go through all the data types pased on the struct. 
+        A = [];
         for mn=1:length(pp.what_data_types)
             % Read the time series
             data_type_name = pp.what_data_types{mn};
@@ -37,13 +38,16 @@ function pp = plot_time_series(pp, path_fname)
                 otherwise
                     color = 'k';
             end
-
-            % plot(M.tSeries,[color '-'],'LineWidth',1); 
-            
-            plot(pred,[color ':'],'LineWidth',1);
-            hold on; 
+            plot(length(pp.what_data_types) - mn -1 + normalize(pred, 'range'), ...
+                [color ':'],'LineWidth',1);
+            hold on;
+            h = plot(length(pp.what_data_types) - mn -1 + normalize(M.tSeries, 'range'), ...
+                    [color '-'],'LineWidth',1); 
+            A = [A,h];
+            set(gca,'YTickLabel',[]); 
         end
-        legend(pp.what_data_types)
+        legend(A, cellfun(@(x) strrep(x,'_','\_'), ...
+            pp.what_data_types, 'UniformOutput',false))
     saveas(f, path_fname);
 end
 

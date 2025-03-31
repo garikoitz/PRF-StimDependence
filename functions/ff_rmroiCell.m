@@ -36,12 +36,24 @@ p.addRequired('list_rmNames'  , @iscell);
 p.addParameter('list_path', cr.bk.list_sessionRet);
 p.addParameter('latest_fFit', false, @islogical)
 p.addParameter('checkYear', '2022', @ischar)
+p.addParameter('data_type', 'rmroiCell', @ischar)
 % Parse it
 p.parse(cr, list_subInds, list_roiNames, list_dtNames, list_rmNames, varargin{:});
 % Assign it
 list_path         = p.Results.list_path; 
 latest_fFit       = p.Results.latest_fFit; 
 checkYear         = p.Results.checkYear; 
+data_type         = p.Results.data_type; 
+
+% Validate
+rm_roi = false; time_s = false;
+if strcmp(data_type, 'rmroiCell')
+    rm_roi = true;
+elseif strcmp(data_type, 'TS')
+    time_s = true;
+else
+    error([data_type 'not known'])
+end
 
 %% Define things
 numSubs = length(list_subInds);
@@ -65,6 +77,11 @@ for ii = 1:numSubs
    dirVista = list_path{subInd};
    dirAnatomy = cr.bk.list_anatomy{subInd};
    chdir(dirVista);
+   setpref('VISTA', 'fileFormat', 'nifti')
+   load(fullfile(dirVista,'mrSESSION.mat'))
+   t1_file_path = fullfile(dirAnatomy,'t1.nii.gz');
+   setVAnatomyPath(t1_file_path);
+
    vw = initHiddenGray;
 
    for kk = 1:numRms
@@ -88,6 +105,8 @@ for ii = 1:numSubs
            rmPath = fullfile(dirVista,'Gray',dtName, rmName);
        end
        rmExists = exist(rmPath,'file');
+       tsPath = fullfile(dirVista,'Gray',dtName,'TSeries','Scan1','tSeries1.mat');
+       tsExists = isfile(fullfile(dirVista,'Gray',dtName,'TSeries','Scan1','tSeries1.mat'));
        
        vw = viewSet(vw, 'curdt', dtName); 
        
@@ -96,36 +115,42 @@ for ii = 1:numSubs
            vw = rmSelect(vw, 1, rmPath);
            vw = rmLoadDefault(vw);
        end
-       
+
+       % If we want TS, load them here
+       if time_s && tsExists
+           allTS = load(tsPath);
+           allTS = allTS.tSeries;
+       end
+
        for jj = 1:numRois
-          
+
            roiName = list_roiNames{jj};
-           roiPath = fullfile(dirAnatomy, 'ROIs', roiName);
+           roiPath = fullfile(dirAnatomy, 'ROIs', [roiName '.mat']);
            [vw, roiExists] = loadROI(vw, roiPath, [],[],1,0);
-           
-           if roiExists && rmExists
-               
+
+           if roiExists && rmExists && tsExists
+
                % get the rmroi params and store it
                rmroi = rmGetParamsFromROI(vw);
-               
+
                if calcTSeries
                    % add the amplitude metric
                    % first get roi coordinates and time series
                    roiCoords = viewGet(vw, 'roiCoords');
                    [tSeriesCell, ~] = getTseriesOneROI(vw,roiCoords,[], 0, 0 );
-                   tSeries = tSeriesCell{1}; 
-                   clear tSeriesCell; 
+                   tSeries = tSeriesCell{1};
+                   clear tSeriesCell;
                    numCoords = size(roiCoords, 2);
 
                    % get the mean of the top 8 values
-                   numPoints = 8; 
-                   meanMax = ff_tSeries_meanOfMaxPoints(tSeries, numPoints);                
-                   rmroi.meanMax = meanMax; 
+                   numPoints = 8;
+                   meanMax = ff_tSeries_meanOfMaxPoints(tSeries, numPoints);
+                   rmroi.meanMax = meanMax;
 
                    % get the mean of the peaks
                    meanPeaks = zeros(1,numCoords);
                    if calcPeaks
-                       display('Calculating peak information')                   
+                       display('Calculating peak information')
                        for vv = 1:numCoords
                            pks = findpeaks(tSeries(:,vv), 'NPeaks', numPoints, ...
                                'SortStr', 'descend', ...
@@ -133,20 +158,26 @@ for ii = 1:numSubs
                            meanPeaks(vv) = mean(pks);
                        end
                    end
-                   rmroi.meanPeaks = meanPeaks; 
+                   rmroi.meanPeaks = meanPeaks;
                end
-
-               rmroiCell{ii,jj,kk} = rmroi;  
-               
+               if rm_roi
+                   rmroiCell{ii,jj,kk} = rmroi;
+               end
+               if time_s
+                   % Filter to the ROI
+                   TS = allTS(:,rmroi.indices);
+                   rmroiCell{ii,jj,kk} = TS;
+               end
            else
                % if we come here, either the roi or the rm does not exist.
-               % Be informative. 
+               % Be informative.
                if ~roiExists, display([roiName 'for ' subInitials ' does not exist. ']), end
+               if ~tsExists, display(['TS file for ' subInitials ' does not exist. ']), end
                if ~rmExists, display([rmName 'for ' subInitials ' does not exist. ']), end
                % assign D{ii,jj,kk} to be the empty cell
                rmroiCell{ii,jj,kk} = [];
            end
-                      
+
        end
 
    end

@@ -7,377 +7,27 @@ tbUse PRF-StimDependence;
 
 close all; clear all;
 mrvCleanWorkspace;
-cr         = struct();
-cr.codeDir = sdRP;
-
-% WHERE THE NEW DATA IS
-cr.dirs.BASE     = '/acorn/data/neuro/gari/PRF-StimDependence';
-cr.dirs.DATA     = fullfile(cr.dirs.BASE,'DATA');
-cr.dirs.ANALYSIS = fullfile(cr.dirs.BASE,'ANALYSIS');
-cr.dirs.ORG      = fullfile(cr.codeDir,'DATA','ANALYSIS','matlabfiles','organization');
-cr.dirs.DEF      = fullfile(cr.codeDir,'DATA','ANALYSIS','matlabfiles','defineProjectDefaults');
-% cr.dirs.FIG      = fullfile(cr.codeDir,'DATA','figures');
-% cr.dirs.FIG     = fullfile('/Users/glerma/Library/CloudStorage/GoogleDrive-garikoitz@gmail.com/My Drive/STANFORD/PROJECTS/2018 Reading across maps (Rosemary)/__PUBLISH__/2022_PNAS(3rd)','figures');
-cr.dirs.FIG     = fullfile('~/toolboxes/PRF-StimDependence','DATA', 'figures');
-
-cr.dirs.FIGPNG  = fullfile(cr.dirs.FIG,'png');
-cr.dirs.FIGSVG  = fullfile(cr.dirs.FIG,'svg');
-% if ~isfolder(cr.dirs.FIG); mkdir(cr.dirs.FIG); end
-% if ~isfolder(cr.dirs.FIGPNG); mkdir(cr.dirs.FIGPNG); end
-% if ~isfolder(cr.dirs.FIGSVG); mkdir(cr.dirs.FIGSVG); end
-
-% CONTINUE WITH THE NORMAL PROCESSING
-% add to path the required matlab files inside the project, with info to run the project
-% addpath(genpath(fullfile(cr.dirs.ANALYSIS,'matlabfiles')));
-
-% Rosemary relied on this file that contains most of the subjects and other
-% lists. Make it work with relative paths and store it in each project repository
-% This file was used as well for:
-% - copying files to a new location
-% - editing mrSession to reflect the file changes
-cr.bk = bookKeeping(cr);
-
-%% (1) Run PRFs again
-if 0
-% subjects we want to do this for
-list_subInds        = [31:36 38:44];  % Hebrew
-% list_subInds      = [1:20];  % Original 20
-% mw (13) for Words failed, continue with the next ones for now
-% list_subInds      = [18:20];
-%17 and 13 failed at beginning
-% list_subInds     = [1,3,4,13:20];
-% list_dtNames     = {'WordSmall','WordLarge'};
-% list_dtNames     = {'Checkers'};
-
-    for subind = list_subInds
-
-        mrvCleanWorkspace;
-        % subind  = list_subInds(ns);
-        subname = cr.bk.list_sub{subind};
-        [~,anatName]=fileparts(cr.bk.list_anatomy{subind});
-        fprintf('\nSubDetails:\nInd:%i, StrInd:%s, subname:%s, Name:%s, anatName:%s\n',...
-            subind,cr.bk.list_subNumberString{subind},subname,...
-            cr.bk.list_names{subind},anatName)
-
-        % Change dir, we need to run analysis where mrSession is
-        % FOR ALL
-        chdir(cr.bk.list_sessionRet{subind})
-        prf.dirVistacc = cr.bk.list_sessionRet{subind};
-        % FOR WORD LARGE SMALL
-        % chdir(cr.bk.list_sessionSizeRet{subind})
-        % prf.dirVistacc = cr.bk.list_sessionSizeRet{subind};
-
-        %% PRF analysis
-        % Read the generic params for all subjects
-        run(fullfile(cr.dirs.DEF,'prfrun_defaults.m'));
-        cr.defaults.prfrun.params = params;
-        cr.defaults.prfrun.p      = p;
-        clear('params'); clear('p');
-        % Read prfRun_params specific to this subject
-        % run(cr.bk.list_prfParams{subind}); NOT NECESSARY
-
-        prf.dirAnatomy = cr.bk.list_anatomy{subind};
-        prf.list_rmName= cr.bk.list_rmName{subind};
-        prf.p.stimSize = cr.bk.list_stimSize(subind);
-        prf.wSearch    = cr.bk.list_wSearch(subind);
-        prf.prfModel   = cr.bk.list_prfModels{subind};
-        prf.rois       = cr.bk.list_ROIs{subind};
-
-        cr.subj.(subname).params.prf = prf;
-        clear('prf');
-        % This was on generics but requires specifics so... this is why I am
-        % calling generics as many times as calling different subjects just in case
-        cr.defaults.prfrun.params.stimSize = cr.subj.(subname).params.prf.p.stimSize;
-        % Run the prfModel with mrVista
-        % RUN USING mrVISTA NORMAL INSTALLATION
-            cr = cr_prfRun(cr, subind);
-            % Clean workspace of globals after each subject finishes
-            mrvCleanWorkspace;
-        % RUN USING container prfanalyze-vista:2.0.0 (no modelpred, we get r2)
-            % Generate the config file
-            % Run the container
-            % pmLaunchDockerCommand('prfanalyze','ellipse','tr1dur300v3','afni6')
-            % Convert the data back so that the rest of the scripts continue working
-    end
+MainScriptHelper;
 
 
 
 
 
 
-end
-
-%% -----------------------------------------------------------------------------
-%% -----------------------------------------------------------------------------
-%% (2) VAR EXPLAINED
-inTheServer = false;
-if inTheServer
-    vw = initHiddenGray;
-    vw = rmLoadDefault(vw);
-    save('cc_vw.mat','vw')
-else
-    % Calculate variance explained between
-
-    cd(fullfile(sdRP,'local'));
-    % Load ROIs
-    roiPath = fullfile(sdRP,'local','WangAtlas_V2v_left.mat');
-    % roiPath = fullfile(sdRP,'local','lVOTRC.mat');
-    AA      = load(roiPath);
-    % vw   = initHiddenGray;
-    % vw   = rmLoadDefault(vw);
-    load(fullfile(sdRP,'local','cc_vw.mat'))
-    vw    = loadROI(vw, roiPath, [],[],1,0);
-    assert(isequal(AA.ROI.coords, vw.ROIs(1).coords));
-    vw    = viewSet(vw, 'curdt', 'Checkers');
-    V1indices   = viewGet(vw, 'roiIndices');
-    % V1indices   = V1indices(1:1300);
-
-
-    % Read checkers 1 and the average of 23
-    C1  = load(fullfile(sdRP,'local','cc_checkers1_tSeries1.mat'));
-    C23 = load(fullfile(sdRP,'local','cc_checkers23_tSeries1.mat'));
-    C1  = C1.tSeries;
-    C23 = C23.tSeries;
-
-    % Filter to the ROI, left ventral V1
-    C1V1      = C1(:,V1indices);
-    C23V1     = C23(:,V1indices);
-    subplot(3,3,1)
-    meanC1V1  = mean(C1V1,2); plot(meanC1V1);hold on
-    meanC23V1 = mean(C23V1,2); plot(meanC23V1,'r');
-    title('Mean V1 activation');legend({'Checkers1','Checkers23'});
-    % We need to demean it
-    subplot(3,3,2)
-    dmC1V1   = C1V1 - mean(C1V1);
-    mdmC1V1  = mean(dmC1V1,2); plot(mdmC1V1);hold on
-    dmC23V1  = C23V1 - mean(C23V1);
-    mdmC23V1 = mean(dmC23V1,2); plot(mdmC23V1,'r');
-    title('Demeaned mean V1 activation');legend({'Checkers1','Checkers23'});
 
 
 
 
-    % Read the latest model fit
-    C   = load(fullfile(sdRP,'local','retModel-Checkers-css-fFit-fFit.mat'));
-    % Filter for V1
-    rss    = C.model{1}.rss(V1indices);
-    rawrss = C.model{1}.rawrss(V1indices);
-    % Calculate var explained of model fit
-    varexp         = 100*(1 - rss ./rawrss);
-    subplot(3,3,4)
-    plot(varexp,'.')
-    ylim([0,100])
-    title('var exp by index, new fit')
-    subplot(3,3,5)
-    histogram(varexp,100)
-    xlim([0,100]);
-    title('var exp by histogram, new fit')
-
-    subplot(3,3,3)
-    plot(dmC1V1,dmC23V1,'.');
-    xlabel('dmC1V1')
-    ylabel('dmC23V1')
-    identityLine(gca)
-    title('scatterplot of tSeries')
-
-    subplot(3,3,6)
-    histogram((diag(corr(dmC1V1,dmC23V1)).^2),200);
-    xlabel('var explained')
-    title('Corr of tSeries')
 
 
 
-    % Calcualte var explained of the two time series
-    F   = 100*(1 - sum((dmC1V1-dmC23V1).^2) ./ sum(dmC23V1.^2));
-    F(F<0)=nan;
-    subplot(3,3,7)
-    plot(F,'.')
-    ylim([0,100])
-    title('var exp by index, 2 runs')
-    subplot(3,3,8)
-    histogram(F,100)
-    xlim([0,100]);
-    title('var exp by histogram, 2 runs')
 
 
-    subplot(3,3,9)
-    plot(varexp,F,'.'); xlim([0,100]); ylim([0,100]);identityLine(gca);
-    xlabel('varexp fits')
-    ylabel('varexp tSeries')
-    title(sprintf('Medians: fit= %2.1f, tSeries= %2.1f', median(varexp,'omitnan'),median(F,'omitnan')))
-end
-%% -----------------------------------------------------------------------------
 
-%% (3) PREPARE DATA: WORDS, CHECKERS AND FALSEFONTS
-% Generate the rmroicell that we will use in all plots in this script
-% This will read the results obtained by Rosemary or the re-run in 2021
 
-readExisting = true;
-whatFit = 'new';  % 'new' | 'Rosemary'
-merge_data='left_dorsal'; % 'merge_dorsal_ventral';
 
-%
-list_subInds  = [1:20];
-list_subInds  = [31:36 38:44];
 
-% TEST what happens with dorsal
-% V1-3d, V3a,IPS0-1
-% list_roiNames = {'WangAtlas_V1v_left'
-%                  'WangAtlas_V2v_left'
-%                  'WangAtlas_V3v_left'
-%                  'WangAtlas_hV4_left'
-%                  'WangAtlas_VO1_left'
-%                  'lVOTRC'
-%                  'WangAtlas_IPS0'
-%                  'WangAtlas_IPS1'};
-% list_roiNames = {'WangAtlas_V1d_left'
-%                  'WangAtlas_V2d_left'
-%                  'WangAtlas_V3d_left'
-%                  'WangAtlas_V3A_left'
-%                  'WangAtlas_IPS0'
-%                  'WangAtlas_IPS1'};
-list_roiNames = {'WangAtlas_V1d_left'
-                 'WangAtlas_V2d_left'
-                 'WangAtlas_V3d_left'
-                 'WangAtlas_V1v_left'
-                 'WangAtlas_V2v_left'
-                 'WangAtlas_V3v_left'
-                 'WangAtlas_hV4_left'
-                 'WangAtlas_VO1_left'
-                 'WangAtlas_V3A_left'
-                 'WangAtlas_IPS0_left'
-                 'WangAtlas_IPS1_left'
-                 'WangAtlas_V1d_right'
-                 'WangAtlas_V2d_right'
-                 'WangAtlas_V3d_right'
-                 'WangAtlas_V1v_right'
-                 'WangAtlas_V2v_right'
-                 'WangAtlas_V3v_right'
-                 'WangAtlas_hV4_right'
-                 'WangAtlas_VO1_right'
-                 'WangAtlas_V3A_right'
-                 'WangAtlas_IPS0_right'
-                 'WangAtlas_IPS1_right'};
 
-list_dtNames  = {'Checkers','Words','FalseFont'};
-list_rmNames  = {'retModel-Checkers-css-fFit.mat'
-                 'retModel-Words-css-fFit.mat'
-                 'retModel-FalseFont-css-fFit.mat' };
-%{
-% Use the originals calculated by Rosemary
-list_rmNames  = {'retModel-Checkers-css.mat'
-                 'retModel-Words-css.mat'
-                 'retModel-FalseFont-css.mat'};
-%}
-rmroiFname = ['rmroicell_subInds-1to20_dtNames-cb-w-ff_fits-' whatFit '_LeftRightROIs_2023.mat'];
-rmroiFname='rmroicell_subInds-31to36-38to44_dtNames-ALL-LeftRight_fits-new_2023.mat';
-
-if readExisting
-    % Check if the file exists in the local dir, otherwise download from
-    % OSF
-    fpath = fullfile(sdRP,'DATA',rmroiFname);
-    
-    if ~isfile(fpath)
-        % Download from OSF
-        if strcmp(rmroiFname, ['rmroicell_subInds-1to20_dtNames-cb-w-ff_fits-' whatFit '_LeftRightROIs_2023.mat'])
-            url = 'https://osf.io/download/y7wp6/';
-        elseif strcmp(rmroiFname, 'rmroicell_subInds-31to36-38to44_dtNames-ALL-LeftRight_fits-new_2023.mat')
-            url = 'https://osf.io//download/b35qe/';
-
-            list_dtNames     = {'Words_English','Words_Hebrew','Checkers'};
-            list_rmDescripts = {'Words_English','Words_Hebrew','Checkers'};
-            if strcmp(whatFit,'Rosemary')
-                list_rmNames     = {'retModel-Words_English-css.mat','retModel-Words_Hebrew-css.mat' };
-            else
-                 list_rmNames     = {'retModel-Words_English-css-fFit.mat','retModel-Words_Hebrew-css-fFit.mat' };
-            end
-            
-        else
-            error('File not known')
-        end
-        location = websave(fpath,url);
-    end
-    % Load it
-    load(fpath,'rmroiCell');
-    % load(fullfile(sdRP,'DATA',rmroiFname))
-    
-    % If we have ventral ROIs, we should merge them with dorsal ones
-    % Or use just one or the other
-    % This is the backup
-    bu_rmroiCell = rmroiCell;
-    bu_list_roiNames = list_roiNames;
-    switch merge_data
-        case {'merge_dorsal_ventral'}
-            list_roiNames = {'WangAtlas_V1_left'
-                'WangAtlas_V2_left'
-                'WangAtlas_V3_left'
-                'WangAtlas_hV4_left'
-                'WangAtlas_VO1_left'
-                'WangAtlas_V3A_left'
-                'WangAtlas_IPS0_left'
-                'WangAtlas_IPS1_left'
-                'WangAtlas_V1_right'
-                'WangAtlas_V2_right'
-                'WangAtlas_V3_right'
-                'WangAtlas_hV4_right'
-                'WangAtlas_VO1_right'
-                'WangAtlas_V3A_right'
-                'WangAtlas_IPS0_right'
-                'WangAtlas_IPS1_right'};
-            rmroiCell = cell([size(bu_rmroiCell,1), (22-6), size(bu_rmroiCell,3)]);
-            if strcmp('WangAtlas_V1v_left',bu_list_roiNames{4}) && length(bu_list_roiNames)==22
-                nnr = 0;
-                for nr=1:size(bu_rmroiCell,2)
-                    if ismember(nr,[1:3,12:14])
-                        
-                        nnr = nnr + 1
-                        for ii=1:3
-                            for jj=1:size(bu_rmroiCell,1)
-                                rmroiCell(jj,nnr,ii) = merge_cell_content(bu_rmroiCell,jj,nr,ii);
-                            end
-                        end
-                    elseif ismember(nr,[7:11, 18:22])
-                        
-                        nnr = nnr + 1
-                        for ii=1:3
-                            rmroiCell(:,nnr,ii) = bu_rmroiCell(:,nr,ii);
-                        end
-                    end
-                end
-            end
-        case {'left_dorsal'}
-            new_roi_ind = [4,5,6,7,8,9];
-            new_list_roiNames = list_roiNames(new_roi_ind);
-            new_rmroiCell = rmroiCell(:,new_roi_ind,:);
-
-        otherwise
-            error("this option does not exist")
-    end
-    
-    
-else  % Do not do them again before publishing paper, all is in the 2023 dorsal one
-    rmroiCell = ff_rmroiCell(cr,...
-        list_subInds,...
-        list_roiNames,...
-        list_dtNames, ...
-        list_rmNames,...
-        'list_path',cr.bk.list_sessionRet,...
-        'latest_fFit',true, ...
-        'checkYear','2022');
-    % Save rmroicell
-    save(fullfile(sdRP,'DATA',rmroiFname),'rmroiCell')
-    
-end
-
-% Read the generic params for coverage for all subjects
-cr.defaults.covfig.vfc = ff_vfcDefault();
-cr.defaults.covfig.vfc.list_roiNames = new_list_roiNames;
-% data types we want to look at
-cr.defaults.covfig.vfc.list_dtNames = list_dtNames;
-% names of the rm in each dt
-cr.defaults.covfig.vfc.list_rmNames = list_rmNames;
-% subinds = [31:36 38:44]; % Hebrew
-% cr.defaults.covfig.vfc = ff_vfcDefault_Hebrew();
 
 %% (4) Time series comparisons
 readExisting = true;
@@ -780,8 +430,64 @@ plot_params.rmNames = {'retModel-Words_English-css-fFit-fFit.mat',...
            'retModel-Words_Hebrew-css-fFit-fFit.mat',...
            'retModel-Checkers-css-fFit-fFit.mat'};
 pp=plot_params;
-plot_time_series(plot_params)
+fname = ['heb_pilot09_hv4_left_ind-' pp.ind];
+fpath = '~/toolboxes/PRF-StimDependence/DATA/figures/png';
+path_fname = fullfile(fpath, [fname '.png']);
+plot_time_series(plot_params, path_fname)
 
+
+WE = load(fullfile(pp.p2_ret_data,pp.what_data_types{1},'retModel-Words_English-css.mat'));
+WH = load(fullfile(pp.p2_ret_data,pp.what_data_types{2},'retModel-Words_Hebrew-css.mat'));
+CB = load(fullfile(pp.p2_ret_data,pp.what_data_types{3},'retModel-Checkers-css-fFit-fFit.mat'));
+
+WE1 = load(fullfile(pp.p2_ret_data,pp.what_data_types{1},'retModel-Words_English-css-fFit.mat'));
+WH1 = load(fullfile(pp.p2_ret_data,pp.what_data_types{2},'retModel-Words_Hebrew-css-fFit.mat'));
+CB1 = load(fullfile(pp.p2_ret_data,pp.what_data_types{3},'retModel-Checkers-css-fFit-fFit.mat'));
+
+WE2 = load(fullfile(pp.p2_ret_data,pp.what_data_types{1},'retModel-Words_English-css-fFit-fFit.mat'));
+WH2 = load(fullfile(pp.p2_ret_data,pp.what_data_types{2},'retModel-Words_Hebrew-css-fFit-fFit.mat'));
+CB2 = load(fullfile(pp.p2_ret_data,pp.what_data_types{3},'retModel-Checkers-css-fFit-fFit.mat'));
+
+
+fprintf('\n\nparams.stims.stimSize\nWE: %.2g, fFit: %i, fFit-fFit: %i\nWH: %.2g, fFit: %i, fFit-fFit: %i\nCB: %i, fFit: %i, fFit-fFit: %i\n', ...
+        WE.params.stim.stimSize, ...
+        WE1.params.stim.stimSize, ...
+        WE2.params.stim.stimSize, ...
+        WH.params.stim.stimSize, ...
+        WH1.params.stim.stimSize, ...
+        WH2.params.stim.stimSize, ...
+        CB.params.stim.stimSize, ...
+        CB1.params.stim.stimSize, ...
+        CB2.params.stim.stimSize)
+
+
+fprintf('\n\nparams.analysis.fieldSize\nWE: %.2g, fFit: %i, fFit-fFit: %i\nWH: %.2g, fFit: %i, fFit-fFit: %i\nCB: %i, fFit: %i, fFit-fFit: %i\n', ...
+        WE.params.analysis.fieldSize, ...
+        WE1.params.analysis.fieldSize, ...
+        WE2.params.analysis.fieldSize, ...
+        WH.params.analysis.fieldSize, ...
+        WH1.params.analysis.fieldSize, ...
+        WH2.params.analysis.fieldSize, ...
+        CB.params.analysis.fieldSize, ...
+        CB1.params.analysis.fieldSize, ...
+        CB2.params.analysis.fieldSize)
+
+
+[WE.model{1}.angle,WE.model{1}.ecc] = cart2pol(WE.model{1}.x0, WE.model{1}.y0);
+[WH.model{1}.angle,WH.model{1}.ecc] = cart2pol(WH.model{1}.x0, WH.model{1}.y0);
+[CB.model{1}.angle,CB.model{1}.ecc] = cart2pol(CB.model{1}.x0, CB.model{1}.y0);
+
+[WE1.model{1}.angle,WE1.model{1}.ecc] = cart2pol(WE1.model{1}.x0, WE1.model{1}.y0);
+[WH1.model{1}.angle,WH1.model{1}.ecc] = cart2pol(WH1.model{1}.x0, WH1.model{1}.y0);
+[CB1.model{1}.angle,CB1.model{1}.ecc] = cart2pol(CB1.model{1}.x0, CB1.model{1}.y0);
+
+[WE2.model{1}.angle,WE2.model{1}.ecc] = cart2pol(WE2.model{1}.x0, WE2.model{1}.y0);
+[WH2.model{1}.angle,WH2.model{1}.ecc] = cart2pol(WH2.model{1}.x0, WH2.model{1}.y0);
+[CB2.model{1}.angle,CB2.model{1}.ecc] = cart2pol(CB2.model{1}.x0, CB2.model{1}.y0);
+
+x = WE.model{1}.ecc(1000:10000);
+y = CB.model{1}.ecc(1000:10000);
+close all; figure; plot(x, y,'b.'); grid on; axis equal;
 
 
                                 
