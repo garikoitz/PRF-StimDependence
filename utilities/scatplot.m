@@ -1,4 +1,4 @@
-function out = scatplot(x,y,method,radius,N,n,po,ms,colormap,cutoff)
+function out = scatplot(x,y,method,radius,N,n,po,ms,colormap)
 % Scatter plot with color indicating data density
 %
 % USAGE:
@@ -100,29 +100,29 @@ hold on
 
 % GLU --- obtain coordinates for max density points
 % it makes more sense that the density is calculated in each cutoff section
-x_upper = x(y>cutoff);
-y_upper = y(y>cutoff);
-x_lower = x(y<cutoff);
-y_lower = y(y<cutoff);
+% x_upper = x(y>cutoff);
+% y_upper = y(y>cutoff);
+% x_lower = x(y<cutoff);
+% y_lower = y(y<cutoff);
 
 %--------- Caclulate data density ---------
 dd = datadensity(x,y,method,radius);
-dd_upper = datadensity(x_upper,y_upper,method,radius);
-dd_lower = datadensity(x_lower,y_lower,method,radius);
+% dd_upper = datadensity(x_upper,y_upper,method,radius);
+% dd_lower = datadensity(x_lower,y_lower,method,radius);
 %------------- Gridding -------------------
 xi = repmat(linspace(min(x),max(x),N),N,1);
 yi = repmat(linspace(min(y),max(y),N)',1,N);
 zi = griddata(x,y,dd,xi,yi);
 
-xi_upper = repmat(linspace(min(x_upper),max(x_upper),N),N,1);
-yi_upper = repmat(linspace(min(y_upper),max(y_upper),N)',1,N);
-zi_upper = griddata(x_upper,y_upper,dd_upper,xi_upper,yi_upper);
-
-
-xi_lower = repmat(linspace(min(x_lower),max(x_lower),N),N,1);
-yi_lower = repmat(linspace(min(y_lower),max(y_lower),N)',1,N);
-zi_lower = griddata(x_lower,y_lower,dd_lower,xi_lower,yi_lower);
-
+% xi_upper = repmat(linspace(min(x_upper),max(x_upper),N),N,1);
+% yi_upper = repmat(linspace(min(y_upper),max(y_upper),N)',1,N);
+% zi_upper = griddata(x_upper,y_upper,dd_upper,xi_upper,yi_upper);
+% 
+% 
+% xi_lower = repmat(linspace(min(x_lower),max(x_lower),N),N,1);
+% yi_lower = repmat(linspace(min(y_lower),max(y_lower),N)',1,N);
+% zi_lower = griddata(x_lower,y_lower,dd_lower,xi_lower,yi_lower);
+% 
 
 
 %----- Bidimensional running mean filter -----
@@ -135,29 +135,29 @@ if length(n)>1
     end
 end
 
-zi_upper(isnan(zi_upper)) = 0;
-coef = ones(n(1),1)/n(1);
-zif_upper = conv2(coef,coef,zi_upper,'same');
-if length(n)>1
-    for k=1:n(2)
-        zif_upper = conv2(coef,coef,zif_upper,'same');
-    end
-end
-
-
-zi_lower(isnan(zi_lower)) = 0;
-coef = ones(n(1),1)/n(1);
-zif_lower = conv2(coef,coef,zi_lower,'same');
-if length(n)>1
-    for k=1:n(2)
-        zif_lower = conv2(coef,coef,zif_lower,'same');
-    end
-end
+% zi_upper(isnan(zi_upper)) = 0;
+% coef = ones(n(1),1)/n(1);
+% zif_upper = conv2(coef,coef,zi_upper,'same');
+% if length(n)>1
+%     for k=1:n(2)
+%         zif_upper = conv2(coef,coef,zif_upper,'same');
+%     end
+% end
+% 
+% 
+% zi_lower(isnan(zi_lower)) = 0;
+% coef = ones(n(1),1)/n(1);
+% zif_lower = conv2(coef,coef,zi_lower,'same');
+% if length(n)>1
+%     for k=1:n(2)
+%         zif_lower = conv2(coef,coef,zif_lower,'same');
+%     end
+% end
 
 %-------- New Filtered data densities --------
 ddf = griddata(xi,yi,zif,x,y);
-ddf_upper = griddata(xi_upper,yi_upper,zif_upper,x_upper,y_upper);
-ddf_lower = griddata(xi_lower,yi_lower,zif_lower,x_lower,y_lower);
+% ddf_upper = griddata(xi_upper,yi_upper,zif_upper,x_upper,y_upper);
+% ddf_lower = griddata(xi_lower,yi_lower,zif_lower,x_lower,y_lower);
 %----------- Plotting --------------------
 switch po
     case {1,2}
@@ -170,8 +170,8 @@ switch po
         out.hs = hs;
         colorbar
         D = ddf;
-        D_upper = ddf_upper;
-        D_lower = ddf_lower;
+        % D_upper = ddf_upper;
+        % D_lower = ddf_lower;
     case {3,4}
         if po>3
             [c,h] = contour(xi,yi,zi);
@@ -181,8 +181,8 @@ switch po
         out.hs = hs;
         colorbar
         D = dd;
-        D_upper = dd_upper;
-        D_lower = dd_lower;        
+        % D_upper = dd_upper;
+        % D_lower = dd_lower;        
 end %switch
 %------Relocate variables and place NaN's ----------
 dd(idat) = dd;
@@ -204,16 +204,16 @@ out.zif = zif;
 % This is the other method I don't think makes sense, keep it for now
 % D_upper = D(y>cutoff);
 % D_lower = D(y<cutoff);
-[maxdens_upper, indmaxdens_upper] = max(D_upper);
-[maxdens_lower, indmaxdens_lower] = max(D_lower);
+% [maxdens_upper, indmaxdens_upper] = max(D_upper);
+% [maxdens_lower, indmaxdens_lower] = max(D_lower);
 
 
 out.global_max_dens_coord_x = x(indmaxdens_global);
 out.global_max_dens_coord_y = y(indmaxdens_global);
-out.upper_max_dens_coord_x  = x_upper(indmaxdens_upper);
-out.upper_max_dens_coord_y  = y_upper(indmaxdens_upper);
-out.lower_max_dens_coord_x  = x_lower(indmaxdens_lower);
-out.lower_max_dens_coord_y  = y_lower(indmaxdens_lower);
+% out.upper_max_dens_coord_x  = x_upper(indmaxdens_upper);
+% out.upper_max_dens_coord_y  = y_upper(indmaxdens_upper);
+% out.lower_max_dens_coord_x  = x_lower(indmaxdens_lower);
+% out.lower_max_dens_coord_y  = y_lower(indmaxdens_lower);
 
 if ~holdstate
     hold off
@@ -229,7 +229,7 @@ n = [];
 ms = 5;
 x = randn(1000,1);
 y = randn(1000,1);
-out = scatplot(x,y,method,radius,N,n,po,ms)
+scatplot(x,y,method,radius,N,n,po,ms)
 return
 %~~~~~~~~~~ Data Density ~~~~~~~~~~~~~~
 function dd = datadensity(x,y,method,r)

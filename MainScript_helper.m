@@ -10,7 +10,7 @@ cr.dirs.DATA     = fullfile(cr.dirs.BASE,'DATA');
 cr.dirs.local    = fullfile(cr.codeDir,'local');
 cr.dirs.ANALYSIS = fullfile(cr.dirs.BASE,'ANALYSIS');
 cr.dirs.ORG      = fullfile(cr.codeDir,'DATA','ANALYSIS','matlabfiles','organization');
-cr.dirs.DEF      = fullfile(cr.codeDir,'DATA','ANALYSIS','matlabfiles','defineProjectDefaults');
+cr.dirs.DEF      = fullfile(cr.codeDir,'defineDefaults');
 cr.dirs.TMP      = fullfile(cr.codeDir,'DATA','ANALYSIS','TMP');
 cr.dirs.FIG      = fullfile(cr.codeDir,'DATA','figures');
 cr.dirs.FIGPNG  = fullfile(cr.dirs.FIG,'png');
@@ -106,12 +106,7 @@ if ~isfile(all_sd_data_file); check_download_from_osf(all_sd_data_file); end
 load(all_sd_data_file)
 
 
-% % Read the generic params for coverage for all subjects
-% cr.defaults.covfig.vfc = ff_vfcDefault();
-% cr.defaults.covfig.vfc.list_roiNames = list_roiNames;
-% % data types we want to look at
-% cr.defaults.covfig.vfc.list_dtNames = list_dtNames;
-% % names of the rm in each dt
-% cr.defaults.covfig.vfc.list_rmNames = list_rmNames;
-% % subinds = [31:36 38:44]; % Hebrew
-% % cr.defaults.covfig.vfc = ff_vfcDefault_Hebrew();
+
+% ADD DEFAULTS FOR PLOTTING, DIFFERENT PER SITE
+sd_data.CNI.vfc = ff_vfcDefault('CNI');
+sd_data.ISRAEL.vfc = ff_vfcDefault('ISRAEL');

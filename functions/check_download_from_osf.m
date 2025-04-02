@@ -1,6 +1,7 @@
 function is_file_osf = check_download_from_osf(rmroi_fpath)
 %check_download_from_osf Check if file is in osf, if it is, download it. 
     is_file_osf = false;
+
     [fpath, fname, fext] = fileparts(rmroi_fpath);
     switch fname
         case 'rmroicell_subInds-1to20_dtNames-cb-w-ff_fits-new_LeftRightROIs_2023'

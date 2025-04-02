@@ -11,8 +11,123 @@ close all; clear all;
 mrvCleanWorkspace;
 MainScript_helper;
 
+%% (1) SCATTERPLOTS
 
-%% (1) Scatterplots
+
+%% FIGURE 2: (C) Eccentricity: Scatterplots: word-checkerboard (no IPS)
+% Define here first all the figures to be generated
+VEs = [0.2, 0.1, 0.05]; % We used VE limits of 20% and 5% in previous plots. 
+min_sizes = [0.5, 1]; % Restrict pRF size, leave 0 to compare with old results
+min_eccs = [1, 2]; % Remove fovea, leave 0 to compare with old results. 
+left_dorsal = {'WangAtlas_V1d_left', 'WangAtlas_V2d_left', 'WangAtlas_V3d_left', ...
+               'WangAtlas_V3A_left', 'WangAtlas_IPS0_left','WangAtlas_IPS1_left'};
+left_ventral = {'WangAtlas_V1v_left', 'WangAtlas_V2v_left', 'WangAtlas_V3v_left', ...
+                'WangAtlas_hV4_left', 'WangAtlas_VO1_left'};
+right_dorsal = strrep(left_dorsal, 'left','right');
+right_ventral = strrep(left_ventral, 'left','right');
+% We can plot several combinations, start with this
+roi_groups = {'left_ventral', 'left_dorsal', 'right_ventral', 'right_dorsal',}; 
+sites = {'CNI', 'ISRAEL'};
+what2plots = {'ecc'};
+% Generate a struct with all figure names and options
+figures = struct();
+ii = 0;
+for site=sites;for VE=VEs;for min_size=min_sizes;for min_ecc=min_eccs;
+for roi_group=roi_groups; for what2plot=what2plots  % ;end;end;end;end;end;end
+    ii = ii + 1;
+    figures(ii).fname = sprintf(...
+                        '%s-scatterplot_site-%s_VE-%i%%_minsize-%.2g_minecc-%.2g_rois-%s', ...
+                         what2plot{:}, site{:}, 100*VE, min_size, min_ecc, roi_group{:});
+    figures(ii).site = site{:};
+    figures(ii).VE = VE;
+    figures(ii).sizes = [min_size, sd_data.(site{:}).vfc.fieldRange];
+    figures(ii).eccs = [min_ecc, sd_data.(site{:}).vfc.fieldRange];
+    figures(ii).roi_group = roi_group{:};
+    figures(ii).roi_groups.(roi_group{:}) = eval(roi_group{:}); 
+    figures(ii).roi_inds.(roi_group{:}) = find(ismember(sd_data.(site{:}).list_roiNames, ...
+                                                               eval(roi_group{:})'));
+    figures(ii).what2plot = what2plot{:};
+end;end;end;end;end;end
+
+
+% To replicate just the plots in the original paper first, we need to use
+replicate_index = 1:length(figures);  % [1,25,37]; 
+nri = length(replicate_index);
+for nf = replicate_index
+    % Filter data by pairs. 
+    % It does not make sense filtering CB and WE based on FF values. 
+    f = figures(nf);
+    rmrcell = sd_data.(f.site).rmroiCell;
+    % Check if there are more than one rm, if there are, create pairs. 
+    NR = nchoosek(1:length(sd_data.(f.site).list_rmNames), 2);
+    for nr = 1:size(NR,1)
+        nrr = NR(nr,:);
+        % We want Checkers in Y axis, flip if it is the opposite. Then flip all
+        if strcmp('Checkers',sd_data.(f.site).list_dtNames{nrr(1)});nrr=flip(nrr);end
+        [rm1, rm2] = sd_data.(f.site).list_dtNames{nrr};
+        new_fname = strrep(f.fname, 'scatterplot', ['scatterplot-' rm1 '-' rm2]);
+        fprintf('\nNow doing %i/%i,%i/%i >>> %s\n', nf,nri,nr,size(NR,1),new_fname)
+        % Filter the main dataset (all subject, less rois, 2 rm-s)
+        rmrcell_pairs = rmrcell(:, f.roi_inds.(f.roi_group), nrr);
+        % Change the defaults for filtering and plotting
+        % Eccentricity minimum and maximum
+        sd_data.(f.site).vfc.eccthresh = f.sizes;
+        % pRF size minimum and maximum
+        sd_data.(f.site).vfc.sigmaEffthresh = f.sizes;
+        sd_data.(f.site).vfc.sigmaMajthresh = f.sizes;
+        % Minimum variance explained (VE)
+        sd_data.(f.site).vfc.cothresh = f.VE;
+
+        % Filter the data so that we only have valid voxels
+        [R,C_data,cr] = sd_filter_same_voxel_pairs(cr,...
+                                       rmrcell_pairs,...
+                                       sd_data.(f.site).list_subInds,...
+                                       f.roi_groups.(f.roi_group),...
+                                       sd_data.(f.site).vfc, ...
+                                       'show_summary', true);        
+        % Plot it
+        fontsize = 12;
+        % figure(nr)
+        [percAboveIdentity] = crCreateScatterplot(R, C_data, cr, ...
+                                    sd_data.(f.site).vfc, ...
+                                    sd_data.(f.site).list_subInds,...
+                                    f.roi_groups.(f.roi_group),...
+                                    sd_data.(f.site).list_dtNames(nrr),...
+                                    'ecc', ...
+                                    fontsize, ...
+                                    new_fname);
+
+    end
+end
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -352,71 +467,6 @@ set(0, 'DefaultFigureRenderer', 'painters');
 saveas(gcf, fullfile(cr.dirs.FIGPNG, [fname '.png']), 'png')
 saveas(gcf, fullfile(cr.dirs.FIGSVG,[fname '.svg']), 'svg')
 
-%% FIGURE 2: (C) Eccentricity: Scatterplots: word-checkerboard (no IPS)
-% Order is CB, W, FF, invert it so that it is W then CB
-
-% LEFT
-% CNI
-%{
-rmroiCell_WC     = new_rmroiCell(:,:,1:2);
-rmroiCell_WC     = flip(rmroiCell_WC,3);
-list_rmDescripts = {'Words', 'Checkers'};%     {'FalseFont'}
-%}
-% ISRAEL
-% {
-rmroiCell_WC     = new_rmroiCell(:,:,1:3);
-rmroiCell_WC     = flip(rmroiCell_WC,3);
-list_rmDescripts = {'Words_English', 'Checkers'};%     {'Words_Hebrew'}
-%}
-
-% Obtain equally thresholded voxels to scatterplot
-varExplained=0.2;
-[R,C_data,cr]=crThreshGetSameVoxel(cr,...
-                                   rmroiCell_WC,...
-                                   list_subInds,...
-                                   new_list_roiNames,...
-                                   'cothres', varExplained,...
-                                   'fieldrange', 15);
-
-% Plot it
-fontsize = 12;
-fname = ['TEST_LEFT_scatterplot_eccentricity_FFVsCheck_6DorsalROIs_20subs_' whatFit 'Fit_v01'];
-[percAboveIdentity] = crCreateScatterplot(R,C_data,cr,...
-                                    list_subInds,...
-                                    new_list_roiNames,...
-                                    list_rmDescripts,...
-                                    'ecc', ...  % 'co'
-                                    fontsize, ...
-                                    fname, ...
-                                    5);
-
-% RIGHT
-
-rmroiCell_WC     = rmroiCell(:,9:16,1:2);
-rmroiCell_WC     = flip(rmroiCell_WC,3);
-list_roiNames16  = list_roiNames(9:16);
-list_rmDescripts = {'Words','Checkers'};%    {'FalseFont'}
-
-
-% Obtain equally thresholded voxels to scatterplot
-varExplained=0.2;
-[R,C_data,cr]=crThreshGetSameVoxel(cr,...
-                                   rmroiCell_WC,...
-                                   list_subInds,...
-                                   list_roiNames16,...
-                                   'cothres', varExplained,...
-                                   'fieldrange', 15);
-
-% Plot it
-fontsize = 12;
-fname = ['RIGHT_scatterplot_eccentricity_WordVsCheck_6DorsalROIs_20subs_' whatFit 'Fit_v01'];
-[percAboveIdentity,~] = crCreateScatterplot(R,C_data,cr,...
-                                    list_subInds,...
-                                    list_roiNames16,...
-                                    list_rmDescripts,...
-                                    'ecc', ...  % 'co'
-                                    fontsize, ...
-                                    '');
 
 
 

@@ -1,5 +1,5 @@
 function c = ff_histogramHeat(x, y, minmaxX, minmaxY, numHistBins,...
-                             cmapValuesHist,fov,roiName,fieldName,fontsize, cutoff)
+                             cmapValuesHist,fov,roiName,fieldName,fontsize)
 % ff_histogramHeat(x, y, maxValueX, maxValueY, numHistBins) 
 %
 % Makes a heat map!
@@ -33,7 +33,11 @@ axisLimsY = minmaxY;
 
 % New GLU: 2D plot, simpler and more control
 % scatplot(x,y,method,radius,N,n,po,ms,colormap)
-outdata = scatplot(x,y,'squares',numHistBins,100,5,1,10,cmapValuesHist, cutoff);
+% try 
+   outdata = scatplot(x,y,'squares',numHistBins,100,5,1,10,cmapValuesHist);
+% catch ME
+%     plot(x,y, 'y.')
+% end
 set(gca,'color','k');
 set(gca, 'xlim', axisLimsX);
 set(gca, 'ylim', axisLimsY);
@@ -84,8 +88,11 @@ if strcmp(hemi,'R ')
     roiName = strrep(ff_stringRemove(roiName, 'WangAtlas_'),'_right','');
     roiName = strrep(roiName,'r','');
 end
-text(maxValueX-(maxValueX-minValueX)*(1/2), minValueY+fov/2, ...
-    sprintf('%s %s (N:%i)',hemi, roiName, size(x,2)) , ...
+text(minValueX+fov/4, maxValueY-fov/2, ...
+    sprintf('%s %s',hemi, roiName) , 'HorizontalAlignment', 'left',...
+     'Color','w','FontWeight','Bold','FontSize',fontsize+4)
+text(maxValueX-fov/4, minValueY+fov/2, ...
+    sprintf('N:%i',size(x,2)) , 'HorizontalAlignment', 'right',...
      'Color','w','FontWeight','Bold','FontSize',fontsize+4)
 colormap(cmapValuesHist); 
 c = colorbar;
@@ -100,35 +107,49 @@ switch fieldName
         % Calculate standard dev
         S = std(x-y);
         % Cohens d
-        fovealInd = (y <= cutoff);
-        dfoveal = computeCohen_d(y(fovealInd), x(fovealInd),'paired');
-        dperiph = computeCohen_d(y(~fovealInd), x(~fovealInd),'paired');
+        % fovealInd = (y <= cutoff & x <= cutoff);
+        % dfoveal = computeCohen_d(y(fovealInd), x(fovealInd),'paired');
+        % dperiph = computeCohen_d(y(~fovealInd), x(~fovealInd),'paired');
+        % I am removing the cutoff idea
+        d_all = computeCohen_d(y, x,'paired');
+
+
         % text(maxValueX-(maxValueX-minValueX)*(1/3), (cutoff + 0.75),sprintf('d\'': %.2g',dperiph),...
         %     'Color','w','FontWeight','Bold','FontSize',fontsize)
         % text(maxValueX-(maxValueX-minValueX)*(1/3), (cutoff - 0.75) ,sprintf('d\'': %.2g',dfoveal),...
         %     'Color','w','FontWeight','Bold','FontSize',fontsize)
-        % 
+        %  
         % text(maxValueX-(maxValueX-minValueX)*(1/3), (cutoff - 1.5) ,sprintf('std: %.2g',S),...
         %     'Color','w','FontWeight','Bold','FontSize',fontsize)
-        title(sprintf('d\'': %.2g/%.2g(p/f),std:%.2g',dperiph,dfoveal,S))
+        % title(sprintf('d\'': %.2g/%.2g(p/f),std:%.2g',dperiph,dfoveal,S))
+        title(sprintf('d\'': %.2g,std:%.2g',d_all,S))
 
     case {'x0','y0'}
-        line([minValueX, maxValueX], [cutoff,cutoff], 'LineStyle','-', 'Color', 'r', 'LineWidth',1)
+        % line([minValueX, maxValueX], [cutoff,cutoff], 'LineStyle','-', 'Color', 'r', 'LineWidth',1)
         % Here we can do the ecc tests in BarData1 and BarData2
         % Cohens d
-        fovealInd = (y <= cutoff);
-        dfoveal = computeCohen_d(y(fovealInd), x(fovealInd),'paired');
-        dperiph = computeCohen_d(y(~fovealInd), x(~fovealInd),'paired');
-        text(maxValueX-(maxValueX-minValueX)*(1/3), (cutoff + 0.75),sprintf('d\'': %.2g',dperiph),...
-            'Color','w','FontWeight','Bold','FontSize',fontsize)
-        text(maxValueX-(maxValueX-minValueX)*(1/3), (cutoff - 0.75) ,sprintf('d\'': %.2g',dfoveal),...
-            'Color','w','FontWeight','Bold','FontSize',fontsize)
+        % fovealInd = (y <= cutoff);
+        % dfoveal = computeCohen_d(y(fovealInd), x(fovealInd),'paired');
+        % dperiph = computeCohen_d(y(~fovealInd), x(~fovealInd),'paired');
+        % I am removing the cutoff idea
+        d_all = computeCohen_d(y, x,'paired');
+
+        % text(maxValueX-(maxValueX-minValueX)*(1/3), (cutoff + 0.75),sprintf('d\'': %.2g',dperiph),...
+        %     'Color','w','FontWeight','Bold','FontSize',fontsize)
+        % text(maxValueX-(maxValueX-minValueX)*(1/3), (cutoff - 0.75) ,sprintf('d\'': %.2g',dfoveal),...
+        %     'Color','w','FontWeight','Bold','FontSize',fontsize)
+        % Calculate standard dev
+        S = std(x-y);
+        title(sprintf('d\'': %.2g,std:%.2g',d_all,S))
     case {'co'}
         % Here we can do the ecc tests in BarData1 and BarData2
         % Cohens d
         d = computeCohen_d(y, x,'paired');
-        text(maxValueX-(maxValueX-minValueX)*(1/3), minValueY+fov ,sprintf('d\'': %.2g',d),...
-            'Color','w','FontWeight','Bold','FontSize',fontsize)
+        % text(maxValueX-(maxValueX-minValueX)*(1/3), minValueY+fov ,sprintf('d\'': %.2g',d),...
+        %     'Color','w','FontWeight','Bold','FontSize',fontsize)
+        % Calculate standard dev
+        S = std(x-y);
+        title(sprintf('d\'': %.2g,std:%.2g',d,S))
     otherwise
         error('fieldName not known, only ecc and co implemented ')
         

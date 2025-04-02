@@ -1,11 +1,10 @@
-function  [percentAboveSubs] = crCreateScatterplot(R, C_data, cr, ...
+function  [percentAboveSubs] = crCreateScatterplot(R, C_data, cr, vfc, ...
                                                           list_subInds,...
                                                           list_roiNames,...
                                                           list_rmDescripts,...
                                                           fieldName, ...
                                                           fontsize,...
-                                                          fname, ...
-                                                          cutoff)
+                                                          fname)
 %%
 % colormap for histogram
 % cmapValuesHist = colormap('pink');
@@ -69,8 +68,8 @@ numRois = length(list_roiNames);
 % numFields = length(list_fieldNames);
 
 % rm descriptions
-rm1Descript = list_rmDescripts{1}; 
-rm2Descript = list_rmDescripts{2}; 
+rm1Descript = strrep(list_rmDescripts{1},'_','\_'); 
+rm2Descript = strrep(list_rmDescripts{2},'_','\_'); 
 
 % initialize structs / matrices for mixed effects
 % subjectLines = cell(numSubs, numRois, numFields); % because pairwise
@@ -114,17 +113,17 @@ A = cell(numRois, 5);
     % fieldNameDescript = list_fieldDescripts{ff}; 
     radius = 1;
     if strcmp(fieldName, 'sigma1') 
-        maxValue = cr.defaults.covfig.vfc.sigmaMajthresh(2);
-        minValue = cr.defaults.covfig.vfc.sigmaMajthresh(1);
+        maxValue = vfc.sigmaMajthresh(2);
+        minValue = vfc.sigmaMajthresh(1);
     elseif strcmp(fieldName, 'sigma')          
-        maxValue = cr.defaults.covfig.vfc.sigmaEffthresh(2);
-        minValue = cr.defaults.covfig.vfc.sigmaMajthresh(1);
+        maxValue = vfc.sigmaEffthresh(2);
+        minValue = vfc.sigmaMajthresh(1);
     elseif strcmp(fieldName, 'ecc')
-        maxValue = cr.defaults.covfig.vfc.eccthresh(2);
-        minValue = cr.defaults.covfig.vfc.eccthresh(1);
+        maxValue = vfc.eccthresh(2);
+        minValue = 0; % vfc.eccthresh(1);
         fov = 1; % width of the band, selected by looking at the std of words-FF, because we consider them as replications. TODO: pass this as a variable. 
         nrows = 2; ncols = 3;
-        position = [0.005 0.062 .95 .7 ];
+        position = [0.005 0.062 .95 .6 ];
         radius = 2;
     elseif strcmp(fieldName, 'co')
         maxValue = 1; 
@@ -148,8 +147,8 @@ A = cell(numRois, 5);
         maxValue = 5; 
         minValue = 0; 
     elseif strcmp(fieldName, 'x0') || strcmp(fieldName, 'y0')
-        maxValue = cr.defaults.covfig.vfc.fieldRange;
-        minValue = -cr.defaults.covfig.vfc.fieldRange;
+        maxValue = vfc.fieldRange;
+        minValue = -vfc.fieldRange;
         fov = 1; % width of the band, look comment for ecc
         nrows = 2; ncols = 3;
         position = [0.005 0.062 .95 .7 ];
@@ -173,7 +172,7 @@ A = cell(numRois, 5);
     end
 
     
-    xx = mrvNewGraphWin('Scatterplots');
+    xx = mrvNewGraphWin('Scatterplots', [], 'off');
     position = [0 0 1 .75];
     set(xx,'Position',position);
     ha = tight_subplot(nrows,ncols,[.005 .01],[.05 .01],[.05 .01]);
@@ -295,8 +294,8 @@ A = cell(numRois, 5);
         % 3d histogram heat map -- absolute number of voxels
         if length(BarData1) > 0
             c = ff_histogramHeat(BarData1, BarData2, [minValue,maxValue], ...
-                             [minValue,maxValue],radius,cmapValuesHist,fov,...
-                             roiName,fieldName,fontsize, cutoff);
+                              [minValue,maxValue],radius,cmapValuesHist,fov,...
+                              roiName,fieldName,fontsize);
         else
             continue
         end
@@ -428,7 +427,7 @@ A = cell(numRois, 5);
     if ~isempty(fname)
         set(gcf, 'InvertHardcopy', 'off')
         saveas(gcf, fullfile(cr.dirs.FIGPNG, [fname '.png']), 'png')
-        saveas(gcf, fullfile(cr.dirs.FIGSVG,[fname '.svg']), 'svg')
+        % saveas(gcf, fullfile(cr.dirs.FIGSVG,[fname '.svg']), 'svg')
     end
 
 end
