@@ -4,7 +4,7 @@ function  [percentAboveSubs] = crCreateScatterplot(R, C_data, cr, vfc, ...
                                                           list_rmDescripts,...
                                                           fieldName, ...
                                                           fontsize,...
-                                                          fname)
+                                                          fname, visible)
 %%
 % colormap for histogram
 % cmapValuesHist = colormap('pink');
@@ -172,7 +172,7 @@ A = cell(numRois, 5);
     end
 
     
-    xx = mrvNewGraphWin('Scatterplots', [], 'off');
+    xx = mrvNewGraphWin('Scatterplots', [], visible);
     position = [0 0 1 .75];
     set(xx,'Position',position);
     ha = tight_subplot(nrows,ncols,[.005 .01],[.05 .01],[.05 .01]);
