@@ -33,11 +33,11 @@ axisLimsY = minmaxY;
 
 % New GLU: 2D plot, simpler and more control
 % scatplot(x,y,method,radius,N,n,po,ms,colormap)
-% try 
+try 
    outdata = scatplot(x,y,'squares',numHistBins,100,5,1,10,cmapValuesHist);
-% catch ME
-%     plot(x,y, 'y.')
-% end
+catch ME
+     plot(x,y, 'y.')
+end
 set(gca,'color','k');
 set(gca, 'xlim', axisLimsX);
 set(gca, 'ylim', axisLimsY);
@@ -83,11 +83,16 @@ if contains(lower(roiName),'right'); hemi = 'R '; end
 if strcmp(hemi,'L ')
     roiName = strrep(ff_stringRemove(roiName, 'WangAtlas_'),'_left','');
     roiName = strrep(roiName,'l','');
+    roiName = strrep(roiName,'L_','');
 end
 if strcmp(hemi,'R ')
     roiName = strrep(ff_stringRemove(roiName, 'WangAtlas_'),'_right','');
     roiName = strrep(roiName,'r','');
+    roiName = strrep(roiName,'R_','');
 end
+roiName = strrep(roiName,'_wang','');
+roiName = strrep(roiName,'_','\_');
+
 text(minValueX+fov/4, maxValueY-fov/2, ...
     sprintf('%s %s',hemi, roiName) , 'HorizontalAlignment', 'left',...
      'Color','w','FontWeight','Bold','FontSize',fontsize+4)

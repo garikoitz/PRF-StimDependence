@@ -5,6 +5,7 @@ function  [percentAboveSubs] = crCreateScatterplot(R, C_data, cr, vfc, ...
                                                           fieldName, ...
                                                           fontsize,...
                                                           fname, visible)
+
 %%
 % colormap for histogram
 % cmapValuesHist = colormap('pink');
@@ -60,8 +61,11 @@ alphaValue = 0.4;
 cbarLocation = 'eastoutside';
 
 % end modification section
-
-numSubs = length(list_subInds);
+if istable(list_subInds)
+    numSubs = height(list_subInds);
+else
+    numSubs = length(list_subInds);
+end
 numRois = length(list_roiNames);
 
 % number of fields
@@ -191,8 +195,7 @@ A = cell(numRois, 5);
         poolallsubs2=[];
         for ii = 1:numSubs
 
-            subInd = list_subInds(ii);
-            
+           
             % rmRois for different ret models
             rmroi1 = R.rmroiCellSameVox{ii,jj,1}; 
             rmroi2 = R.rmroiCellSameVox{ii,jj,2};

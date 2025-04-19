@@ -6,7 +6,9 @@ function rmroiCoord = ff_rmroi_subset(rmroi, indx)
 
 rmroiCoord = rmroi; 
 if isfield(rmroi, 'coords')
-    rmroiCoord.coords = rmroi.coords(:,indx);
+    if ~isempty(rmroi.coords)
+        rmroiCoord.coords = rmroi.coords(:,indx);
+    end
 end
 if isfield(rmroi, 'indices')
     rmroiCoord.indices = rmroi.indices(indx);
@@ -33,13 +35,20 @@ rmroiCoord.ecc = rmroi.ecc(indx);
 
 % these fields are not always computed because it takes a while
 if isfield(rmroi, 'betaScale')
-    rmroiCoord.meanPeaks = rmroi.betaScale(indx);
+    if ~isempty(rmroi.betaScale)
+        rmroiCoord.betaScale = rmroi.betaScale(indx);
+    end
 end
 if isfield(rmroi, 'meanMax')
-    rmroiCoord.meanPeaks = rmroi.meanMax(indx);
+    if ~isempty(rmroi.meanMax)
+        rmroiCoord.meanMax = rmroi.meanMax(indx);
+    end
 end
+
 if isfield(rmroi, 'meanPeaks')
-    rmroiCoord.meanPeaks = rmroi.meanPeaks(indx);
+    if ~isempty(rmroi.meanPeaks)
+        rmroiCoord.meanPeaks = rmroi.meanPeaks(indx);
+    end
 end
 
 end
