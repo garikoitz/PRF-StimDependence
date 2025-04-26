@@ -4,7 +4,9 @@ function  [percentAboveSubs] = crCreateScatterplot(R, C_data, cr, vfc, ...
                                                           list_rmDescripts,...
                                                           fieldName, ...
                                                           fontsize,...
-                                                          fname, visible)
+                                                          fname, ...
+                                                          visible, ...
+                                                          sub_summary)
 
 %%
 % colormap for histogram
@@ -66,6 +68,7 @@ if istable(list_subInds)
 else
     numSubs = length(list_subInds);
 end
+valid_sessions = logical(ones([numSubs,1]));
 numRois = length(list_roiNames);
 
 % number of fields
@@ -165,10 +168,9 @@ A = cell(numRois, 5);
     end
     
     
-    
     switch numRois
-        % case 6
-        %     nrows = 2; ncols = 3;
+        case 9
+            nrows = 3; ncols = 3;
         case 8
             nrows = 2; ncols = 4;
         otherwise
@@ -412,11 +414,6 @@ A = cell(numRois, 5);
                     xlabel(['pRF eccentricity for ' rm1Descript ' (deg)'],'FontSize',fontsize)
                 end
         end
-        
-        
-        
-        
-        
     end % loop over rois
 
     % titleName = {
@@ -427,6 +424,20 @@ A = cell(numRois, 5);
     %      };
     % title(titleName, 'FontWeight', 'Bold');
     % fname = [titleName{1} '_' fieldName '_band-2x' num2str(fov)];
+    plot_info = strrep(fname,'_','\_');
+    if sub_summary
+%         assert(isequal(length(valid_sessions), size(R.rmroiCellSameVox, 1)))
+        for ii = 1:length(valid_sessions)
+            if isempty(R.rmroiCellSameVox{ii,1,1}) | isempty(R.rmroiCellSameVox{ii,1,2})
+                valid_sessions(ii) = false;
+            end
+        end
+        sub_info = table2string(list_subInds, valid_sessions);
+        sgtitle({plot_info, sub_info})
+    else
+        sgtitle(plot_info)
+    end
+    
     if ~isempty(fname)
         set(gcf, 'InvertHardcopy', 'off')
         saveas(gcf, fullfile(cr.dirs.FIGPNG, [fname '.png']), 'png')
