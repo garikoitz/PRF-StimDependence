@@ -195,9 +195,13 @@ A = cell(numRois, 5);
         
         poolallsubs1=[];
         poolallsubs2=[];
+<<<<<<< HEAD
         for ii = 1:numSubs
 
            
+=======
+        for ii = 1:numSubs            
+>>>>>>> master
             % rmRois for different ret models
             rmroi1 = R.rmroiCellSameVox{ii,jj,1}; 
             rmroi2 = R.rmroiCellSameVox{ii,jj,2};

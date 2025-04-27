@@ -16,6 +16,9 @@ p.addRequired('list_roiNames' , @iscell);
 p.addRequired('vfc'           , @isstruct);
 p.addOptional('show_summary'  , false , @islogical);
 
+subistable = false;
+if istable(list_subInds); subistable = true; end
+
 % Parse. Assign result inside each case
 p.parse(cr, rmroiCell, list_subInds, list_roiNames, vfc, varargin{:});
 % Read here only the generic ones
@@ -23,7 +26,7 @@ show_summary  = p.Results.show_summary;
 
 % INITIALIZE SOME THINGS
 numRois = length(list_roiNames);
-if istable(list_subInds)
+if subistable
     numSubs = height(list_subInds);
 else
     numSubs = length(list_subInds);
