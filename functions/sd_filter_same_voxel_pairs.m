@@ -39,6 +39,7 @@ X_rm2   = cell(1, numRois);
 Y_rm2   = cell(1, numRois);
 Ecc_rm1 = cell(1, numRois);
 Ecc_rm2 = cell(1, numRois);
+ECC_ICC = cell(1, numRois);
 
 % In comparing ret models, the collection of voxels may not be the same
 % because of the thresholding. In this cell we redefine the rmroi
@@ -139,6 +140,8 @@ for jj = 1:numRois
     sm_rm1    = [];
     sm_rm2    = []; 
     
+    
+
     for ii = 1:numSubs
         rmroi1 = rmroiCellSameVox{ii,jj,1};
         rmroi2 = rmroiCellSameVox{ii,jj,2};
@@ -208,6 +211,7 @@ end
 
 % Prepare the output
 R = struct();
+R.ICC = 
 R.rmroiCellSameVox = rmroiCellSameVox;
 R.L_data = L_data;
 R.X_rm1 = X_rm1;
