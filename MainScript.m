@@ -12,7 +12,23 @@ mrvCleanWorkspace;
 MainScript_helper;
 
 %% (1) SCATTERPLOTS
+%{ todo from last meeting
 
+check 10%
+choose one options
+we able to commit
+do several voxels so brian chooses one time series
+finish the correlation histogram one
+
+|||||||||
+
+analyze bcbl 
+analyze israel with our pipeline
+run with the GPU prf david
+
+
+Biran south portugal SEPT 6th to 13th
+%}
 
 %% FIGURE 2: (C) Eccentricity: Scatterplots: word-checkerboard (no IPS)
 % Define here first all the figures to be generated

@@ -189,10 +189,7 @@ A = cell(numRois, 5);
         
         poolallsubs1=[];
         poolallsubs2=[];
-        for ii = 1:numSubs
-
-            subInd = list_subInds(ii);
-            
+        for ii = 1:numSubs            
             % rmRois for different ret models
             rmroi1 = R.rmroiCellSameVox{ii,jj,1}; 
             rmroi2 = R.rmroiCellSameVox{ii,jj,2};

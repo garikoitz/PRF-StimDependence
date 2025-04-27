@@ -11,10 +11,13 @@ varargin = mrvParamFormat(varargin);
 p = inputParser;
 p.addRequired('cr'            , @isstruct);
 p.addRequired('rmroicell'     , @iscell);
-p.addRequired('list_subInds'  , @isnumeric);
+p.addRequired('list_subInds');
 p.addRequired('list_roiNames' , @iscell);
 p.addRequired('vfc'           , @isstruct);
 p.addOptional('show_summary'  , false , @islogical);
+
+subistable = false;
+if istable(list_subInds); subistable = true; end
 
 % Parse. Assign result inside each case
 p.parse(cr, rmroiCell, list_subInds, list_roiNames, vfc, varargin{:});
@@ -23,7 +26,11 @@ show_summary  = p.Results.show_summary;
 
 % INITIALIZE SOME THINGS
 numRois = length(list_roiNames);
-numSubs = length(list_subInds);
+if subistable; 
+    numSubs = height(list_subInds)
+else
+    numSubs = length(list_subInds);
+end
 % cell for linearizing the data (a vector for each ROI)
 L_data  = cell(1, numRois);
 X_rm1   = cell(1, numRois);

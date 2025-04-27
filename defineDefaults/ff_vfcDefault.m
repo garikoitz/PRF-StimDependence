@@ -47,9 +47,13 @@ function vfc = ff_vfcDefault(site)
             vfc.eccthresh       = [0.2 7];
             vfc.sigmaEffthresh  = [0.2 7];   % sigma effect (sigmaMajor/sqrt(exponent))
             vfc.sigmaMajthresh  = [0 14];  % sigma major 
-
+        case 'BCBL'
+            vfc.fieldRange      = 9;
+            vfc.eccthresh       = [0.2 9];
+            vfc.sigmaEffthresh  = [0.2 9];   % sigma effect (sigmaMajor/sqrt(exponent))
+            vfc.sigmaMajthresh  = [0 9];  % sigma major 
         otherwise
-            error('Only SNI or ISRAEL are allowed')
+            error('Only BCBL, SNI or ISRAEL are allowed')
     end
 
 end
