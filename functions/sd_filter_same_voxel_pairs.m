@@ -1,4 +1,4 @@
-function [R,C_data,cr]=sd_filter_same_voxel_pairs(cr,...
+function [R,C_data,cr, icc_table]=sd_filter_same_voxel_pairs(cr,...
                                          rmroiCell, ...
                                          list_subInds,...
                                          list_roiNames,...
@@ -15,6 +15,10 @@ p.addRequired('list_subInds');
 p.addRequired('list_roiNames' , @iscell);
 p.addRequired('vfc'           , @isstruct);
 p.addOptional('show_summary'  , false , @islogical);
+p.addOptional('calculate_icc' , false , @islogical);
+p.addOptional('rmNames'       , {'NA', 'NA'}, @iscellstr);
+p.addOptional('icc_meas'      , 'ecc', @ischar);
+
 
 subistable = false;
 if istable(list_subInds); subistable = true; end
@@ -23,13 +27,61 @@ if istable(list_subInds); subistable = true; end
 p.parse(cr, rmroiCell, list_subInds, list_roiNames, vfc, varargin{:});
 % Read here only the generic ones
 show_summary  = p.Results.show_summary;
+calculate_icc = p.Results.calculate_icc;
+rmNames       = p.Results.rmNames;
+icc_meas      = p.Results.icc_meas;
 
 % INITIALIZE SOME THINGS
 numRois = length(list_roiNames);
 if subistable
     numSubs = height(list_subInds);
-else
+else  
     numSubs = length(list_subInds);
+end
+% if calculate_icc is true, see if a table of subs was passed and only one
+% sub was passed. 
+icc_table = table();
+if calculate_icc
+    if ~subistable
+        warning(['calculate_icc=true will be ignored, as list_subInds is not '...
+                'a table. This will be only used to calculate the ICC for one '...
+                'subject across different sessions'])
+    end
+    if length(unique(list_subInds.sub)) > 1
+        warning(['calculate_icc=true will be ignored, as list_subInds is a table ' ...
+                 'with more than one subject. This will be only used to calculate ' ...
+                 'the ICC for one subject across different sessions'])
+    end
+    disp('Conditions to calculate per-subject intra-session ICC seem ok, doing')
+    roi_data_icc = NaN(1, numRois);
+    for nm = 1:2
+        if ~isempty(rmroiCell{1,1,nm})
+            for nr = 1:numRois
+                M = NaN(numSubs, size(rmroiCell{1,nr,nm}.(icc_meas),2));
+                for ii=1:height(list_subInds)
+                    if ~isempty(rmroiCell{ii,nr,nm})
+                        M(ii,:) = rmroiCell{ii,nr,nm}.(icc_meas);
+                    end
+                end
+                % Invert it so that sessions are observations
+                MM = M';
+                % Remove columns with NaN (not acquired or any other problem)
+                MM(:, any(isnan(MM), 1)) = [];
+                % If there is only one sub, ignore, no ICC
+                if size(M,2) > 1
+                    roi_data_icc(nr) = compute_icc31(MM);
+                else
+                    roi_data_icc(nr) = 0;
+                end
+            end
+            % Create the table
+            CT = [{unique(list_subInds.sub)}, {categorical(rmNames(nm))}, ...
+                {categorical(string(icc_meas))}, num2cell(roi_data_icc)];
+            T = cell2table(CT, 'VariableNames', ['sub', 'type', 'meas', list_roiNames]);
+            icc_table = [icc_table; T];
+        end
+   end
+
 end
 % cell for linearizing the data (a vector for each ROI)
 L_data  = cell(1, numRois);
@@ -39,7 +91,6 @@ X_rm2   = cell(1, numRois);
 Y_rm2   = cell(1, numRois);
 Ecc_rm1 = cell(1, numRois);
 Ecc_rm2 = cell(1, numRois);
-ECC_ICC = cell(1, numRois);
 
 % In comparing ret models, the collection of voxels may not be the same
 % because of the thresholding. In this cell we redefine the rmroi
@@ -211,7 +262,6 @@ end
 
 % Prepare the output
 R = struct();
-R.ICC = 
 R.rmroiCellSameVox = rmroiCellSameVox;
 R.L_data = L_data;
 R.X_rm1 = X_rm1;
