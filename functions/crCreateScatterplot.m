@@ -1,4 +1,4 @@
-function  [percentAboveSubs] = crCreateScatterplot(R, C_data, cr, vfc, ...
+function  [percentAboveSubs, xx] = crCreateScatterplot(R, C_data, cr, vfc, ...
                                                           list_subInds,...
                                                           list_roiNames,...
                                                           list_rmDescripts,...
@@ -177,11 +177,13 @@ A = cell(numRois, 5);
             nrows = 1; ncols = numRois;
     end
 
-    
+
+
+
     xx = mrvNewGraphWin('Scatterplots', [], visible);
     position = [0 0 1 .75];
     set(xx,'Position',position);
-    ha = tight_subplot(nrows,ncols,[.005 .01],[.05 .01],[.05 .01]);
+
     
     for jj = 1:numRois
         roiName = list_roiNames{jj};
@@ -316,18 +318,12 @@ A = cell(numRois, 5);
                 case {8}
                     if jj==1 || jj==(numRois/2)+1
                         ylabel(['pRF eccentricity for ' rm2Descript ' (deg)'],'FontSize',fontsize)
-                        % set(ha(jj),'YTickLabel',ha(jj).YTick);set(ha(jj),'YTick',ha(jj).YTick)
-                    else
-                        % set(ha(jj),'YTickLabel','');set(ha(jj),'YTick','')
                     end
                     if any(~(jj==(numRois/2) || jj==(numRois)))
                         set(c, 'visible', 'off')
                     end
-                    if jj<=(numRois/2)
-                        % set(ha(jj),'XTickLabel','');set(ha(jj),'XTick','')
-                    else
+                    if jj>(numRois/2)
                         xlabel(['pRF eccentricity for ' rm1Descript ' (deg)'],'FontSize',fontsize)
-                         %set(ha(jj),'XTickLabel',ha(jj).XTick);set(ha(jj),'XTick',ha(jj).XTick)
                     end
                 case {5,6}
                     if jj==1
@@ -336,9 +332,7 @@ A = cell(numRois, 5);
                     if any(~(jj==(numRois/2) || jj==(numRois)))
                         set(c, 'visible', 'off')
                     end
-                    
                     xlabel(['pRF eccentricity for ' rm1Descript ' (deg)'],'FontSize',fontsize)
-                                        
                 otherwise
                     ylabel(['pRF eccentricity for ' rm2Descript ' (deg)'],'FontSize',fontsize)
                     xlabel(['pRF eccentricity for ' rm1Descript ' (deg)'],'FontSize',fontsize)

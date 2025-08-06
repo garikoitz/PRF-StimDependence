@@ -5,17 +5,20 @@
 % this specific project from others, we need to separate data from code.
 
 % All data from the server has been read on the variable sd_data. 
-tbUse PRF-StimDependence;
+% tbUse PRF-StimDependence;
 
 close all; clear all;
 mrvCleanWorkspace;
 MainScript_helper;
 
 %% (1) SCATTERPLOTS
-%{ todo from last meeting
+%{ 
+todo from last meeting
 
+
+TODOs from Meetings with Brian
 check 10%
-choose one options
+choose one option
 DONE: we able to commit
 do several voxels so brian chooses one time series
 finish the correlation histogram one
@@ -28,13 +31,18 @@ run with the GPU prf david
 
 
 Brian south Portugal SEPT 6th to 13th
+
+
+HACER EL DE USUARIO A USUARIO CON LOS DE CNI Y 
+VER SI TENGO AQUI LOS DATOS DE ISRAEL DE SURFACE
+
 %}
 
 %% FIGURE 2: (C) Eccentricity: Scatterplots: word-checkerboard (no IPS)
 % Define here first all the figures to be generated
-VEs = [0.2, 0.1, 0.05]; % We used VE limits of 20% and 5% in previous plots. 
-min_sizes = [0.5, 1]; % Restrict pRF size, leave 0 to compare with old results
-min_eccs = [1, 2]; % Remove fovea, leave 0 to compare with old results. 
+VEs = [0.1]; % We used VE limits of 20% and 5% in previous plots. 
+min_sizes = [1]; % Restrict pRF size, leave 0 to compare with old results
+min_eccs = [2]; % Remove fovea, leave 0 to compare with old results. 
 left_dorsal = {'WangAtlas_V1d_left', 'WangAtlas_V2d_left', 'WangAtlas_V3d_left', ...
                'WangAtlas_V3A_left', 'WangAtlas_IPS0_left','WangAtlas_IPS1_left'};
 left_ventral = {'WangAtlas_V1v_left', 'WangAtlas_V2v_left', 'WangAtlas_V3v_left', ...
@@ -42,17 +50,19 @@ left_ventral = {'WangAtlas_V1v_left', 'WangAtlas_V2v_left', 'WangAtlas_V3v_left'
 right_dorsal = strrep(left_dorsal, 'left','right');
 right_ventral = strrep(left_ventral, 'left','right');
 % We can plot several combinations, start with this
-roi_groups = {'left_ventral', 'left_dorsal', 'right_ventral', 'right_dorsal',}; 
+roi_groups = {'left_ventral'}; % , 'left_dorsal', 'right_ventral', 'right_dorsal'};
 sites = {'CNI', 'ISRAEL'};
 what2plots = {'ecc'};
+separate_subjects = true;
 % Generate a struct with all figure names and options
 figures = struct();
 ii = 0;
 for site=sites;for VE=VEs;for min_size=min_sizes;for min_ecc=min_eccs;
 for roi_group=roi_groups; for what2plot=what2plots  % ;end;end;end;end;end;end
     ii = ii + 1;
+    figures(ii).separate_subjects = separate_subjects;
     figures(ii).fname = sprintf(...
-                        '%s-scatterplot_site-%s_VE-%i%%_minsize-%.2g_minecc-%.2g_rois-%s', ...
+                        '%s-scatterplot_site-%s_VE-%i%%_minsize-%.2g_minec-%.2g_rois-%s', ...
                          what2plot{:}, site{:}, 100*VE, min_size, min_ecc, roi_group{:});
     figures(ii).site = site{:};
     figures(ii).VE = VE;
@@ -83,8 +93,6 @@ for nf = replicate_index
         [rm1, rm2] = sd_data.(f.site).list_dtNames{nrr};
         new_fname = strrep(f.fname, 'scatterplot', ['scatterplot-' rm1 '-' rm2]);
         fprintf('\nNow doing %i/%i,%i/%i >>> %s\n', nf,nri,nr,size(NR,1),new_fname)
-        % Filter the main dataset (all subject, less rois, 2 rm-s)
-        rmrcell_pairs = rmrcell(:, f.roi_inds.(f.roi_group), nrr);
         % Change the defaults for filtering and plotting
         % Eccentricity minimum and maximum
         sd_data.(f.site).vfc.eccthresh = f.sizes;
@@ -94,25 +102,83 @@ for nf = replicate_index
         % Minimum variance explained (VE)
         sd_data.(f.site).vfc.cothresh = f.VE;
 
-        % Filter the data so that we only have valid voxels
-        [R,C_data,cr] = sd_filter_same_voxel_pairs(cr,...
-                                       rmrcell_pairs,...
-                                       sd_data.(f.site).list_subInds,...
-                                       f.roi_groups.(f.roi_group),...
-                                       sd_data.(f.site).vfc, ...
-                                       'show_summary', true);
-        % Plot it
-        fontsize = 12;
-        % figure(nr)
-        [percAboveIdentity] = crCreateScatterplot(R, C_data, cr, ...
-                                    sd_data.(f.site).vfc, ...
-                                    sd_data.(f.site).list_subInds,...
-                                    f.roi_groups.(f.roi_group),...
-                                    sd_data.(f.site).list_dtNames(nrr),...
-                                    'ecc', ...
-                                    fontsize, ...
-                                    '', ... %new_fname,
-                                    'on');
+
+        % The code is similar to VOTCLOC but different, in VOTCLOC we hade
+        % few subjects and lots of sessions. In this case we only have one
+        % session per each subjects, so basically we plot them together
+        % with the existing code or we reuse it to create a figure of
+        % figures with individual subject.
+        if ~f.separate_subjects
+            % PLOT ALL SUBJECTS
+            % %%%%%%%%%%%%%%%%%%
+
+            % Filter the main dataset (all subject, less rois, 2 rm-s)
+            rmrcell_pairs = rmrcell(:, f.roi_inds.(f.roi_group), nrr);
+            % Filter the data so that we only have valid voxels
+            [R, C_data, cr] = sd_filter_same_voxel_pairs(cr,...
+                                        rmrcell_pairs,...
+                                        sd_data.(f.site).list_subInds,...
+                                        f.roi_groups.(f.roi_group),...
+                                        sd_data.(f.site).vfc, ...
+                                        'show_summary', true);
+            % Plot it
+            fontsize = 12;
+            % figure(nr)
+            visible = 'on';
+            subject_summary_in_title = false;
+            fig_name = new_fname;
+            fig_name = ''; % Will not save, for tests
+            [percAboveIdentity, xx] = crCreateScatterplot(R, C_data, cr, ...
+                                        sd_data.(f.site).vfc, ...
+                                        sd_data.(f.site).list_subInds,...
+                                        f.roi_groups.(f.roi_group),...
+                                        sd_data.(f.site).list_dtNames(nrr),...
+                                        'ecc', ...
+                                        fontsize, ...
+                                        fig_name, ...
+                                        visible, ...
+                                        subject_summary_in_title);
+
+        else
+            % PLOT SUBJECTS SEPARATELY
+            % %%%%%%%%%%%%%%%%%%%%%%%%%
+            all_subs = sd_data.(f.site).list_subInds;
+            for ns = 1:length(all_subs)
+                % Filter the main dataset (all subject, less rois, 2 rm-s)
+                rmrcell_pairs = rmrcell(ns, f.roi_inds.(f.roi_group), nrr);
+                if isempty(rmrcell_pairs{1,1,1}) | isempty(rmrcell_pairs{1,1,2})
+                    continue
+                end
+                % Filter the data so that we only have valid voxels
+                [R, C_data, cr] = sd_filter_same_voxel_pairs(cr,...
+                                                    rmrcell_pairs,...
+                                                    ns,...
+                                                    f.roi_groups.(f.roi_group),...
+                                                    sd_data.(f.site).vfc, ...
+                                                    'show_summary', false, ...
+                                                    'calculate_icc', false, ...
+                                                    'rmNames', {rm1, rm2});
+                % Plot it
+                fontsize = 12;
+                new_new_fname = strrep(new_fname, f.what2plot, ...
+                    [f.what2plot '_subind-' num2str(sd_data.(f.site).list_subInds(ns))]);
+                new_new_fname = strrep(new_new_fname, '-scatterplot', '_scatterplot');
+                % new_new_fname = '';
+                visible = 'off';
+                subject_summary_in_title = false;
+                [percAboveIdentity] = crCreateScatterplot(R, C_data, cr, ...
+                                            sd_data.(f.site).vfc, ...
+                                            sd_data.(f.site).list_subInds(ns),...
+                                            f.roi_groups.(f.roi_group),...
+                                            sd_data.(f.site).list_dtNames(nrr),...
+                                            'ecc', ...
+                                            fontsize, ...
+                                            new_new_fname, ...
+                                            visible, ...
+                                            subject_summary_in_title);
+
+            end
+        end
 
     end
 end
@@ -120,15 +186,33 @@ end
 
 
 
+ISRAEL_subjecs_png = dir(fullfile(cr.dirs.FIGPNG,'ecc_subind*Words_English-Checkers_site-ISRAEL_VE-10%_minsize-1_minec-2_rois-left_ventral.png'));
+rect_size_5_plots = [500 750 3449 549];
+rsy = rect_size_5_plots(4)+1;
+rsx = rect_size_5_plots(3)+1;
+Icropmontage = uint8(zeros([length(ISRAEL_subjecs_png)*rsy,rsx, 3]));
+for ni=1:length(ISRAEL_subjecs_png)
+    I = imread(fullfile(ISRAEL_subjecs_png(ni).folder, ISRAEL_subjecs_png(ni).name));
+    Icropped = imcrop(I, rect_size_5_plots);
+    Icropmontage(rsy*(ni-1)+1:rsy*ni,:,:) = Icropped;
+end
+fname = fullfile(cr.dirs.FIGPNG,'ecc_ALLSUBS_subind_Words-Checkers_site-ISRAEL_VE-10%_minsize-1_minec-2_rois-left_ventral.png');
+imwrite(Icropmontage, fname);
 
 
 
-
-
-
-
-
-
+CNI_subjects_png = dir(fullfile(cr.dirs.FIGPNG,'ecc_subind*Words-Checkers_site-CNI_VE-10%_minsize-1_minec-2_rois-left_ventral.png'));
+rect_size_5_plots = [500 750 3449 549];
+rsy = rect_size_5_plots(4)+1;
+rsx = rect_size_5_plots(3)+1;
+Icropmontage = uint8(zeros([length(CNI_subjects_png)*rsy,rsx, 3]));
+for ni=1:length(CNI_subjects_png)
+    I = imread(fullfile(CNI_subjects_png(ni).folder, CNI_subjects_png(ni).name));
+    Icropped = imcrop(I, rect_size_5_plots);
+    Icropmontage(rsy*(ni-1)+1:rsy*ni,:,:) = Icropped;
+end
+fname = fullfile(cr.dirs.FIGPNG,'ecc_ALLSUBS_subind_Words-Checkers_site-CNI_VE-10%_minsize-1_minec-2_rois-left_ventral.png');
+imwrite(Icropmontage, fname);
 
 
 
